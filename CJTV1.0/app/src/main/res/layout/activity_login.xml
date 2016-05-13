@@ -35,7 +35,7 @@
             android:id="@+id/login_header_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/login_header"
+            android:text="@string/login_button"
             android:layout_marginTop="20dp"
             android:layout_centerHorizontal="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
@@ -104,7 +104,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:inputType="textPassword"/>
 
-        <TextView
+        <Spinner
             android:id="@+id/login_vehicle_list"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
@@ -114,11 +114,21 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/login_vehicle_bg"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="CH001"
+            android:textColor="@color/black"
             android:gravity="center|left"
-            android:paddingLeft="55dp"/>
+            android:paddingLeft="45dp"/>
+
+        <ImageView
+            android:id="@+id/login_vehicle_down_arrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignRight="@+id/login_txt_password"
+            android:layout_below="@+id/login_txt_password"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/icon_arrow_down_black" />
 
         <Button
+            android:id="@+id/login_btn_login"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignLeft="@+id/img_bp"
