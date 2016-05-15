@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@mipmap/icon_refresh"
+        app:showAsAction="ifRoom"
+        android:title="Refresh"/>
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@mipmap/icon_logout"
+        app:showAsAction="ifRoom"
+        android:title="Logout"/>
+    <item
+        android:id="@+id/action_version"
+        android:title="@string/app_name">
+    </item>
+
+</menu>

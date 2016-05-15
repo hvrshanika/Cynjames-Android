@@ -4,4 +4,12 @@
     <string name="login_username">Username</string>
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
+    <string name="main_concept">Concept</string>
+    <string name="main_jobs_pending">Jobs Pending</string>
+    <string name="main_view_now">View Now</string>
+    <string name="main_concept_ready">Concept Ready for Delivery</string>
+    <string name="main_adhocs">Ad Hocs</string>
+    <string name="main_messages">Messages</string>
+    <string name="main_unread">Unread Messages</string>
+    <string name="main_ready_delivery">Ready for Delivery</string>
 </resources>

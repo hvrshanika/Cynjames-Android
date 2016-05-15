@@ -2,15 +2,16 @@ package au.com.cynjames.login;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.RequestParams;
@@ -20,7 +21,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import au.com.cynjames.Utils.GenericMethods;
+import au.com.cynjames.mainView.MainActivity;
+import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
@@ -28,12 +30,13 @@ import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles;
 import au.com.cynjames.models.Vehicles.Vehicle;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends AppCompatActivity {
     Gson gson;
     Spinner vehicleList;
     Context context;
     EditText username;
     EditText password;
+    Editor prefsEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class LoginActivity extends Activity {
         else{
             GenericMethods.showNoInternetDialog(context);
         }
+        SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        prefsEditor = mPrefs.edit();
     }
 
     private void init(){
@@ -72,14 +77,15 @@ public class LoginActivity extends Activity {
         } else if (password.getText().toString().isEmpty()) {
             GenericMethods.showToast(context, "Please enter your password");
         } else if (vehicleList.getSelectedItemPosition() != 0) {
-            sendLoginRequest(username.getText().toString(), password.getText().toString(), (Vehicle) vehicleList.getSelectedItem());
+            if(GenericMethods.isConnectedToInternet(this)) {
+                sendLoginRequest(username.getText().toString(), password.getText().toString(), (Vehicle) vehicleList.getSelectedItem());
+            }
+            else{
+                GenericMethods.showNoInternetDialog(context);
+            }
         } else {
             GenericMethods.showToast(context, "Please select Vehicle id");
         }
-    }
-
-    private void vehicleListClicked(){
-
     }
 
     private void sendLoginRequest(String userName, String password, Vehicle vehicle) {
@@ -112,11 +118,17 @@ public class LoginActivity extends Activity {
 
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
-            GenericMethods.showToast(context,jSONObject.getString("message"));
             if (jSONObject.getInt("success") == 1) {
                 User user = (User) gson.fromJson(jSONObject.toString(), User.class);
                 user.setVehicle(vehicle);
-                return;
+                String jsonUser = gson.toJson(user);
+                prefsEditor.putString("User", jsonUser);
+                prefsEditor.commit();
+                Intent intent = new Intent(context, MainActivity.class);
+                startActivity(intent);
+            }
+            else{
+                GenericMethods.showToast(context,jSONObject.getString("message"));
             }
         }
     }

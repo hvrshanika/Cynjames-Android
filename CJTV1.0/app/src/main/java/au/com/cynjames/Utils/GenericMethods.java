@@ -1,4 +1,4 @@
-package au.com.cynjames.Utils;
+package au.com.cynjames.utils;
 
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.NetworkInfo.State;
 import android.widget.Toast;
 
 /**
@@ -32,6 +31,7 @@ public class GenericMethods {
     public static ProgressDialog getProgressDialog(Context context) {
         ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
         progressDialog.setMessage("Please Wait...");
         return progressDialog;
     }

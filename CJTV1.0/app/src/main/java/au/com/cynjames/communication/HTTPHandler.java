@@ -7,7 +7,7 @@ import com.loopj.android.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import au.com.cynjames.Utils.GenericMethods;
+import au.com.cynjames.utils.GenericMethods;
 import cz.msebera.android.httpclient.Header;
 
 public class HTTPHandler {
