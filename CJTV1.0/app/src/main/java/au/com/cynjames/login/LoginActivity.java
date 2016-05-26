@@ -29,6 +29,7 @@ import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles;
 import au.com.cynjames.models.Vehicles.Vehicle;
+import au.com.cynjames.utils.SQLiteHelper;
 
 public class LoginActivity extends AppCompatActivity {
     Gson gson;
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText username;
     EditText password;
     Editor prefsEditor;
+    SQLiteHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
         prefsEditor = mPrefs.edit();
+        db = new SQLiteHelper(this);
     }
 
     private void init(){
@@ -92,11 +95,11 @@ public class LoginActivity extends AppCompatActivity {
         RequestParams params = new RequestParams();
         params.add("username", userName);
         params.add("password", password);
-        HTTPHandler.post("login.php", params,  new HTTPHandler.ResponseManager(new LoginChecker(vehicle), context));
+        HTTPHandler.post("cjt-login.php", params,  new HTTPHandler.ResponseManager(new LoginChecker(vehicle), context, "Please Wait..."));
     }
 
     private void loadVehicleList(){
-        HTTPHandler.post("vehicles.php", null, new HTTPHandler.ResponseManager(new VehicleListLoader(), context));
+        HTTPHandler.post("cjt-vehicles.php", null, new HTTPHandler.ResponseManager(new VehicleListLoader(), context, "Please Wait..."));
     }
 
     public class VehicleListLoader implements ResponseListener {
@@ -121,7 +124,9 @@ public class LoginActivity extends AppCompatActivity {
             if (jSONObject.getInt("success") == 1) {
                 User user = (User) gson.fromJson(jSONObject.toString(), User.class);
                 user.setVehicle(vehicle);
-                String jsonUser = gson.toJson(user);
+                db.clearTable("user");
+                db.addUser(user);
+                String jsonUser = gson.toJson(user.getUserid());
                 prefsEditor.putString("User", jsonUser);
                 prefsEditor.commit();
                 Intent intent = new Intent(context, MainActivity.class);

@@ -18,6 +18,72 @@ public class ConceptBooking implements Serializable {
     private int pallets;
     private int parcels;
     private int conceptBookingStatus;
+    private int conceptBookingTailLift;
+
+    public String getConceptPickupSignature() {
+        return conceptPickupSignature;
+    }
+
+    public void setConceptPickupSignature(String conceptPickupSignature) {
+        this.conceptPickupSignature = conceptPickupSignature;
+    }
+
+    public String getConceptPickupName() {
+        return conceptPickupName;
+    }
+
+    public void setConceptPickupName(String conceptPickupName) {
+        this.conceptPickupName = conceptPickupName;
+    }
+
+    public String getArrivedConcept() {
+        return arrivedConcept;
+    }
+
+    public void setArrivedConcept(String arrivedConcept) {
+        this.arrivedConcept = arrivedConcept;
+    }
+
+    private String conceptPickupSignature;
+    private String conceptPickupName;
+    private String arrivedConcept;
+
+    public String getConceptBookingPickupDate() {
+        return conceptBookingPickupDate;
+    }
+
+    public void setConceptBookingPickupDate(String conceptBookingPickupDate) {
+        this.conceptBookingPickupDate = conceptBookingPickupDate;
+    }
+
+    private String conceptBookingPickupDate;
+
+    public int getConceptBookingTailLift() {
+        return conceptBookingTailLift;
+    }
+
+    public void setConceptBookingTailLift(int conceptBookingTailLift) {
+        this.conceptBookingTailLift = conceptBookingTailLift;
+    }
+
+    public int getConceptBookingHandUnload() {
+        return conceptBookingHandUnload;
+    }
+
+    public void setConceptBookingHandUnload(int conceptBookingHandUnload) {
+        this.conceptBookingHandUnload = conceptBookingHandUnload;
+    }
+
+    public int getConceptBookingUrgent() {
+        return conceptBookingUrgent;
+    }
+
+    public void setConceptBookingUrgent(int conceptBookingUrgent) {
+        this.conceptBookingUrgent = conceptBookingUrgent;
+    }
+
+    private int conceptBookingHandUnload;
+    private int conceptBookingUrgent;
 
     public int getId() {
         return id;

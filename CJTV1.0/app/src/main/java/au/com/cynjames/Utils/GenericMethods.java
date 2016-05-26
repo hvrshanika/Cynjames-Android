@@ -8,6 +8,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by eleos on 5/13/2016.
  */
@@ -28,11 +31,11 @@ public class GenericMethods {
         Toast.makeText(con, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static ProgressDialog getProgressDialog(Context context) {
+    public static ProgressDialog getProgressDialog(Context context, String message) {
         ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
-        progressDialog.setMessage("Please Wait...");
+        progressDialog.setMessage(message);
         return progressDialog;
     }
 
@@ -47,6 +50,18 @@ public class GenericMethods {
             }
         });
         build.create().show();
+    }
+
+    public static String getDisplayDate(Date date) {
+        if (date == null) {
+            date = new Date();
+
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String d=formatter.format(date);
+        return d;
+
     }
 
 }

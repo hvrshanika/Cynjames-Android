@@ -20,6 +20,16 @@
         android:background="@drawable/login_content_bg"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
+    <ImageView
+        android:id="@+id/main_truck_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignRight="@+id/main_welcome_user_text"
+        android:layout_alignTop="@+id/main_welcome_user_text"
+        android:layout_marginRight="5dp"
+        android:src="@mipmap/truck_icon"
+        android:visibility="gone"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

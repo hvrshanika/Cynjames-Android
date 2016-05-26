@@ -37,10 +37,10 @@ public class HTTPHandler {
         final Context context;
         ProgressDialog progressDialog;
 
-        public ResponseManager(ResponseListener responseListener, Context context) {
+        public ResponseManager(ResponseListener responseListener, Context context, String msg) {
             this.responseListener = responseListener;
             this.context = context;
-            progressDialog = GenericMethods.getProgressDialog(context);
+            progressDialog = GenericMethods.getProgressDialog(context, msg);
         }
 
         public void onStart() {

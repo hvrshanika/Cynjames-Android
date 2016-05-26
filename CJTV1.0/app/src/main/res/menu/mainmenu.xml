@@ -16,5 +16,17 @@
         android:id="@+id/action_version"
         android:title="@string/app_name">
     </item>
+    <item
+        android:id="@+id/action_ariive_concept"
+        android:title="">
+    </item>
+    <item
+        android:id="@+id/action_arrive_client"
+        android:title="">
+    </item>
+    <item
+        android:id="@+id/action_difference"
+        android:title="">
+    </item>
 
 </menu>

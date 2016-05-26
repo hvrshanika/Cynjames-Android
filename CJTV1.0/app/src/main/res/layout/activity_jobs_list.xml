@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="au.com.cynjames.mainView.JobsListActivity">
+
+    <TextView
+        android:id="@+id/fragment_jobs_list_header_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:paddingLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center|left"
+        android:text="Concept Jobs"
+        android:textColor="@color/black"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <View
+        android:id="@+id/view_seperator"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/light_gray"
+        android:layout_below="@+id/fragment_jobs_list_header_text"/>
+
+    <TextView
+        android:id="@+id/fragment_jobs_list_header_back_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/fragment_jobs_list_back"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:background="@drawable/main_viewnow_orange_bg"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/fragment_jobs_list_header_depart_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/fragment_jobs_list_header_back_button"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/fragment_jobs_list_depart"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:background="@drawable/main_viewnow_orange_bg"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ListView
+        android:id="@+id/fragment_jobs_list_jobs_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fragment_jobs_list_header_text"
+        android:layout_marginTop="2dp"/>
+
+</RelativeLayout>

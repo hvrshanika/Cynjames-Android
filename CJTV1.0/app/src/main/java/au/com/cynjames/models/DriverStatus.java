@@ -34,19 +34,19 @@ public class DriverStatus implements Serializable {
         this.driverStatusDescription = driverStatusDescription;
     }
 
-    public String getDriverStatusLongitude() {
+    public double getDriverStatusLongitude() {
         return driverStatusLongitude;
     }
 
-    public void setDriverStatusLongitude(String driverStatusLongitude) {
+    public void setDriverStatusLongitude(double driverStatusLongitude) {
         this.driverStatusLongitude = driverStatusLongitude;
     }
 
-    public String getDriverStatusLatitude() {
+    public double getDriverStatusLatitude() {
         return driverStatusLatitude;
     }
 
-    public void setDriverStatusLatitude(String driverStatusLatitude) {
+    public void setDriverStatusLatitude(double driverStatusLatitude) {
         this.driverStatusLatitude = driverStatusLatitude;
     }
 
@@ -58,17 +58,17 @@ public class DriverStatus implements Serializable {
         this.driverStatus_driverId = driverStatus_driverId;
     }
 
-    public int getDriverStatus_vehicleId() {
+    public String getDriverStatus_vehicleId() {
         return driverStatus_vehicleId;
     }
 
-    public void setDriverStatus_vehicleId(int driverStatus_vehicleId) {
+    public void setDriverStatus_vehicleId(String driverStatus_vehicleId) {
         this.driverStatus_vehicleId = driverStatus_vehicleId;
     }
 
-    private String driverStatusLongitude;
-    private String driverStatusLatitude;
+    private double driverStatusLongitude;
+    private double driverStatusLatitude;
     private int driverStatus_driverId;
-    private int driverStatus_vehicleId;
+    private String driverStatus_vehicleId;
 
 }
