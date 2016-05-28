@@ -127,7 +127,9 @@ public class LoginActivity extends AppCompatActivity {
                 db.clearTable("user");
                 db.addUser(user);
                 String jsonUser = gson.toJson(user.getUserid());
+                String jsonVehicle = gson.toJson(vehicle, Vehicle.class);
                 prefsEditor.putString("User", jsonUser);
+                prefsEditor.putString("Vehicle", jsonVehicle);
                 prefsEditor.commit();
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);

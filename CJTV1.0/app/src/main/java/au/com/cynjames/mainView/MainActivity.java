@@ -45,6 +45,8 @@ import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.DriverStatus;
 import au.com.cynjames.models.User;
+import au.com.cynjames.models.Vehicles;
+import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity{
     List<ConceptBooking> deliverReadyJobs;
     Location mLastLocation;
     ImageView pendingIcon;
+    Vehicle vehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +119,9 @@ public class MainActivity extends AppCompatActivity{
             case R.id.action_logout:
                 logoutUser();
                 break;
+            case R.id.action_log:
+                logsBtnClicked();
+                break;
             default:
                 break;
         }
@@ -129,6 +135,11 @@ public class MainActivity extends AppCompatActivity{
         super.onDestroy();
     }
 
+    @Override
+    public void onBackPressed() {
+        logoutUser();
+    }
+
     private void updateMenuTitles() {
         MenuItem arriveConcept = menu.findItem(R.id.action_ariive_concept);
         MenuItem arriveClient = menu.findItem(R.id.action_arrive_client);
@@ -139,6 +150,14 @@ public class MainActivity extends AppCompatActivity{
         if (user.getUserArriveClient() != null) {
             arriveClient.setTitle(user.getUserArriveClient());
         }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        getUser();
+        invalidateOptionsMenu();
+        updateLabels();
     }
 
     private void init() {
@@ -196,6 +215,8 @@ public class MainActivity extends AppCompatActivity{
         String jsonUser = mPrefs.getString("User", "");
         int id = gson.fromJson(jsonUser, Integer.TYPE);
         user = db.getUser(id);
+        String jsonVehicle = mPrefs.getString("Vehicle", "");
+        vehicle = gson.fromJson(jsonVehicle, Vehicle.class);
     }
 
     public class PendingListLoader implements ResponseListener{
@@ -212,6 +233,10 @@ public class MainActivity extends AppCompatActivity{
 
                 }
                 updateLabels();
+                if(pendingJobs.size()>0){
+                    pendingIcon.setVisibility(View.VISIBLE);
+                    playSound();
+                }
             }
         }
     }
@@ -221,10 +246,7 @@ public class MainActivity extends AppCompatActivity{
         deliverReadyJobs = db.getReadyJobs();
         pendingCount.setText(String.valueOf(pendingJobs.size()));
         deliverReadyCount.setText(String.valueOf(deliverReadyJobs.size()));
-        if(pendingJobs.size()>0){
-            pendingIcon.setVisibility(View.VISIBLE);
-            playSound();
-        }
+
     }
 
     private void updateDriverStauts(){
@@ -234,7 +256,7 @@ public class MainActivity extends AppCompatActivity{
         status.setDriverStatusTime(c.getTime().toString());
         status.setDriverStatus_driverId(user.getDriverId());
         status.setDriverStatusDescription("Locating Driver");
-        status.setDriverStatus_vehicleId(user.getVehicle().getVehicleId());
+        status.setDriverStatus_vehicleId(vehicle.getVehicleId());
         status.setDriverStatusLatitude(mLastLocation.getLatitude());
         status.setDriverStatusLongitude(mLastLocation.getLongitude());
         db.addDriverStatus(status);
@@ -279,6 +301,11 @@ public class MainActivity extends AppCompatActivity{
         Intent intent = new Intent(context, JobsListActivity.class);
         intent.putExtra("type", "JobsPending");
         startActivity(intent);
+    }
+
+    private void logsBtnClicked(){
+        List<DriverStatus> statusList = db.getAllStatus();
+        GenericMethods.showToast(context, "driverStatus Table count:" + statusList.size());
     }
 
 }

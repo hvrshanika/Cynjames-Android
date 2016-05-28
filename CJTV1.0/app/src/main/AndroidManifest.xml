@@ -15,11 +15,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_header"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
         <activity
             android:name="au.com.cynjames.login.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,11 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="au.com.cynjames.mainView.MainActivity" />
+        <activity
+            android:name="au.com.cynjames.mainView.MainActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name="au.com.cynjames.utils.LocationService" />
 
-        <activity android:name="au.com.cynjames.mainView.JobsListActivity"></activity>
+        <activity
+            android:name="au.com.cynjames.mainView.JobsListActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

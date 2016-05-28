@@ -4,7 +4,11 @@ package au.com.cynjames.mainView;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.gesture.GestureOverlayView;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,8 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +37,9 @@ public class DepartFragment extends DialogFragment {
     User user;
     SQLiteHelper db;
     EditText name;
-    EditText sign;
     JobsDetailsFragmentListener listener;
+    GestureOverlayView sign;
+    String signtureId;
 
     public DepartFragment() {
 
@@ -82,7 +89,8 @@ public class DepartFragment extends DialogFragment {
         TextView arriveConcept = (TextView) viewRef.findViewById(R.id.list_item_arrive_concept);
         TextView departConcept = (TextView) viewRef.findViewById(R.id.list_item_depart_concept);
         name = (EditText) viewRef.findViewById(R.id.list_item_name);
-        sign = (EditText) viewRef.findViewById(R.id.list_item_sign);
+        sign = (GestureOverlayView) viewRef.findViewById(R.id.list_item_sign);
+        sign.setDrawingCacheEnabled(true);
         TextView btnProcess = (TextView) viewRef.findViewById(R.id.list_item_process_button);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,10 +120,12 @@ public class DepartFragment extends DialogFragment {
     private void BtnProcessClicked(){
         if (name.getText().toString().isEmpty()) {
             GenericMethods.showToast(context, "Please enter Name");
-        } else if (sign.getText().toString().isEmpty()) {
+        }
+        else if (!(sign.isGestureVisible())) {
             GenericMethods.showToast(context, "Please input Signature");
         }
         else {
+            saveSig();
             List<ConceptBooking> jobs = db.getPendingJobsStatusTwo();
             for (ConceptBooking job : jobs) {
                 ConceptBookingLog log = new ConceptBookingLog();
@@ -130,16 +140,16 @@ public class DepartFragment extends DialogFragment {
 
                 db.addLog(log);
 
-                job.setConceptPickupSignature(sign.getText().toString());
+                job.setConceptPickupSignature(signtureId);
                 job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
                 job.setConceptPickupName(name.getText().toString());
                 job.setConceptBookingStatus(8);
                 job.setArrivedConcept(user.getUserArriveConcept());
-
                 db.updateJob(job);
             }
-            user.setUserArriveConcept("");
+            user.setUserArriveConcept(null);
             db.updateUser(user);
+            listener.handleDialogCloseDepart();
         }
 
     }
@@ -150,7 +160,25 @@ public class DepartFragment extends DialogFragment {
 
     private void btnClearClicked(){
         name.setText("");
-        sign.setText("");
+        sign.clear(true);
+    }
+
+    public void saveSig() {
+        long time= System.currentTimeMillis();
+        try {
+            Bitmap bm = Bitmap.createBitmap(sign.getDrawingCache());
+            signtureId = "signature"+time+".png";
+            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator);
+            dir.mkdir();
+            File f = new File(dir, signtureId);
+            f.createNewFile();
+            FileOutputStream os = new FileOutputStream(f);
+            bm.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.close();
+        } catch (Exception e) {
+            Log.v("Gestures", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }

@@ -28,5 +28,9 @@
         android:id="@+id/action_difference"
         android:title="">
     </item>
+    <item
+        android:id="@+id/action_log"
+        android:title="Logs">
+    </item>
 
 </menu>

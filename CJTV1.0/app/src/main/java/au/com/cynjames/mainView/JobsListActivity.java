@@ -179,6 +179,11 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         });
     }
 
+    @Override
+    public void handleDialogCloseDepart() {
+        finish();
+    }
+
     private void checkDepartBtn(){
         for(ConceptBooking job : sortedJobsList){
             if(job.getConceptBookingStatus() == 2){

@@ -58,7 +58,7 @@ public class GenericMethods {
 
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
         String d=formatter.format(date);
         return d;
 
