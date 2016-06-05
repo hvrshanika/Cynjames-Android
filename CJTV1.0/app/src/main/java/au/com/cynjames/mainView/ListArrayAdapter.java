@@ -32,9 +32,9 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.jobs_list_item, parent, false);
         ConceptBooking job = jobsList.get(position);
-        if(job.getConceptBookingStatus() == 7){
+        if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8 ){
             rowView.setBackgroundColor(context.getResources().getColor(R.color.dark_red));
-        }else if(job.getConceptBookingStatus() == 2){
+        }else if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9 ){
             rowView.setBackgroundColor(context.getResources().getColor(R.color.green));
         }
 

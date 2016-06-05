@@ -5,6 +5,15 @@ package au.com.cynjames.models;
  */
 public class ConceptBookingLog {
 
+    private int conceptBookingLog_bookingId;
+    private String conceptBookingLogOrderNo;
+    private String conceptBookingLogBarcode;
+    private int conceptBookingLogUserId;
+    private String conceptBookingLogComments;
+    private String conceptBookingLogDate;
+    private int conceptBookingLogStatus;
+    private int hasDeparted;
+
     public int getHasDeparted() {
         return hasDeparted;
     }
@@ -68,14 +77,5 @@ public class ConceptBookingLog {
     public void setConceptBookingLogStatus(int conceptBookingLogStatus) {
         this.conceptBookingLogStatus = conceptBookingLogStatus;
     }
-
-    private int conceptBookingLog_bookingId;
-    private String conceptBookingLogOrderNo;
-    private String conceptBookingLogBarcode;
-    private int conceptBookingLogUserId;
-    private String conceptBookingLogComments;
-    private String conceptBookingLogDate;
-    private int conceptBookingLogStatus;
-    private int hasDeparted;
 
 }

@@ -31,7 +31,6 @@ import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.SQLiteHelper;
 
 public class DepartFragment extends DialogFragment {
-    ConceptBooking job;
     Context context;
     WindowManager.LayoutParams params;
     User user;
@@ -40,15 +39,17 @@ public class DepartFragment extends DialogFragment {
     JobsDetailsFragmentListener listener;
     GestureOverlayView sign;
     String signtureId;
+    String type;
 
     public DepartFragment() {
 
     }
 
-    public DepartFragment(Context context, WindowManager.LayoutParams params) {
-        this.job = job;
+    public DepartFragment(Context context, WindowManager.LayoutParams params, String type) {
         this.context = context;
         this.params = params;
+        this.type = type;
+
     }
 
     @Override
@@ -105,13 +106,27 @@ public class DepartFragment extends DialogFragment {
                 btnClearClicked();
             }
         });
-        arriveConcept.setText(user.getUserArriveConcept());
+        TextView arriveConceptLabel = (TextView) viewRef.findViewById(R.id.list_item_arrive_concept_label);
+        TextView departConceptLabel = (TextView) viewRef.findViewById(R.id.list_item_depart_concept_label);
+        if(type.equals("JobsPending")){
+            arriveConceptLabel.setText("Arrive Concept");
+            departConceptLabel.setText("Depart Concept");
+            arriveConcept.setText(user.getUserArriveConcept());
+        }else if(type.equals("DeliveryJobs")){
+            arriveConceptLabel.setText("Arrive Client");
+            departConceptLabel.setText("Depart Client");
+            arriveConcept.setText(user.getUserArriveClient());
+        }
         departConcept.setText(GenericMethods.getDisplayDate(new Date()));
     }
 
     private void btnBackClicked(){
         if(user.getUserArriveClient() != null){
-            GenericMethods.showToast(context, "Have not departed client premises yet");
+            if(type.equals("JobsPending")) {
+                GenericMethods.showToast(context, "Have not departed client premises yet");
+            }else if(type.equals("DeliveryJobs")){{
+                GenericMethods.showToast(context, "Have not departed concept premises yet");
+            }}
         }
         listener.handleDialogClose();
         dismiss();
@@ -126,28 +141,53 @@ public class DepartFragment extends DialogFragment {
         }
         else {
             saveSig();
-            List<ConceptBooking> jobs = db.getPendingJobsStatusTwo();
-            for (ConceptBooking job : jobs) {
-                ConceptBookingLog log = new ConceptBookingLog();
-                log.setConceptBookingLog_bookingId(job.getId());
-                log.setConceptBookingLogOrderNo(job.getOrderno());
-                log.setConceptBookingLogBarcode("");
-                log.setConceptBookingLogUserId(user.getDriverId());
-                log.setConceptBookingLogComments(user.getUserFirstName() + "has departed concept");
-                log.setConceptBookingLogDate(GenericMethods.getDisplayDate(new Date()));
-                log.setConceptBookingLogStatus(8);
-                log.setHasDeparted(1);
+            if(type.equals("JobsPending")) {
+                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("2");
+                for (ConceptBooking job : jobs) {
+                    ConceptBookingLog log = new ConceptBookingLog();
+                    log.setConceptBookingLog_bookingId(job.getId());
+                    log.setConceptBookingLogOrderNo(job.getOrderno());
+                    log.setConceptBookingLogBarcode(" ");
+                    log.setConceptBookingLogUserId(user.getDriverId());
+                    log.setConceptBookingLogComments(user.getUserFirstName() + " has departed concept");
+                    log.setConceptBookingLogDate(GenericMethods.getDisplayDate(new Date()));
+                    log.setConceptBookingLogStatus(8);
+                    log.setHasDeparted(1);
 
-                db.addLog(log);
+                    db.addLog(log);
 
-                job.setConceptPickupSignature(signtureId);
-                job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
-                job.setConceptPickupName(name.getText().toString());
-                job.setConceptBookingStatus(8);
-                job.setArrivedConcept(user.getUserArriveConcept());
-                db.updateJob(job);
+                    job.setConceptPickupSignature(signtureId);
+                    job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
+                    job.setConceptPickupName(name.getText().toString());
+                    job.setConceptBookingStatus(8);
+                    job.setArrivedConcept(user.getUserArriveConcept());
+                    db.updateJob(job);
+                }
+                user.setUserArriveConcept(null);
+            }else if(type.equals("DeliveryJobs")){
+                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9");
+                for (ConceptBooking job : jobs) {
+                    ConceptBookingLog log = new ConceptBookingLog();
+                    log.setConceptBookingLog_bookingId(job.getId());
+                    log.setConceptBookingLogOrderNo(job.getOrderno());
+                    log.setConceptBookingLogBarcode(" ");
+                    log.setConceptBookingLogUserId(user.getDriverId());
+                    log.setConceptBookingLogComments(user.getUserFirstName() + "has departed client");
+                    log.setConceptBookingLogDate(GenericMethods.getDisplayDate(new Date()));
+                    log.setConceptBookingLogStatus(10);
+                    log.setHasDeparted(1);
+
+                    db.addLog(log);
+
+                    job.setConceptDeliverySignature(signtureId);
+                    job.setConceptDeliveryDate(GenericMethods.getDisplayDate(new Date()));
+                    job.setConceptDeliveryName(name.getText().toString());
+                    job.setConceptBookingStatus(10);
+                    job.setArrivedClient(user.getUserArriveClient());
+                    db.updateJob(job);
+                }
+                user.setUserArriveClient(null);
             }
-            user.setUserArriveConcept(null);
             db.updateUser(user);
             listener.handleDialogCloseDepart();
         }

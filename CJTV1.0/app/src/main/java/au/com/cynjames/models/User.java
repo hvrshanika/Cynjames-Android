@@ -8,27 +8,33 @@ public class User implements Serializable {
     private String userLastName;
     private int userid;
     private String userRole;
+    private int driverId;
+    private String userArriveConcept;
+    private String userArriveClient;
+    private Vehicle vehicle;
 
     public int getUserid() {
         return userid;
     }
 
-    private int driverId;
-    private String userArriveConcept;
-    private String userArriveClient;
-
-    private Vehicle vehicle;
-
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
+    public void setUserid(int userid) {
+        this.userid = userid;
     }
 
     public Vehicle getVehicle() {
         return this.vehicle;
     }
 
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+
     public String getUserFirstName() {
         return this.userFirstName;
+    }
+
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
     }
 
     public String getUserLastName() {
@@ -37,10 +43,6 @@ public class User implements Serializable {
 
     public void setUserLastName(String userLastName) {
         this.userLastName = userLastName;
-    }
-
-    public void setUserid(int userid) {
-        this.userid = userid;
     }
 
     public String getUserRole() {
@@ -73,10 +75,6 @@ public class User implements Serializable {
 
     public void setUserArriveClient(String userArriveClient) {
         this.userArriveClient = userArriveClient;
-    }
-
-    public void setUserFirstName(String userFirstName) {
-        this.userFirstName = userFirstName;
     }
 
 }

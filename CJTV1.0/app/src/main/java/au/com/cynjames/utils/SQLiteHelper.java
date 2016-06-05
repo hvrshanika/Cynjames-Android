@@ -20,9 +20,10 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 9;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
+    String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
 
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,7 +32,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createUserTable = "CREATE TABLE user (userid INTEGER PRIMARY KEY NOT NULL, userFirstName TEXT, userLastName TEXT, userRole TEXT, driverId INTEGER, userArriveConcept TEXT, userArriveClient TEXT )";
-        String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT )";
+        String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         db.execSQL(createUserTable);
@@ -49,8 +50,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS conceptBookingLog");
         this.onCreate(db);
     }
-
-    String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
 
     public void addUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -136,6 +135,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("conceptPickupSignature", job.getConceptPickupSignature());
         values.put("conceptPickupName", job.getConceptPickupName());
         values.put("arrivedConcept", job.getArrivedConcept());
+        values.put("conceptDeliveryDate", job.getConceptDeliveryDate());
+        values.put("arrivedClient", job.getArrivedClient());
+        values.put("conceptDeliverySignature", job.getConceptDeliverySignature());
+        values.put("conceptDeliveryName", job.getConceptDeliveryName());
 
         db.insert("conceptBooking", null, values);
 
@@ -164,6 +167,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("conceptPickupSignature", job.getConceptPickupSignature());
         values.put("conceptPickupName", job.getConceptPickupName());
         values.put("arrivedConcept", job.getArrivedConcept());
+        values.put("conceptDeliveryDate", job.getConceptDeliveryDate());
+        values.put("arrivedClient", job.getArrivedClient());
+        values.put("conceptDeliverySignature", job.getConceptDeliverySignature());
+        values.put("conceptDeliveryName", job.getConceptDeliveryName());
 
 
         db.update("conceptBooking", values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
@@ -196,8 +203,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    String[] JOBSCOLUMNS = {"conceptBookingId","conceptBookingOrderNo","conceptBookingBarcode","conceptBookingDeliverySuburb","conceptBookingClientName","conceptBookingDeliveryAddress","specialNotes", "conceptBookingTime", "conceptBookingTimeFor", "conceptBookingPallets", "conceptBookingParcels", "conceptBookingStatus"};
-
     public List<ConceptBooking> getPendingJobs(){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
@@ -229,6 +234,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setConceptPickupSignature(cursor.getString(16));
                 job.setConceptPickupName(cursor.getString(17));
                 job.setArrivedConcept(cursor.getString(18));
+                job.setConceptDeliveryDate(cursor.getString(19));
+                job.setArrivedClient((cursor.getString(20)));
+                job.setConceptDeliverySignature(cursor.getString(21));
+                job.setConceptDeliveryName(cursor.getString(22));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -239,10 +248,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public List<ConceptBooking> getPendingJobsStatusTwo(){
+    public List<ConceptBooking> getPendingJobsWithStatus(String status){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
-        String query = "SELECT * FROM conceptBooking where conceptBookingStatus = 2";
+        String query = "SELECT * FROM conceptBooking where conceptBookingStatus = " + status + "";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -270,6 +279,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setConceptPickupSignature(cursor.getString(16));
                 job.setConceptPickupName(cursor.getString(17));
                 job.setArrivedConcept(cursor.getString(18));
+                job.setConceptDeliveryDate(cursor.getString(19));
+                job.setArrivedClient((cursor.getString(20)));
+                job.setConceptDeliverySignature(cursor.getString(21));
+                job.setConceptDeliveryName(cursor.getString(22));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -311,6 +324,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setConceptPickupSignature(cursor.getString(16));
                 job.setConceptPickupName(cursor.getString(17));
                 job.setArrivedConcept(cursor.getString(18));
+                job.setConceptDeliveryDate(cursor.getString(19));
+                job.setArrivedClient((cursor.getString(20)));
+                job.setConceptDeliverySignature(cursor.getString(21));
+                job.setConceptDeliveryName(cursor.getString(22));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -320,6 +337,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         return jobs;
     }
+
+    public void clearConcept(int id) {
+        String idString = String.valueOf(id);
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("delete from conceptBooking WHERE conceptBookingId = " + idString);
+    }
+
 
     public void addDriverStatus(DriverStatus status){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -351,7 +375,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job = new DriverStatus();
                 job.setDriverStatusDate(cursor.getString(1));
                 job.setDriverStatusTime(cursor.getString(2));
+                job.setDriverStatusDescription(cursor.getString(3));
                 job.setDriverStatusLongitude(Double.parseDouble(cursor.getString(4)));
+                job.setDriverStatusLatitude(Double.parseDouble(cursor.getString(5)));
+                job.setDriverStatus_driverId(Integer.parseInt(cursor.getString(6)));
+                job.setDriverStatus_vehicleId(cursor.getString(7));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -377,5 +405,35 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.insert("conceptBookingLog", null, values);
 
         db.close();
+    }
+
+    public List<ConceptBookingLog> getAllLogs() {
+        List<ConceptBookingLog> jobs = new LinkedList<ConceptBookingLog>();
+
+        String query = "SELECT * FROM conceptBookingLog";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        ConceptBookingLog job = null;
+        if (cursor.moveToFirst()) {
+            do {
+                job = new ConceptBookingLog();
+                job.setConceptBookingLog_bookingId(Integer.parseInt(cursor.getString(1)));
+                job.setConceptBookingLogOrderNo(cursor.getString(2));
+                job.setConceptBookingLogBarcode(cursor.getString(3));
+                job.setConceptBookingLogUserId(Integer.parseInt(cursor.getString(4)));
+                job.setConceptBookingLogComments(cursor.getString(5));
+                job.setConceptBookingLogDate(cursor.getString(6));
+                job.setConceptBookingLogStatus(Integer.parseInt(cursor.getString(7)));
+                job.setHasDeparted(Integer.parseInt(cursor.getString(8)));
+
+                jobs.add(job);
+            } while (cursor.moveToNext());
+        }
+        for(ConceptBookingLog jobb: jobs) {
+            Log.d("getAllStatus()", String.valueOf(jobb.getConceptBookingLogDate()));
+        }
+        return jobs;
     }
 }

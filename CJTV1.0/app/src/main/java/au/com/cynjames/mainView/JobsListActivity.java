@@ -3,6 +3,7 @@ package au.com.cynjames.mainView;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.User;
@@ -42,11 +44,13 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     ListView jobsListView;
     boolean isDepart = false;
     TextView btnDepart;
+    String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jobs_list);
+        type = getIntent().getExtras().getString("type");
         db = new SQLiteHelper(this);
         sortedJobsList = new ArrayList<>();
         ActionBar actionBar = getSupportActionBar();
@@ -59,7 +63,11 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         gson = new Gson();
         getData();
         getUser();
-        checkUserArriveConcept();
+        if(type.equals("JobsPending")) {
+            checkUserArriveConcept();
+        }else if(type.equals("DeliveryJobs")){
+            checkUserArriveClient();
+        }
         adapter = new ListArrayAdapter(this, sortedJobsList);
         init();
         setButtonListeners();
@@ -92,9 +100,11 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void getData(){
-        String type = getIntent().getExtras().getString("type");
         if(type.equals("JobsPending")){
             jobsList = db.getPendingJobs();
+        }
+        else if(type.equals("DeliveryJobs")){
+            jobsList = db.getReadyJobs();
         }
     }
 
@@ -143,13 +153,55 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        ProgressDialog progressDialog = GenericMethods.getProgressDialog(this, "Updating...");
+        //progressDialog.show();
+        ((CJT)this.getApplication()).stopActivityTransitionTimer();
+    }
+
+    private void checkUserArriveClient(){
+        boolean isStatusEight = false;
+        for(ConceptBooking job : jobsList){
+            if(job.getConceptBookingStatus() == 8){
+                isStatusEight = true;
+                sortedJobsList.add(job);
+            }
+        }
+        for(ConceptBooking job : jobsList){
+            if(job.getConceptBookingStatus() == 9){
+                sortedJobsList.add(job);
+            }
+        }
+        if(user.getUserArriveClient() == null && user.getUserArriveConcept() == null && isStatusEight){
+            AlertDialog.Builder build = new AlertDialog.Builder(this);
+            build.setMessage("Arrived at Client?");
+            build.setCancelable(false);
+            build.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    user.setUserArriveClient(GenericMethods.getDisplayDate(new Date()));
+                    db.updateUser(user);
+                    dialog.dismiss();
+                }
+            });
+            build.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            build.create().show();
+        }
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
             params.width = WindowManager.LayoutParams.MATCH_PARENT;
             params.height = WindowManager.LayoutParams.MATCH_PARENT;
             params.gravity = Gravity.CENTER;
         FragmentManager fm = getFragmentManager();
-        JobDetailsFragment jobFragment = new JobDetailsFragment(this, sortedJobsList.get(position), params);
+        JobDetailsFragment jobFragment = new JobDetailsFragment(this, sortedJobsList.get(position), params, type);
         jobFragment.setListener(this);
         jobFragment.setStyle( DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar );
         jobFragment.show(fm, "job_fragment");
@@ -162,12 +214,12 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 sortedJobsList.clear();
                 getData();
                 for(ConceptBooking job : jobsList){
-                    if(job.getConceptBookingStatus() == 7){
+                    if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8){
                         sortedJobsList.add(job);
                     }
                 }
                 for(ConceptBooking job : jobsList){
-                    if(job.getConceptBookingStatus() == 2){
+                    if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9){
                         sortedJobsList.add(job);
                     }
                 }
@@ -186,7 +238,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
 
     private void checkDepartBtn(){
         for(ConceptBooking job : sortedJobsList){
-            if(job.getConceptBookingStatus() == 2){
+            if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9){
                 isDepart = true;
             }
         }
@@ -205,7 +257,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
         params.gravity = Gravity.CENTER;
         FragmentManager fm = getFragmentManager();
-        DepartFragment departFragment = new DepartFragment(this, params);
+        DepartFragment departFragment = new DepartFragment(this, params, type);
         departFragment.setListener(this);
         departFragment.setStyle( DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar );
         departFragment.show(fm, "depart_fragment");

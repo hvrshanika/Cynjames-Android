@@ -36,15 +36,17 @@ public class JobDetailsFragment extends DialogFragment {
     JobsDetailsFragmentListener listener;
     TextView pallets;
     TextView parcels;
+    String type;
 
     public JobDetailsFragment() {
 
     }
 
-    public JobDetailsFragment(Context context, ConceptBooking job, WindowManager.LayoutParams params) {
+    public JobDetailsFragment(Context context, ConceptBooking job, WindowManager.LayoutParams params, String type) {
         this.job = job;
         this.context = context;
         this.params = params;
+        this.type = type;
     }
 
     @Override
@@ -122,11 +124,20 @@ public class JobDetailsFragment extends DialogFragment {
         address.setText(job.getAddress());
         notes.setText(job.getSpecialNotes());
 
-        if(user.getUserArriveConcept() != null){
+        if(type.equals("JobsPending") && user.getUserArriveConcept() != null){
             if(job.getConceptBookingStatus() == 7) {
                 btnProcess.setVisibility(View.VISIBLE);
             }
             else if(job.getConceptBookingStatus() == 2){
+                btnProcess.setVisibility(View.VISIBLE);
+                btnProcess.setText("Cancel");
+            }
+        }
+        if(type.equals("DeliveryJobs") && user.getUserArriveClient() != null){
+            if(job.getConceptBookingStatus() == 8) {
+                btnProcess.setVisibility(View.VISIBLE);
+            }
+            else if(job.getConceptBookingStatus() == 9){
                 btnProcess.setVisibility(View.VISIBLE);
                 btnProcess.setText("Cancel");
             }
@@ -142,14 +153,25 @@ public class JobDetailsFragment extends DialogFragment {
     }
 
     private void BtnProcessClicked(){
-        if(job.getConceptBookingStatus() == 7) {
-            job.setConceptBookingStatus(2);
-            job.setPallets(Integer.parseInt(pallets.getText().toString()));
-            job.setParcels(Integer.parseInt(parcels.getText().toString()));
-            job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
+        if(type.equals("JobsPending")) {
+            if (job.getConceptBookingStatus() == 7) {
+                job.setConceptBookingStatus(2);
+                job.setPallets(Integer.parseInt(pallets.getText().toString()));
+                job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
+            } else if (job.getConceptBookingStatus() == 2) {
+                job.setConceptBookingStatus(7);
+            }
         }
-        else if(job.getConceptBookingStatus() == 2) {
-            job.setConceptBookingStatus(7);
+        if(type.equals("DeliveryJobs")) {
+            if (job.getConceptBookingStatus() == 8) {
+                job.setConceptBookingStatus(9);
+                job.setPallets(Integer.parseInt(pallets.getText().toString()));
+                job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                job.setConceptDeliveryDate(GenericMethods.getDisplayDate(new Date()));
+            } else if (job.getConceptBookingStatus() == 9) {
+                job.setConceptBookingStatus(8);
+            }
         }
         db.updateJob(job);
         listener.handleDialogClose();

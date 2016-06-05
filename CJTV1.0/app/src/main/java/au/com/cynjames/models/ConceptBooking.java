@@ -19,6 +19,32 @@ public class ConceptBooking implements Serializable {
     private int parcels;
     private int conceptBookingStatus;
     private int conceptBookingTailLift;
+    private String arrivedClient;
+    private String conceptDeliveryDate;
+    private String conceptPickupSignature;
+    private String conceptPickupName;
+    private String conceptDeliverySignature;
+    private String conceptDeliveryName;
+    private String arrivedConcept;
+    private String conceptBookingPickupDate;
+    private int conceptBookingHandUnload;
+    private int conceptBookingUrgent;
+
+    public String getArrivedClient() {
+        return arrivedClient;
+    }
+
+    public void setArrivedClient(String arrivedClient) {
+        this.arrivedClient = arrivedClient;
+    }
+
+    public String getConceptDeliveryDate() {
+        return conceptDeliveryDate;
+    }
+
+    public void setConceptDeliveryDate(String conceptDeliveryDate) {
+        this.conceptDeliveryDate = conceptDeliveryDate;
+    }
 
     public String getConceptPickupSignature() {
         return conceptPickupSignature;
@@ -44,9 +70,21 @@ public class ConceptBooking implements Serializable {
         this.arrivedConcept = arrivedConcept;
     }
 
-    private String conceptPickupSignature;
-    private String conceptPickupName;
-    private String arrivedConcept;
+    public String getConceptDeliverySignature() {
+        return conceptDeliverySignature;
+    }
+
+    public void setConceptDeliverySignature(String conceptDeliverySignature) {
+        this.conceptDeliverySignature = conceptDeliverySignature;
+    }
+
+    public String getConceptDeliveryName() {
+        return conceptDeliveryName;
+    }
+
+    public void setConceptDeliveryName(String conceptDeliveryName) {
+        this.conceptDeliveryName = conceptDeliveryName;
+    }
 
     public String getConceptBookingPickupDate() {
         return conceptBookingPickupDate;
@@ -55,8 +93,6 @@ public class ConceptBooking implements Serializable {
     public void setConceptBookingPickupDate(String conceptBookingPickupDate) {
         this.conceptBookingPickupDate = conceptBookingPickupDate;
     }
-
-    private String conceptBookingPickupDate;
 
     public int getConceptBookingTailLift() {
         return conceptBookingTailLift;
@@ -81,9 +117,6 @@ public class ConceptBooking implements Serializable {
     public void setConceptBookingUrgent(int conceptBookingUrgent) {
         this.conceptBookingUrgent = conceptBookingUrgent;
     }
-
-    private int conceptBookingHandUnload;
-    private int conceptBookingUrgent;
 
     public int getId() {
         return id;
@@ -180,7 +213,6 @@ public class ConceptBooking implements Serializable {
     public void setConceptBookingStatus(int conceptBookingStatus) {
         this.conceptBookingStatus = conceptBookingStatus;
     }
-
 
 
 }

@@ -2,13 +2,21 @@ package au.com.cynjames.communication;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 import com.loopj.android.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 import au.com.cynjames.utils.GenericMethods;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.methods.HttpPut;
+import cz.msebera.android.httpclient.entity.ContentType;
+import cz.msebera.android.httpclient.entity.mime.MultipartEntityBuilder;
 
 public class HTTPHandler {
 
@@ -61,6 +69,7 @@ public class HTTPHandler {
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
             //progressDialog.dismiss();
+            Log.d("Failed", responseString);
         }
 
         public void onFinish() {

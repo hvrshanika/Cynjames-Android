@@ -9,6 +9,10 @@ public class DriverStatus implements Serializable {
     private String driverStatusDate;
     private String driverStatusTime;
     private String driverStatusDescription;
+    private double driverStatusLongitude;
+    private double driverStatusLatitude;
+    private int driverStatus_driverId;
+    private String driverStatus_vehicleId;
 
     public String getDriverStatusDate() {
         return driverStatusDate;
@@ -65,10 +69,5 @@ public class DriverStatus implements Serializable {
     public void setDriverStatus_vehicleId(String driverStatus_vehicleId) {
         this.driverStatus_vehicleId = driverStatus_vehicleId;
     }
-
-    private double driverStatusLongitude;
-    private double driverStatusLatitude;
-    private int driverStatus_driverId;
-    private String driverStatus_vehicleId;
 
 }

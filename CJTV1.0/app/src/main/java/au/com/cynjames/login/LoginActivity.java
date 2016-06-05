@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.mainView.MainActivity;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.cjtv10.R;
@@ -110,6 +111,13 @@ public class LoginActivity extends AppCompatActivity {
             vehicleArrayList.add(0, new Vehicles().getAVehicle("Vehicle no", "-1"));
             vehicleList.setAdapter(new ArrayAdapter<>(context,R.layout.spinner_item,vehicleArrayList));
         }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        ((CJT)this.getApplication()).stopActivityTransitionTimer();
     }
 
     public class LoginChecker implements ResponseListener {

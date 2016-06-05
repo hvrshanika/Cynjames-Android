@@ -1,9 +1,6 @@
 package au.com.cynjames.mainView;
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,11 +8,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.media.MediaPlayer;
-import android.support.v4.app.FragmentManager;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,29 +31,35 @@ import android.widget.TextView;
 import android.support.v7.app.ActionBar;
 
 import com.google.gson.Gson;
+import com.loopj.android.http.Base64;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.ConceptBooking;
+import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.DriverStatus;
 import au.com.cynjames.models.User;
-import au.com.cynjames.models.Vehicles;
 import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
 
 public class MainActivity extends AppCompatActivity{
+    public static final long INTERACTION_TIMEOUT = 8000;
     Context context;
     Menu menu;
     Editor prefsEditor;
@@ -68,11 +76,46 @@ public class MainActivity extends AppCompatActivity{
     Location mLastLocation;
     ImageView pendingIcon;
     Vehicle vehicle;
+    CJT myApp;
+    boolean logoutClicked;
+    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator;
+    int prelogCount = 0;
+    int postlogCount = 0;
+    int preStatusCount = 0;
+    int postStatusCount = 0;
+    int prejobsCount = 0;
+    int postjobsCount = 0;
+    int preImagesCount = 0;
+    int postImagesCount = 0;
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getBundleExtra("Location");
+            mLastLocation = (Location) b.getParcelable("Location");
+            if (mLastLocation != null) {
+                updateDriverStauts();
+            }
+        }
+    };
+    private Handler interactionHandler = new Handler(){
+        public void handleMessage(Message msg) {
+        }
+    };
+    private Runnable interactionCallback = new Runnable() {
+        @Override
+        public void run() {
+            if(GenericMethods.isConnectedToInternet(MainActivity.this)) {
+                uploadDatatoServer();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myApp = (CJT)this.getApplication();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#bec2cb")));
         actionBar.setLogo(R.mipmap.logo_red);
@@ -158,6 +201,44 @@ public class MainActivity extends AppCompatActivity{
         getUser();
         invalidateOptionsMenu();
         updateLabels();
+        myApp.stopActivityTransitionTimer();
+        resetDisconnectTimer();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        myApp.startActivityTransitionTimer();
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        stopDisconnectTimer();
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                if(GenericMethods.isConnectedToInternet(MainActivity.this)) {
+                    Log.d("stopped","ONSTOP");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (myApp.wasInBackground)
+                    {
+                        Log.d("inBackground","ONSTOP");
+                        uploadDatatoServer();
+                    }
+
+                }
+            }
+        };
+
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 3000);
+
     }
 
     private void init() {
@@ -172,6 +253,13 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 pendingJobsViewBtnClicked();
+            }
+        });
+        TextView deliveryJobsViewBtn = (TextView) findViewById(R.id.main_concept_ready_view);
+        deliveryJobsViewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deliveryJobsViewBtnClicked();
             }
         });
 
@@ -198,8 +286,9 @@ public class MainActivity extends AppCompatActivity{
             build.setCancelable(false);
             build.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    prefsEditor.clear();
-                    finish();
+                    initVariables();
+                    logoutClicked = true;
+                    uploadDatatoServer();
                 }
             });
             build.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -217,6 +306,186 @@ public class MainActivity extends AppCompatActivity{
         user = db.getUser(id);
         String jsonVehicle = mPrefs.getString("Vehicle", "");
         vehicle = gson.fromJson(jsonVehicle, Vehicle.class);
+    }
+
+    public void updateLabels(){
+        pendingJobs = db.getPendingJobs();
+        deliverReadyJobs = db.getReadyJobs();
+        pendingCount.setText(String.valueOf(pendingJobs.size()));
+        deliverReadyCount.setText(String.valueOf(deliverReadyJobs.size()));
+
+    }
+
+    private void initVariables(){
+        prelogCount = 0;
+        postlogCount = 0;
+        preStatusCount = 0;
+        postStatusCount = 0;
+        prejobsCount = 0;
+        postjobsCount = 0;
+        preImagesCount = 0;
+        postImagesCount = 0;
+    }
+
+    private void updateDriverStauts(){
+        Calendar c = Calendar.getInstance();
+        DriverStatus status = new DriverStatus();
+        status.setDriverStatusDate(String.valueOf(c.get(Calendar.DATE)));
+        status.setDriverStatusTime(c.getTime().toString());
+        status.setDriverStatus_driverId(user.getDriverId());
+        status.setDriverStatusDescription("Locating Driver");
+        status.setDriverStatus_vehicleId(vehicle.getVehicleId());
+        status.setDriverStatusLatitude(mLastLocation.getLatitude());
+        status.setDriverStatusLongitude(mLastLocation.getLongitude());
+        db.addDriverStatus(status);
+    }
+
+    public void startLocationService() {
+        startService(new Intent(getBaseContext(), LocationService.class));
+    }
+
+    public void stopLocationService() {
+        stopService(new Intent(getBaseContext(), LocationService.class));
+    }
+
+    private void playSound(){
+        MediaPlayer mp;
+        mp = MediaPlayer.create(context, R.raw.notification_sound);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+                mp.release();
+                mp=null;
+            }
+
+        });
+        mp.start();
+    }
+
+    private void pendingJobsViewBtnClicked(){
+        Intent intent = new Intent(context, JobsListActivity.class);
+        intent.putExtra("type", "JobsPending");
+        startActivity(intent);
+    }
+
+    private  void deliveryJobsViewBtnClicked(){
+        Intent intent = new Intent(context, JobsListActivity.class);
+        intent.putExtra("type", "DeliveryJobs");
+        startActivity(intent);
+    }
+
+    private void logsBtnClicked(){
+        List<DriverStatus> statusList = db.getAllStatus();
+        GenericMethods.showToast(context, "driverStatus Table count:" + statusList.size());
+    }
+
+    public void resetDisconnectTimer(){
+        interactionHandler.removeCallbacks(interactionCallback);
+        interactionHandler.postDelayed(interactionCallback, INTERACTION_TIMEOUT);
+    }
+
+    public void stopDisconnectTimer(){
+        interactionHandler.removeCallbacks(interactionCallback);
+    }
+
+    @Override
+    public void onUserInteraction(){
+        resetDisconnectTimer();
+    }
+
+
+
+    private void uploadDatatoServer(){
+        List<ConceptBookingLog> logs = db.getAllLogs();
+        prelogCount = logs.size();
+        for(ConceptBookingLog log: logs){
+            RequestParams params = new RequestParams();
+            params.add("conceptBookingLog_bookingId", String.valueOf(log.getConceptBookingLog_bookingId()));
+            params.add("conceptBookingLogOrderNo", log.getConceptBookingLogOrderNo());
+            params.add("conceptBookingLogBarcode", log.getConceptBookingLogBarcode());
+            params.add("conceptBookingLogUserId", String.valueOf(log.getConceptBookingLogUserId()));
+            params.add("conceptBookingLogComments", log.getConceptBookingLogComments());
+            params.add("conceptBookingLogDate", log.getConceptBookingLogDate());
+            params.add("conceptBookingLogStatus", String.valueOf(log.getConceptBookingLogStatus()));
+            HTTPHandler.post("cjt-update-log.php", params, new HTTPHandler.ResponseManager(new LogUploader(), context, "Updating..."));
+        }
+        List<DriverStatus> statuses = db.getAllStatus();
+        preStatusCount = statuses.size();
+        for(DriverStatus status: statuses){
+            RequestParams params = new RequestParams();
+            params.add("date", status.getDriverStatusDate());
+            params.add("time", status.getDriverStatusTime());
+            params.add("description", status.getDriverStatusDescription());
+            params.add("longitude", String.valueOf(status.getDriverStatusLongitude()));
+            params.add("latitude", String.valueOf(status.getDriverStatusLatitude()));
+            params.add("driverid", String.valueOf(status.getDriverStatus_driverId()));
+            params.add("vehicleid", status.getDriverStatus_vehicleId());
+            HTTPHandler.post("cjt-update-driver-status.php", params, new HTTPHandler.ResponseManager(new DriverStatusUploader(), context, "Updating..."));
+        }
+        List<ConceptBooking> jobsStausEight = db.getPendingJobsWithStatus("8");
+        List<ConceptBooking> jobsStausTen = db.getPendingJobsWithStatus("10");
+        for(ConceptBooking jobStatusEight: jobsStausEight){
+            RequestParams params = new RequestParams();
+            params.add("id", String.valueOf(jobStatusEight.getId()));
+            params.add("arrivedConcept", jobStatusEight.getArrivedConcept());
+            params.add("conceptBookingStatus", String.valueOf(jobStatusEight.getConceptBookingStatus()));
+            params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
+            params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());
+            params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
+            if(jobStatusEight.getConceptPickupSignature() != null) {
+                prejobsCount++;
+                preImagesCount += 1;
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStatusEight.getConceptPickupSignature() + ""));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String encoded = getStringImage(bitmap);
+                RequestParams paramsImg = new RequestParams();
+                paramsImg.add("image", encoded);
+                paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
+                HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
+                HTTPHandler.post("cjt-update-jobs.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
+            }
+        }
+        for(ConceptBooking jobStausTen: jobsStausTen){
+            RequestParams params = new RequestParams();
+            params.add("id", String.valueOf(jobStausTen.getId()));
+            params.add("arrivedClient", jobStausTen.getArrivedClient());
+            params.add("conceptBookingStatus", String.valueOf(jobStausTen.getConceptBookingStatus()));
+            params.add("conceptDeliveryName", jobStausTen.getConceptDeliveryName());
+            params.add("conceptDeliveryDate", jobStausTen.getConceptDeliveryDate());
+            params.add("conceptDeliverySignature", jobStausTen.getConceptDeliverySignature());
+            if(jobStausTen.getConceptDeliverySignature() != null) {
+                prejobsCount++;
+                preImagesCount += 1;
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausTen.getConceptDeliverySignature() + ""));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String encoded = getStringImage(bitmap);
+                RequestParams paramsImg = new RequestParams();
+                paramsImg.add("image", encoded);
+                paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
+                HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
+                HTTPHandler.post("cjt-update-jobs.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+            }
+        }
+        stopDisconnectTimer();
+        isUpdatefinished();
+    }
+
+    private String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
     }
 
     public class PendingListLoader implements ResponseListener{
@@ -241,71 +510,78 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void updateLabels(){
-        pendingJobs = db.getPendingJobs();
-        deliverReadyJobs = db.getReadyJobs();
-        pendingCount.setText(String.valueOf(pendingJobs.size()));
-        deliverReadyCount.setText(String.valueOf(deliverReadyJobs.size()));
-
-    }
-
-    private void updateDriverStauts(){
-        Calendar c = Calendar.getInstance();
-        DriverStatus status = new DriverStatus();
-        status.setDriverStatusDate(String.valueOf(c.get(Calendar.DATE)));
-        status.setDriverStatusTime(c.getTime().toString());
-        status.setDriverStatus_driverId(user.getDriverId());
-        status.setDriverStatusDescription("Locating Driver");
-        status.setDriverStatus_vehicleId(vehicle.getVehicleId());
-        status.setDriverStatusLatitude(mLastLocation.getLatitude());
-        status.setDriverStatusLongitude(mLastLocation.getLongitude());
-        db.addDriverStatus(status);
-    }
-
-    public void startLocationService() {
-        startService(new Intent(getBaseContext(), LocationService.class));
-    }
-
-    public void stopLocationService() {
-        stopService(new Intent(getBaseContext(), LocationService.class));
-    }
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    public class LogUploader implements ResponseListener {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle b = intent.getBundleExtra("Location");
-            mLastLocation = (Location) b.getParcelable("Location");
-            if (mLastLocation != null) {
-                updateDriverStauts();
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            postlogCount++;
+            if (jSONObject.getInt("success") == 1) {
+                GenericMethods.showToast(MainActivity.this, "Log data upload successful.");
+                db.clearTable("conceptBookingLog");
             }
+            isUpdatefinished();
         }
-    };
+    }
 
-    private void playSound(){
-        MediaPlayer mp;
-        mp = MediaPlayer.create(context, R.raw.notification_sound);
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mp.reset();
-                mp.release();
-                mp=null;
+    public class DriverStatusUploader implements ResponseListener {
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            postStatusCount++;
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                GenericMethods.showToast(MainActivity.this, "Driver data upload successful.");
+                db.clearTable("driverStatus");
             }
-
-        });
-        mp.start();
+            isUpdatefinished();
+        }
     }
 
-    private void pendingJobsViewBtnClicked(){
-        Intent intent = new Intent(context, JobsListActivity.class);
-        intent.putExtra("type", "JobsPending");
-        startActivity(intent);
+    public class ConceptUploader implements ResponseListener {
+        int id;
+        public ConceptUploader(int id){
+            this.id = id;
+        }
+
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            postjobsCount++;
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
+                if(jSONObject.getInt("status") == 10){
+                    db.clearConcept(id);
+                }
+            }
+            isUpdatefinished();
+        }
     }
 
-    private void logsBtnClicked(){
-        List<DriverStatus> statusList = db.getAllStatus();
-        GenericMethods.showToast(context, "driverStatus Table count:" + statusList.size());
+    public class ImageUploader implements ResponseListener {
+        String name;
+        public ImageUploader(String name){
+            this.name = name;
+        }
+
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            postImagesCount++;
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                GenericMethods.showToast(MainActivity.this, "Image upload successful.");
+                File file = new File(FILE_PATH,name);
+                file.delete();
+            }
+            isUpdatefinished();
+        }
     }
 
+    private void isUpdatefinished(){
+        if(logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount){
+            prefsEditor.clear();
+            finish();
+        }
+        else{
+            //GenericMethods.showToast(context,"Data upload not finished.");
+        }
+    }
 }
