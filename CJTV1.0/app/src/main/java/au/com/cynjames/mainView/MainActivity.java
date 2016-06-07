@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import au.com.cynjames.CJT;
@@ -58,7 +59,7 @@ import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     public static final long INTERACTION_TIMEOUT = 8000;
     Context context;
     Menu menu;
@@ -98,14 +99,14 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     };
-    private Handler interactionHandler = new Handler(){
+    private Handler interactionHandler = new Handler() {
         public void handleMessage(Message msg) {
         }
     };
     private Runnable interactionCallback = new Runnable() {
         @Override
         public void run() {
-            if(GenericMethods.isConnectedToInternet(MainActivity.this)) {
+            if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
                 uploadDatatoServer();
             }
         }
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        myApp = (CJT)this.getApplication();
+        myApp = (CJT) this.getApplication();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#bec2cb")));
         actionBar.setLogo(R.mipmap.logo_red);
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         getUser();
         invalidateOptionsMenu();
@@ -206,29 +207,28 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         myApp.startActivityTransitionTimer();
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         stopDisconnectTimer();
         Runnable progressRunnable = new Runnable() {
 
             @Override
             public void run() {
-                if(GenericMethods.isConnectedToInternet(MainActivity.this)) {
-                    Log.d("stopped","ONSTOP");
+                if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
+                    Log.d("stopped", "ONSTOP");
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    if (myApp.wasInBackground)
-                    {
-                        Log.d("inBackground","ONSTOP");
+                    if (myApp.wasInBackground) {
+                        Log.d("inBackground", "ONSTOP");
                         uploadDatatoServer();
                     }
 
@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity{
         vehicle = gson.fromJson(jsonVehicle, Vehicle.class);
     }
 
-    public void updateLabels(){
+    public void updateLabels() {
         pendingJobs = db.getPendingJobs();
         deliverReadyJobs = db.getReadyJobs();
         pendingCount.setText(String.valueOf(pendingJobs.size()));
@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-    private void initVariables(){
+    private void initVariables() {
         prelogCount = 0;
         postlogCount = 0;
         preStatusCount = 0;
@@ -327,10 +327,10 @@ public class MainActivity extends AppCompatActivity{
         postImagesCount = 0;
     }
 
-    private void updateDriverStauts(){
+    private void updateDriverStauts() {
         Calendar c = Calendar.getInstance();
         DriverStatus status = new DriverStatus();
-        status.setDriverStatusDate(String.valueOf(c.get(Calendar.DATE)));
+        status.setDriverStatusDate(GenericMethods.getDisplayDate(new Date()));
         status.setDriverStatusTime(c.getTime().toString());
         status.setDriverStatus_driverId(user.getDriverId());
         status.setDriverStatusDescription("Locating Driver");
@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity{
         stopService(new Intent(getBaseContext(), LocationService.class));
     }
 
-    private void playSound(){
+    private void playSound() {
         MediaPlayer mp;
         mp = MediaPlayer.create(context, R.raw.notification_sound);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -357,65 +357,65 @@ public class MainActivity extends AppCompatActivity{
             public void onCompletion(MediaPlayer mp) {
                 mp.reset();
                 mp.release();
-                mp=null;
+                mp = null;
             }
 
         });
         mp.start();
     }
 
-    private void pendingJobsViewBtnClicked(){
+    private void pendingJobsViewBtnClicked() {
         Intent intent = new Intent(context, JobsListActivity.class);
         intent.putExtra("type", "JobsPending");
         startActivity(intent);
     }
 
-    private  void deliveryJobsViewBtnClicked(){
+    private void deliveryJobsViewBtnClicked() {
         Intent intent = new Intent(context, JobsListActivity.class);
         intent.putExtra("type", "DeliveryJobs");
         startActivity(intent);
     }
 
-    private void logsBtnClicked(){
+    private void logsBtnClicked() {
         List<DriverStatus> statusList = db.getAllStatus();
         GenericMethods.showToast(context, "driverStatus Table count:" + statusList.size());
     }
 
-    public void resetDisconnectTimer(){
+    public void resetDisconnectTimer() {
         interactionHandler.removeCallbacks(interactionCallback);
         interactionHandler.postDelayed(interactionCallback, INTERACTION_TIMEOUT);
     }
 
-    public void stopDisconnectTimer(){
+    public void stopDisconnectTimer() {
         interactionHandler.removeCallbacks(interactionCallback);
     }
 
     @Override
-    public void onUserInteraction(){
+    public void onUserInteraction() {
         resetDisconnectTimer();
     }
 
 
-
-    private void uploadDatatoServer(){
+    private void uploadDatatoServer() {
         List<ConceptBookingLog> logs = db.getAllLogs();
         prelogCount = logs.size();
-        for(ConceptBookingLog log: logs){
+        for (ConceptBookingLog log : logs) {
             RequestParams params = new RequestParams();
             params.add("conceptBookingLog_bookingId", String.valueOf(log.getConceptBookingLog_bookingId()));
             params.add("conceptBookingLogOrderNo", log.getConceptBookingLogOrderNo());
             params.add("conceptBookingLogBarcode", log.getConceptBookingLogBarcode());
             params.add("conceptBookingLogUserId", String.valueOf(log.getConceptBookingLogUserId()));
             params.add("conceptBookingLogComments", log.getConceptBookingLogComments());
-            params.add("conceptBookingLogDate", log.getConceptBookingLogDate());
+            params.add("conceptBookingLogDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(log.getConceptBookingLogDate())));
             params.add("conceptBookingLogStatus", String.valueOf(log.getConceptBookingLogStatus()));
+            params.add("hasDeparted", String.valueOf(log.getHasDeparted()));
             HTTPHandler.post("cjt-update-log.php", params, new HTTPHandler.ResponseManager(new LogUploader(), context, "Updating..."));
         }
         List<DriverStatus> statuses = db.getAllStatus();
         preStatusCount = statuses.size();
-        for(DriverStatus status: statuses){
+        for (DriverStatus status : statuses) {
             RequestParams params = new RequestParams();
-            params.add("date", status.getDriverStatusDate());
+            params.add("date", GenericMethods.getDBDate(GenericMethods.getDatefromString(status.getDriverStatusDate())));
             params.add("time", status.getDriverStatusTime());
             params.add("description", status.getDriverStatusDescription());
             params.add("longitude", String.valueOf(status.getDriverStatusLongitude()));
@@ -426,15 +426,19 @@ public class MainActivity extends AppCompatActivity{
         }
         List<ConceptBooking> jobsStausEight = db.getPendingJobsWithStatus("8");
         List<ConceptBooking> jobsStausTen = db.getPendingJobsWithStatus("10");
-        for(ConceptBooking jobStatusEight: jobsStausEight){
+        for (ConceptBooking jobStatusEight : jobsStausEight) {
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStatusEight.getId()));
             params.add("arrivedConcept", jobStatusEight.getArrivedConcept());
             params.add("conceptBookingStatus", String.valueOf(jobStatusEight.getConceptBookingStatus()));
             params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
-            params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());
-            params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
-            if(jobStatusEight.getConceptPickupSignature() != null) {
+            params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
+            if (jobStatusEight.getConceptPickupSignature().contains("uploads")) {
+                params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
+            } else {
+                params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
+            }
+            if (jobStatusEight.getConceptPickupSignature() != null) {
                 prejobsCount++;
                 preImagesCount += 1;
                 Bitmap bitmap = null;
@@ -443,23 +447,34 @@ public class MainActivity extends AppCompatActivity{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String encoded = getStringImage(bitmap);
-                RequestParams paramsImg = new RequestParams();
-                paramsImg.add("image", encoded);
-                paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
-                HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
-                HTTPHandler.post("cjt-update-jobs.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
+                if (bitmap != null) {
+                    String encoded = getStringImage(bitmap);
+                    RequestParams paramsImg = new RequestParams();
+                    paramsImg.add("image", encoded);
+                    paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
+                    HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
+                }
+                HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
             }
         }
-        for(ConceptBooking jobStausTen: jobsStausTen){
+        for (ConceptBooking jobStausTen : jobsStausTen) {
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStausTen.getId()));
             params.add("arrivedClient", jobStausTen.getArrivedClient());
             params.add("conceptBookingStatus", String.valueOf(jobStausTen.getConceptBookingStatus()));
             params.add("conceptDeliveryName", jobStausTen.getConceptDeliveryName());
-            params.add("conceptDeliveryDate", jobStausTen.getConceptDeliveryDate());
-            params.add("conceptDeliverySignature", jobStausTen.getConceptDeliverySignature());
-            if(jobStausTen.getConceptDeliverySignature() != null) {
+            params.add("conceptDeliveryDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptDeliveryDate())));
+            params.add("conceptDeliverySignature", "uploads/" + jobStausTen.getConceptDeliverySignature());
+            params.add("arrivedConcept", jobStausTen.getArrivedConcept());
+            params.add("conceptPickupName", jobStausTen.getConceptPickupName());
+            params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
+            if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
+                params.add("conceptPickupSignature", jobStausTen.getConceptPickupSignature());
+            } else {
+                params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
+            }
+
+            if (jobStausTen.getConceptDeliverySignature() != null) {
                 prejobsCount++;
                 preImagesCount += 1;
                 Bitmap bitmap = null;
@@ -468,19 +483,21 @@ public class MainActivity extends AppCompatActivity{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String encoded = getStringImage(bitmap);
-                RequestParams paramsImg = new RequestParams();
-                paramsImg.add("image", encoded);
-                paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
-                HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
-                HTTPHandler.post("cjt-update-jobs.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+                if (bitmap != null) {
+                    String encoded = getStringImage(bitmap);
+                    RequestParams paramsImg = new RequestParams();
+                    paramsImg.add("image", encoded);
+                    paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
+                    HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
+                }
+                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
             }
         }
         stopDisconnectTimer();
         isUpdatefinished();
     }
 
-    private String getStringImage(Bitmap bmp){
+    private String getStringImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
@@ -488,21 +505,21 @@ public class MainActivity extends AppCompatActivity{
         return encodedImage;
     }
 
-    public class PendingListLoader implements ResponseListener{
+    public class PendingListLoader implements ResponseListener {
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 JSONArray objs = jSONObject.getJSONArray("joblist");
                 db.clearTable("conceptBooking");
-                for(int i = 0; i<objs.length(); i++){
+                for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
-                    ConceptBooking job = gson.fromJson(obj.toString(),ConceptBooking.class);
+                    ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
                     db.addJob(job);
 
                 }
                 updateLabels();
-                if(pendingJobs.size()>0){
+                if (pendingJobs.size() > 0) {
                     pendingIcon.setVisibility(View.VISIBLE);
                     playSound();
                 }
@@ -538,7 +555,8 @@ public class MainActivity extends AppCompatActivity{
 
     public class ConceptUploader implements ResponseListener {
         int id;
-        public ConceptUploader(int id){
+
+        public ConceptUploader(int id) {
             this.id = id;
         }
 
@@ -548,7 +566,7 @@ public class MainActivity extends AppCompatActivity{
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
-                if(jSONObject.getInt("status") == 10){
+                if (jSONObject.getInt("status") == 10) {
                     db.clearConcept(id);
                 }
             }
@@ -558,7 +576,8 @@ public class MainActivity extends AppCompatActivity{
 
     public class ImageUploader implements ResponseListener {
         String name;
-        public ImageUploader(String name){
+
+        public ImageUploader(String name) {
             this.name = name;
         }
 
@@ -568,19 +587,18 @@ public class MainActivity extends AppCompatActivity{
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 GenericMethods.showToast(MainActivity.this, "Image upload successful.");
-                File file = new File(FILE_PATH,name);
+                File file = new File(FILE_PATH, name);
                 file.delete();
             }
             isUpdatefinished();
         }
     }
 
-    private void isUpdatefinished(){
-        if(logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount){
+    private void isUpdatefinished() {
+        if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             prefsEditor.clear();
             finish();
-        }
-        else{
+        } else {
             //GenericMethods.showToast(context,"Data upload not finished.");
         }
     }

@@ -147,7 +147,7 @@ public class DepartFragment extends DialogFragment {
                     ConceptBookingLog log = new ConceptBookingLog();
                     log.setConceptBookingLog_bookingId(job.getId());
                     log.setConceptBookingLogOrderNo(job.getOrderno());
-                    log.setConceptBookingLogBarcode(" ");
+                    log.setConceptBookingLogBarcode("-");
                     log.setConceptBookingLogUserId(user.getDriverId());
                     log.setConceptBookingLogComments(user.getUserFirstName() + " has departed concept");
                     log.setConceptBookingLogDate(GenericMethods.getDisplayDate(new Date()));
@@ -170,7 +170,7 @@ public class DepartFragment extends DialogFragment {
                     ConceptBookingLog log = new ConceptBookingLog();
                     log.setConceptBookingLog_bookingId(job.getId());
                     log.setConceptBookingLogOrderNo(job.getOrderno());
-                    log.setConceptBookingLogBarcode(" ");
+                    log.setConceptBookingLogBarcode("-");
                     log.setConceptBookingLogUserId(user.getDriverId());
                     log.setConceptBookingLogComments(user.getUserFirstName() + "has departed client");
                     log.setConceptBookingLogDate(GenericMethods.getDisplayDate(new Date()));

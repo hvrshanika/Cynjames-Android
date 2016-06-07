@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -58,10 +59,34 @@ public class GenericMethods {
 
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String d=formatter.format(date);
         return d;
 
+    }
+
+    public static String getDBDate(Date date) {
+        if (date == null) {
+            date = new Date();
+
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String d=formatter.format(date);
+        return d;
+
+    }
+
+    public static Date getDatefromString(String dateString){
+        SimpleDateFormat  format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        Date date = null;
+        try {
+            date = format.parse(dateString);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return date;
     }
 
 }
