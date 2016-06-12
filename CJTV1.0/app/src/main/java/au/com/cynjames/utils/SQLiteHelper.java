@@ -20,7 +20,7 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
@@ -32,7 +32,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createUserTable = "CREATE TABLE user (userid INTEGER PRIMARY KEY NOT NULL, userFirstName TEXT, userLastName TEXT, userRole TEXT, driverId INTEGER, userArriveConcept TEXT, userArriveClient TEXT )";
-        String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT)";
+        String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         db.execSQL(createUserTable);
@@ -171,6 +171,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("arrivedClient", job.getArrivedClient());
         values.put("conceptDeliverySignature", job.getConceptDeliverySignature());
         values.put("conceptDeliveryName", job.getConceptDeliveryName());
+        values.put("deliveryImages", job.getDeliveryImages());
+        values.put("pickupImages", job.getPickupImages());
 
 
         db.update("conceptBooking", values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
@@ -201,6 +203,26 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             Log.d("getAllJobs()", jobb.getClient());
         }
         return jobs;
+    }
+
+    public boolean jobExist(int id){
+        boolean exist;
+        String query = "SELECT COUNT(conceptBookingId) FROM conceptBooking WHERE conceptBookingId =" + id +"";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                count = cursor.getInt(0);
+            } while (cursor.moveToNext());
+        }
+        if(count == 0){
+            exist = false;
+        }
+        else{
+            exist = true;
+        }
+        return exist;
     }
 
     public List<ConceptBooking> getPendingJobs(){
@@ -238,6 +260,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setArrivedClient((cursor.getString(20)));
                 job.setConceptDeliverySignature(cursor.getString(21));
                 job.setConceptDeliveryName(cursor.getString(22));
+                job.setDeliveryImages(cursor.getString(23));
+                job.setPickupImages(cursor.getString(24));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -283,6 +307,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setArrivedClient((cursor.getString(20)));
                 job.setConceptDeliverySignature(cursor.getString(21));
                 job.setConceptDeliveryName(cursor.getString(22));
+                job.setDeliveryImages(cursor.getString(23));
+                job.setPickupImages(cursor.getString(24));
 
                 jobs.add(job);
             } while (cursor.moveToNext());
@@ -328,6 +354,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setArrivedClient((cursor.getString(20)));
                 job.setConceptDeliverySignature(cursor.getString(21));
                 job.setConceptDeliveryName(cursor.getString(22));
+                job.setDeliveryImages(cursor.getString(23));
+                job.setPickupImages(cursor.getString(24));
 
                 jobs.add(job);
             } while (cursor.moveToNext());

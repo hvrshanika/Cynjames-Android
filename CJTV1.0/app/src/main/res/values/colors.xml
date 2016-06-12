@@ -11,5 +11,6 @@
     <color name="black">#000000</color>
     <color name="orange">#f79520</color>
     <color name="green">#008000</color>
+    <color name="camera_btn_back">#ff4502</color>
 
 </resources>

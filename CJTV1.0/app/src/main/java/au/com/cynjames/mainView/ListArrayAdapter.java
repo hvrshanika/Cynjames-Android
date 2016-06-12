@@ -60,6 +60,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         if(job.getConceptBookingTimeFor() == null){
             bookingTime.setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);
+            rowView.findViewById(R.id.list_item_timefor_line).setVisibility(View.GONE);
         }
         else{
             bookingTime.setText(job.getConceptBookingTimeFor());

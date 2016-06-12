@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-
+                loadNewJobs();
                 break;
             case R.id.action_logout:
                 logoutUser();
@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         for (ConceptBooking jobStatusEight : jobsStausEight) {
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStatusEight.getId()));
-            params.add("arrivedConcept", jobStatusEight.getArrivedConcept());
+            params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getArrivedConcept())));
             params.add("conceptBookingStatus", String.valueOf(jobStatusEight.getConceptBookingStatus()));
             params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
             params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
@@ -437,41 +437,62 @@ public class MainActivity extends AppCompatActivity {
                 params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
             } else {
                 params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
-            }
-            if (jobStatusEight.getConceptPickupSignature() != null) {
-                prejobsCount++;
-                preImagesCount += 1;
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStatusEight.getConceptPickupSignature() + ""));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (jobStatusEight.getConceptPickupSignature() != null) {
+                    prejobsCount++;
+                    preImagesCount += 1;
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStatusEight.getConceptPickupSignature() + ""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (bitmap != null) {
+                        String encoded = getStringImage(bitmap);
+                        RequestParams paramsImg = new RequestParams();
+                        paramsImg.add("image", encoded);
+                        paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
+                        //HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
+                    }
                 }
-                if (bitmap != null) {
-                    String encoded = getStringImage(bitmap);
-                    RequestParams paramsImg = new RequestParams();
-                    paramsImg.add("image", encoded);
-                    paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
-                    HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
-                }
-                HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
             }
+            HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
+            uploadPhotos(jobStatusEight.getPickupImages());
         }
         for (ConceptBooking jobStausTen : jobsStausTen) {
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStausTen.getId()));
-            params.add("arrivedClient", jobStausTen.getArrivedClient());
+            params.add("arrivedClient", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedClient())));
             params.add("conceptBookingStatus", String.valueOf(jobStausTen.getConceptBookingStatus()));
             params.add("conceptDeliveryName", jobStausTen.getConceptDeliveryName());
             params.add("conceptDeliveryDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptDeliveryDate())));
             params.add("conceptDeliverySignature", "uploads/" + jobStausTen.getConceptDeliverySignature());
-            params.add("arrivedConcept", jobStausTen.getArrivedConcept());
             params.add("conceptPickupName", jobStausTen.getConceptPickupName());
-            params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
+            params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
+            params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
                 params.add("conceptPickupSignature", jobStausTen.getConceptPickupSignature());
+                params.add("arrivedConcept", jobStausTen.getArrivedConcept());
+                params.add("conceptBookingPickupDate", jobStausTen.getConceptBookingPickupDate());
             } else {
                 params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
+                params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
+                params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
+                if (jobStausTen.getConceptPickupSignature() != null) {
+                    preImagesCount += 1;
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausTen.getConceptPickupSignature() + ""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (bitmap != null) {
+                        String encoded = getStringImage(bitmap);
+                        RequestParams paramsImg = new RequestParams();
+                        paramsImg.add("image", encoded);
+                        paramsImg.add("name", jobStausTen.getConceptPickupSignature());
+                        HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
+                    }
+                }
             }
 
             if (jobStausTen.getConceptDeliverySignature() != null) {
@@ -491,6 +512,7 @@ public class MainActivity extends AppCompatActivity {
                     HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
                 }
                 HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+                uploadPhotos(jobStausTen.getDeliveryImages());
             }
         }
         stopDisconnectTimer();
@@ -503,6 +525,58 @@ public class MainActivity extends AppCompatActivity {
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
+    }
+
+    private String getStringPhoto(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private void isUpdatefinished() {
+        if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
+            prefsEditor.clear();
+            finish();
+        } else if (prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
+            loadNewJobs();
+        }
+    }
+
+    private void loadNewJobs(){
+        String userId = String.valueOf(user.getUserid());
+        RequestParams params = new RequestParams();
+        params.add("userid", userId);
+        HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(), context, "Updating..."));
+    }
+
+    private void uploadPhotos(String imageString){
+        ArrayList<String> images = new ArrayList<>();
+        if (imageString != null) {
+            String[] imagesArr = imageString.split(",");
+            for (String image : imagesArr) {
+                if (!image.equals("")) {
+                    images.add(image);
+                }
+            }
+        }
+        for(String image: images){
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + image + ""));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (bitmap != null) {
+                preImagesCount += 1;
+                String encoded = getStringPhoto(bitmap);
+                RequestParams paramsImg = new RequestParams();
+                paramsImg.add("image", encoded);
+                paramsImg.add("name", image);
+                HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(image), context, "Uploading Image..."));
+            }
+        }
     }
 
     public class PendingListLoader implements ResponseListener {
@@ -594,12 +668,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void isUpdatefinished() {
-        if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
-            prefsEditor.clear();
-            finish();
-        } else {
-            //GenericMethods.showToast(context,"Data upload not finished.");
+    public class NewJobsLoader implements ResponseListener {
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                ArrayList<ConceptBooking> newJobs = new ArrayList<>();
+                JSONArray objs = jSONObject.getJSONArray("joblist");
+                for (int i = 0; i < objs.length(); i++) {
+                    JSONObject obj = objs.getJSONObject(i);
+                    ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
+                    if(!db.jobExist(job.getId())){
+                        db.addJob(job);
+                        newJobs.add(job);
+                    }
+
+                }
+                updateLabels();
+                if (newJobs.size() > 0) {
+                    pendingIcon.setVisibility(View.VISIBLE);
+                    playSound();
+                }
+            }
         }
     }
 }

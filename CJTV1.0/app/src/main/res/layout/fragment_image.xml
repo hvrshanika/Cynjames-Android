@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="au.com.cynjames.mainView.JobsListActivity">
+
+    <View
+        android:id="@+id/fragment_job_details_header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/dark_gray"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:src="@mipmap/logo_red"
+        android:layout_marginLeft="20dp"/>
+
+    <ImageView
+        android:id="@+id/image_fragment_next_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/ic_next"
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/image_fragment_back_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_toLeftOf="@+id/image_fragment_next_button"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:src="@mipmap/ic_back"
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/image_fragment_delete_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/image_fragment_back_button"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/icon_trashcan"/>
+
+    <ImageView
+        android:id="@+id/image_fragment_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/fragment_job_details_header"/>
+
+
+
+</RelativeLayout>

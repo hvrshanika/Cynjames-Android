@@ -32,6 +32,30 @@
         android:background="@drawable/main_viewnow_orange_bg"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <ImageView
+        android:id="@+id/fragment_job_details_header_camera_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_back_button"
+        android:layout_alignTop="@+id/fragment_job_details_header_back_button"
+        android:layout_marginRight="10dp"
+        android:src="@mipmap/icon_camera"/>
+
+    <TextView
+        android:id="@+id/fragment_job_details_header_images_view_button"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_camera_button"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/fragment_job_details_header"
+        android:text="View Photos"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:background="@drawable/camera_button_bg"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <View
         android:id="@+id/view_seperator"
         android:layout_width="match_parent"
@@ -103,7 +127,7 @@
 
     <TextView
         android:id="@+id/list_item_order_no"
-        android:layout_width="200dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/list_item_suburb"
         android:layout_toRightOf="@+id/list_item_order_no_label"
@@ -113,13 +137,28 @@
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
-        android:id="@+id/list_item_order_no_type"
-        android:layout_width="50dp"
+        android:id="@+id/list_item_order_no_type_tl"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/list_item_suburb"
         android:layout_toRightOf="@+id/list_item_order_no"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
+        android:text="[TL]"
+        android:gravity="left|center"
+        android:visibility="gone"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/list_item_order_no_type_hu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_item_suburb"
+        android:layout_toRightOf="@+id/list_item_order_no_type_tl"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:text="[HU]"
+        android:visibility="gone"
         android:gravity="left|center"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 

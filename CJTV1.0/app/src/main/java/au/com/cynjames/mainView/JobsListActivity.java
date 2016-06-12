@@ -3,7 +3,6 @@ package au.com.cynjames.mainView;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,8 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +42,9 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     boolean isDepart = false;
     TextView btnDepart;
     String type;
+    TextView btnCancel;
+    boolean statusTwoJobs = false;
+    boolean statusNineJobs = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         gson = new Gson();
         getData();
         getUser();
+        setButtonListeners();
         if(type.equals("JobsPending")) {
             checkUserArriveConcept();
         }else if(type.equals("DeliveryJobs")){
@@ -70,9 +71,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         }
         adapter = new ListArrayAdapter(this, sortedJobsList);
         init();
-        setButtonListeners();
         checkDepartBtn();
-
+        showCancelButton();
     }
 
     private void init(){
@@ -97,6 +97,13 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 btnDepartClicked();
             }
         });
+        btnCancel = (TextView) findViewById(R.id.fragment_jobs_list_header_cancel_button);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelButtonClicked();
+            }
+        });
     }
 
     private void getData(){
@@ -114,6 +121,31 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         user = db.getUser(id);
     }
 
+    private void showCancelButton(){
+        if(type.equals("JobsPending")){
+            if(user.getUserArriveConcept() != null && !statusTwoJobs){
+                btnCancel.setVisibility(View.VISIBLE);
+            }
+        }
+        else if(type.equals("DeliveryJobs")){
+            if(user.getUserArriveClient() != null && !statusNineJobs){
+                btnCancel.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void cancelButtonClicked(){
+        if(type.equals("JobsPending")){
+            user.setUserArriveConcept(null);
+            db.updateUser(user);
+            finish();
+        }
+        else if(type.equals("DeliveryJobs")){
+            user.setUserArriveClient(null);
+            db.updateUser(user);
+            finish();
+        }
+    }
 
     private void backBtnClicked(){
         finish();
@@ -130,6 +162,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         for(ConceptBooking job : jobsList){
             if(job.getConceptBookingStatus() == 2){
                 sortedJobsList.add(job);
+                statusTwoJobs = true;
             }
         }
         if(user.getUserArriveConcept() == null && isStatusSeven && user.getUserArriveClient() == null){
@@ -141,6 +174,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                     user.setUserArriveConcept(GenericMethods.getDisplayDate(new Date()));
                     db.updateUser(user);
                     dialog.dismiss();
+                    showCancelButton();
                 }
             });
             build.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -156,8 +190,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     public void onResume()
     {
         super.onResume();
-        ProgressDialog progressDialog = GenericMethods.getProgressDialog(this, "Updating...");
-        //progressDialog.show();
         ((CJT)this.getApplication()).stopActivityTransitionTimer();
     }
 
@@ -172,6 +204,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         for(ConceptBooking job : jobsList){
             if(job.getConceptBookingStatus() == 9){
                 sortedJobsList.add(job);
+                statusNineJobs = true;
             }
         }
         if(user.getUserArriveClient() == null && user.getUserArriveConcept() == null && isStatusEight){
@@ -183,6 +216,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                     user.setUserArriveClient(GenericMethods.getDisplayDate(new Date()));
                     db.updateUser(user);
                     dialog.dismiss();
+                    showCancelButton();
                 }
             });
             build.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -234,6 +268,11 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     @Override
     public void handleDialogCloseDepart() {
         finish();
+    }
+
+    @Override
+    public void handleDialogCloseImage(String image) {
+
     }
 
     private void checkDepartBtn(){
