@@ -492,6 +492,7 @@ public class MainActivity extends AppCompatActivity {
                         paramsImg.add("name", jobStausTen.getConceptPickupSignature());
                         HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
                     }
+                    uploadPhotos(jobStausTen.getPickupImages());
                 }
             }
 
