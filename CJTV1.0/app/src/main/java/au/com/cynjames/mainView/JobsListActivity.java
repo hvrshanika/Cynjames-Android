@@ -126,10 +126,16 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             if(user.getUserArriveConcept() != null && !statusTwoJobs){
                 btnCancel.setVisibility(View.VISIBLE);
             }
+            else{
+                btnCancel.setVisibility(View.INVISIBLE);
+            }
         }
         else if(type.equals("DeliveryJobs")){
             if(user.getUserArriveClient() != null && !statusNineJobs){
                 btnCancel.setVisibility(View.VISIBLE);
+            }
+            else{
+                btnCancel.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -243,6 +249,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void handleDialogClose() {
+        statusTwoJobs = false;
+        statusNineJobs = false;
         runOnUiThread(new Runnable() {
             public void run() {
                 sortedJobsList.clear();
@@ -253,14 +261,20 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                     }
                 }
                 for(ConceptBooking job : jobsList){
-                    if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9){
+                    if(job.getConceptBookingStatus() == 2){
                         sortedJobsList.add(job);
+                        statusTwoJobs = true;
+                    }
+                    if(job.getConceptBookingStatus() == 9){
+                        sortedJobsList.add(job);
+                        statusNineJobs = true;
                     }
                 }
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }
                 checkDepartBtn();
+                showCancelButton();
             }
         });
     }

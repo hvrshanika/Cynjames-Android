@@ -200,7 +200,8 @@ public class DepartFragment extends DialogFragment {
 
     private void btnClearClicked(){
         name.setText("");
-        sign.clear(true);
+        sign.clear(false);
+        sign.cancelClearAnimation();
     }
 
     public void saveSig() {

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +38,8 @@ import java.util.List;
 import java.util.Stack;
 
 import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.communication.HTTPHandler;
+import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.User;
 import au.com.cynjames.utils.GenericMethods;
@@ -146,7 +153,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         }
 
         clientName.setText(job.getClient());
-        if (job.getConceptBookingTimeFor() == null) {
+        if (job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")) {
             bookingTime.setVisibility(View.GONE);
             viewRef.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);
         } else {
@@ -226,7 +233,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 if(rejected){
-                    getEmailIntent();
+                    sendEmail();
                 }
                 job.setConceptBookingStatus(9);
                 job.setPallets(Integer.parseInt(pallets.getText().toString()));
@@ -259,10 +266,30 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                             break;
                     }
                 }
+                else{
+                    switch (which) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            rejected = false;
+                            break;
+                    }
+                }
             }
         });
 
         return builder.create();
+    }
+
+    private void sendEmail(){
+        String subject = "Booking " + job.getId() + " has been rejected";
+        String content = job.getId() + " has been rejected by client " + job.getConceptDeliveryName() + ".";
+        RequestParams params = new RequestParams();
+        params.add("subject", subject);
+        params.add("content", content);
+        HTTPHandler.post("cjt-send-email.php", params, new HTTPHandler.ResponseManager(new EmailSender(), context, "Sending Email..."));
     }
 
     public void getEmailIntent() {
@@ -405,6 +432,16 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                         images.add(image);
                     }
                 }
+            }
+        }
+    }
+
+    public class EmailSender implements ResponseListener {
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                GenericMethods.showToast(context, "Email Sent.");
             }
         }
     }

@@ -57,7 +57,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         }
 
         clientName.setText(job.getClient());
-        if(job.getConceptBookingTimeFor() == null){
+        if(job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")){
             bookingTime.setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_timefor_line).setVisibility(View.GONE);

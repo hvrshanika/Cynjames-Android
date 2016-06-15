@@ -9,298 +9,308 @@
         android:id="@+id/fragment_job_details_header"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/dark_gray"/>
+        android:background="@color/dark_gray" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:src="@mipmap/logo_red"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="20dp"
+        android:src="@mipmap/logo_red" />
 
     <TextView
         android:id="@+id/fragment_job_details_header_back_button"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_alignParentRight="true"
+        android:layout_below="@+id/fragment_job_details_header"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/fragment_job_details_header"
-        android:text="@string/fragment_jobs_list_back"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textStyle="bold"
         android:background="@drawable/main_viewnow_orange_bg"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:gravity="center"
+        android:text="@string/fragment_jobs_list_back"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/fragment_job_details_header_camera_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_toLeftOf="@+id/fragment_job_details_header_back_button"
         android:layout_alignTop="@+id/fragment_job_details_header_back_button"
         android:layout_marginRight="10dp"
-        android:src="@mipmap/icon_camera"/>
+        android:layout_toLeftOf="@+id/fragment_job_details_header_back_button"
+        android:src="@mipmap/icon_camera" />
 
     <TextView
         android:id="@+id/fragment_job_details_header_images_view_button"
         android:layout_width="120dp"
         android:layout_height="40dp"
-        android:layout_toLeftOf="@+id/fragment_job_details_header_camera_button"
+        android:layout_below="@+id/fragment_job_details_header"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/fragment_job_details_header"
-        android:text="View Photos"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textStyle="bold"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_camera_button"
         android:background="@drawable/camera_button_bg"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:gravity="center"
+        android:text="View Photos"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
 
     <View
         android:id="@+id/view_seperator"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/light_gray"
+        android:layout_below="@+id/fragment_job_details_header_back_button"
         android:layout_marginTop="5dp"
-        android:layout_below="@+id/fragment_job_details_header_back_button"/>
+        android:background="@color/light_gray" />
 
-    <TextView
-        android:id="@+id/list_item_suburb_label"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
         android:layout_below="@+id/view_seperator"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/job_details_suburb"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:layout_marginBottom="20dp">
 
-    <TextView
-        android:id="@+id/list_item_suburb"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/list_item_suburb_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_below="@+id/view_seperator"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/list_item_pallets_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_client_name"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:gravity="left|center"
-        android:text="@string/jobs_list_item_pallets"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_suburb_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_suburb"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
-        android:id="@+id/list_item_pallets"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_toRightOf="@+id/list_item_pallets_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_below="@+id/list_item_client_name"
-        android:background="@drawable/bg_white_rounded_with_border"
-        android:layout_marginRight="10dp"
-        android:paddingLeft="5dp"
-        android:inputType="number"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_suburb"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_suburb_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_order_no_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_suburb"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/jobs_list_item_order_no"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_pallets_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_client_name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_pallets"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_order_no"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_suburb"
-        android:layout_toRightOf="@+id/list_item_order_no_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <EditText
+                android:id="@+id/list_item_pallets"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_client_name"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_pallets_label"
+                android:background="@drawable/bg_white_rounded_with_border"
+                android:gravity="left|center"
+                android:inputType="number"
+                android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_order_no_type_tl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_suburb"
-        android:layout_toRightOf="@+id/list_item_order_no"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="10dp"
-        android:text="[TL]"
-        android:gravity="left|center"
-        android:visibility="gone"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_order_no_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_suburb"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_order_no"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_order_no_type_hu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_suburb"
-        android:layout_toRightOf="@+id/list_item_order_no_type_tl"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="10dp"
-        android:text="[HU]"
-        android:visibility="gone"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_order_no"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_suburb"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_order_no_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_parcels_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_pallets"
-        android:layout_alignLeft="@+id/list_item_pallets_label"
-        android:layout_marginTop="20dp"
-        android:gravity="left|center"
-        android:text="@string/jobs_list_item_parcels"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_order_no_type_tl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_suburb"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_order_no"
+                android:gravity="left|center"
+                android:text="[TL]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone" />
 
-    <EditText
-        android:id="@+id/list_item_parcels"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/list_item_pallets"
-        android:layout_toRightOf="@+id/list_item_parcels_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_white_rounded_with_border"
-        android:layout_marginRight="10dp"
-        android:gravity="left|center"
-        android:inputType="number"
-        android:paddingLeft="5dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_order_no_type_hu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_suburb"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_order_no_type_tl"
+                android:gravity="left|center"
+                android:text="[HU]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/list_item_client_name_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_order_no"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/job_details_client_name"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_parcels_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_pallets_label"
+                android:layout_below="@+id/list_item_pallets"
+                android:layout_marginTop="20dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_parcels"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_client_name"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_order_no"
-        android:layout_toRightOf="@+id/list_item_client_name_label"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <EditText
+                android:id="@+id/list_item_parcels"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_pallets"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_parcels_label"
+                android:background="@drawable/bg_white_rounded_with_border"
+                android:gravity="left|center"
+                android:inputType="number"
+                android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_address_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_parcels"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/job_details_address"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_client_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_order_no"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_client_name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_parcels"
-        android:layout_toRightOf="@+id/list_item_address_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_client_name"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_order_no"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_client_name_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_notes_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_address"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/job_details_notes"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_address_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_parcels"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_address"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_notes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_address"
-        android:layout_toRightOf="@+id/list_item_notes_label"
-        android:layout_alignLeft="@+id/list_item_client_name"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_parcels"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_address_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_booking_time_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_notes"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:text="@string/jobs_list_item_booking_time"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_notes_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_address"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_notes"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_booking_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/list_item_notes"
-        android:layout_toRightOf="@+id/list_item_booking_time_label"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:gravity="left|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_address"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_notes_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/list_item_process_button"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/list_item_booking_time"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:background="@drawable/login_button_bg"
-        android:text="@string/job_details_process"
-        android:visibility="gone"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/list_item_booking_time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_notes"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_booking_time"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
+            <TextView
+                android:id="@+id/list_item_booking_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_notes"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_booking_time_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
+            <TextView
+                android:id="@+id/list_item_process_button"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_below="@+id/list_item_booking_time"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/login_button_bg"
+                android:gravity="center"
+                android:text="@string/job_details_process"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 
 </RelativeLayout>

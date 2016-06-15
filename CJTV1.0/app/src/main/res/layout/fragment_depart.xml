@@ -173,6 +173,7 @@
         android:layout_marginTop="10dp"
         android:eventsInterceptionEnabled="true"
         android:fadeEnabled="false"
+        android:fadeOffset="10000"
         android:gestureColor="@color/black"
         android:gestureStrokeLengthThreshold="0.1"
         android:gestureStrokeType="multiple"

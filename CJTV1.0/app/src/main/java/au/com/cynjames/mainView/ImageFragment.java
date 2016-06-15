@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -103,15 +104,20 @@ public class ImageFragment extends DialogFragment {
     }
 
     private void setImage(String imageName) {
-        Bitmap bitmap = null;
+//        Bitmap bitmap = null;
         cuurentImage = imageName;
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + imageName + ""));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 8;
+        String strPath = FILE_PATH + "" + imageName + "";
+        Bitmap bitmap = BitmapFactory.decodeFile(strPath,options);
+//        try {
+//            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + imageName + ""));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
+            //bitmap.recycle();
         } else {
             GenericMethods.showToast(context, "No Image");
         }
