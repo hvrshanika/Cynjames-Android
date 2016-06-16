@@ -75,7 +75,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         db = new SQLiteHelper(context);
         images = new ArrayList<>();
         SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
@@ -89,6 +88,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onResume() {
         super.onResume();
+        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
     }
 
@@ -200,6 +200,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     }
 
     private void btnBackClicked() {
+        listener.handleDialogClose();
         dismiss();
     }
 

@@ -104,13 +104,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         user.setUserArriveClient(cursor.getString(6));
 
         Log.d("getUser("+id+")", "" + user.getUserid() + " " + user.getUserFirstName());
-
+        db.close();
         return user;
     }
 
     public void clearTable(String tableName){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("delete from "+ tableName);
+        db.close();
     }
 
     public void addJob(ConceptBooking job){
@@ -202,6 +203,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(ConceptBooking jobb: jobs) {
             Log.d("getAllJobs()", jobb.getClient());
         }
+        db.close();
         return jobs;
     }
 
@@ -222,6 +224,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         else{
             exist = true;
         }
+        db.close();
         return exist;
     }
 
@@ -269,6 +272,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(ConceptBooking jobb: jobs) {
             Log.d("getPendingJobs()", String.valueOf(jobb.getConceptBookingStatus()));
         }
+        db.close();
         return jobs;
     }
 
@@ -316,6 +320,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(ConceptBooking jobb: jobs) {
             Log.d("getPendingJobs()", String.valueOf(jobb.getConceptBookingStatus()));
         }
+        db.close();
         return jobs;
     }
 
@@ -363,6 +368,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(ConceptBooking jobb: jobs) {
             Log.d("getReadyJobs()", String.valueOf(jobb.getConceptBookingStatus()));
         }
+        db.close();
         return jobs;
     }
 
@@ -370,6 +376,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String idString = String.valueOf(id);
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("delete from conceptBooking WHERE conceptBookingId = " + idString);
+        db.close();
     }
 
 
@@ -415,6 +422,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(DriverStatus jobb: jobs) {
             Log.d("getAllStatus()", String.valueOf(jobb.getDriverStatusLongitude()));
         }
+        db.close();
         return jobs;
     }
 
@@ -462,6 +470,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         for(ConceptBookingLog jobb: jobs) {
             Log.d("getAllStatus()", String.valueOf(jobb.getConceptBookingLogDate()));
         }
+        db.close();
         return jobs;
     }
 }

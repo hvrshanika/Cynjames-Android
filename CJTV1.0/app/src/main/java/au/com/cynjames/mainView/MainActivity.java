@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
         prefsEditor = mPrefs.edit();
-        context = this;
+        context = MainActivity.this;
         pendingJobs = new ArrayList<>();
         deliverReadyJobs = new ArrayList<>();
         gson = new Gson();

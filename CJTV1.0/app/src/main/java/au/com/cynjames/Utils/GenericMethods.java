@@ -77,16 +77,25 @@ public class GenericMethods {
 
     }
 
-    public static Date getDatefromString(String dateString){
-        SimpleDateFormat  format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        Date date = null;
-        try {
-            date = format.parse(dateString);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    public static Date getDatefromString(String dateString) {
+
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            Date date = null;
+        if (dateString != null) {
+            try {
+                date = format.parse(dateString);
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                date = format.parse(getDisplayDate(new Date()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
-        return date;
+            return date;
     }
 
 }

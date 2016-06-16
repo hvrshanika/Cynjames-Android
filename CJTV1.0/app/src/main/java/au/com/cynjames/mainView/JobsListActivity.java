@@ -76,7 +76,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jobs_list);
         myApp = (CJT) this.getApplication();
-        context = this;
+        context = JobsListActivity.this;
         type = getIntent().getExtras().getString("type");
         db = new SQLiteHelper(this);
         sortedJobsList = new ArrayList<>();
@@ -361,7 +361,14 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void handleDialogCloseDepart() {
+        resetDisconnectTimer();
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopDisconnectTimer();
     }
 
     @Override

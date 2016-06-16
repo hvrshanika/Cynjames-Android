@@ -56,7 +56,6 @@ public class DepartFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         db = new SQLiteHelper(context);
         SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
         Gson gson = new Gson();
@@ -89,6 +88,7 @@ public class DepartFragment extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
+        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
     }
 
