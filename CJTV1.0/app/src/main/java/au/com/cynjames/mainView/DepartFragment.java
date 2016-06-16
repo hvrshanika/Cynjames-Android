@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
@@ -55,6 +56,7 @@ public class DepartFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         db = new SQLiteHelper(context);
         SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
         Gson gson = new Gson();
@@ -63,6 +65,11 @@ public class DepartFragment extends DialogFragment {
         user = db.getUser(id);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((JobsListActivity) getActivity()).resetDisconnectTimer();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,6 +84,12 @@ public class DepartFragment extends DialogFragment {
         rootView = inflater.inflate(R.layout.fragment_depart, container, false);
         setLabels(rootView);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
     }
 
     private void setLabels(View viewRef){

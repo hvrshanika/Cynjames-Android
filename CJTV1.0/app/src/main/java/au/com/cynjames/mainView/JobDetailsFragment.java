@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
@@ -74,6 +75,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((JobsListActivity) getActivity()).stopDisconnectTimer();
         db = new SQLiteHelper(context);
         images = new ArrayList<>();
         SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
@@ -84,6 +86,17 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         loadImages();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((JobsListActivity) getActivity()).resetDisconnectTimer();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -285,7 +298,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
     private void sendEmail(){
         String subject = "Booking " + job.getId() + " has been rejected";
-        String content = job.getId() + " has been rejected by client " + job.getConceptDeliveryName() + ".";
+        String content = job.getId() + " has been rejected by client " + job.getClient() + ".";
         RequestParams params = new RequestParams();
         params.add("subject", subject);
         params.add("content", content);
