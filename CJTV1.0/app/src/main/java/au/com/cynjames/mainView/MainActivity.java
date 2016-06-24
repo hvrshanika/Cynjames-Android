@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
@@ -89,14 +91,22 @@ public class MainActivity extends AppCompatActivity {
     int postjobsCount = 0;
     int preImagesCount = 0;
     int postImagesCount = 0;
+    boolean firstStatus;
+    boolean logoutTimer = false;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle b = intent.getBundleExtra("Location");
-            mLastLocation = (Location) b.getParcelable("Location");
+            mLastLocation = b.getParcelable("Location");
             if (mLastLocation != null) {
-                updateDriverStauts();
+                if(firstStatus){
+                    updateDriverStauts("Driver has logged in");
+                    firstStatus = false;
+                }
+                else {
+                    updateDriverStauts("Locating Driver");
+                }
             }
         }
     };
@@ -110,6 +120,17 @@ public class MainActivity extends AppCompatActivity {
             if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
                 uploadDatatoServer();
             }
+        }
+    };
+    private Handler logOutHandler = new Handler() {
+        public void handleMessage(Message msg) {
+        }
+    };
+    private Runnable logOutCallback = new Runnable() {
+        @Override
+        public void run() {
+            prefsEditor.clear();
+            finish();
         }
     };
 
@@ -131,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         deliverReadyJobs = new ArrayList<>();
         gson = new Gson();
         db = new SQLiteHelper(this);
+        firstStatus = true;
         getUser();
         init();
         if (user == null) {
@@ -144,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         }
         startLocationService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+        setTimer();
     }
 
     @Override
@@ -217,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         stopDisconnectTimer();
+        stopLogOutTimer();
         Runnable progressRunnable = new Runnable() {
 
             @Override
@@ -289,6 +313,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int id) {
                     initVariables();
                     logoutClicked = true;
+                    if(mLastLocation != null){
+                        updateDriverStauts("Driver has logged out");
+                    }
                     uploadDatatoServer();
                 }
             });
@@ -328,13 +355,13 @@ public class MainActivity extends AppCompatActivity {
         postImagesCount = 0;
     }
 
-    private void updateDriverStauts() {
+    private void updateDriverStauts(String desc) {
         Calendar c = Calendar.getInstance();
         DriverStatus status = new DriverStatus();
-        status.setDriverStatusDate(GenericMethods.getDisplayDate(new Date()));
+        status.setDriverStatusDate(GenericMethods.getDBDate(GenericMethods.getDatefromString(null)));
         status.setDriverStatusTime(c.getTime().toString());
         status.setDriverStatus_driverId(user.getDriverId());
-        status.setDriverStatusDescription("Locating Driver");
+        status.setDriverStatusDescription(desc);
         status.setDriverStatus_vehicleId(vehicle.getVehicleId());
         status.setDriverStatusLatitude(mLastLocation.getLatitude());
         status.setDriverStatusLongitude(mLastLocation.getLongitude());
@@ -391,9 +418,39 @@ public class MainActivity extends AppCompatActivity {
         interactionHandler.removeCallbacks(interactionCallback);
     }
 
+    public void resetLogOutTimer() {
+        logOutHandler.removeCallbacks(logOutCallback);
+        logOutHandler.postDelayed(logOutCallback, 3600000);
+    }
+
+    public void stopLogOutTimer() {
+        logOutHandler.removeCallbacks(logOutCallback);
+    }
+
     @Override
     public void onUserInteraction() {
         resetDisconnectTimer();
+        if(logoutTimer) {
+            resetLogOutTimer();
+        }
+    }
+
+    private void setTimer(){
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            public void run() {
+                logoutTimer = true;
+                resetLogOutTimer();
+            }
+        };
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.HOUR, 7);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        date.set(Calendar.AM_PM, Calendar.PM);
+        timer.schedule(task, date.getTime(), 1000 * 60 * 60 * 24 * 7
+        );
     }
 
 
@@ -440,8 +497,9 @@ public class MainActivity extends AppCompatActivity {
                 if (jobStatusEight.getConceptPickupSignature() != null) {
                     params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
                     params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
-                    jobStatusEight.setConceptDeliverySignature("uploads/" + jobStatusEight.getConceptPickupSignature());
+                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
                     db.updateJob(jobStatusEight);
+                    updateLabels();
                     prejobsCount++;
                     Bitmap bitmap = null;
                     try {
@@ -471,6 +529,8 @@ public class MainActivity extends AppCompatActivity {
             params.add("conceptDeliveryDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptDeliveryDate())));
             params.add("conceptDeliverySignature", "uploads/" + jobStausTen.getConceptDeliverySignature());
             params.add("conceptPickupName", jobStausTen.getConceptPickupName());
+            params.add("conceptBookingPallets", String.valueOf(jobStausTen.getPallets()));
+            params.add("conceptBookingParcels", String.valueOf(jobStausTen.getParcels()));
             params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
@@ -559,6 +619,7 @@ public class MainActivity extends AppCompatActivity {
             prefsEditor.clear();
             finish();
         } else if (prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
+            initVariables();
             loadNewJobs();
         }
     }
@@ -602,6 +663,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void checkJobsAssigned(){
+        List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7");
+
+        for(ConceptBooking statusSevenJob: statusSevenJobs){
+            RequestParams params = new RequestParams();
+            params.add("userid", String.valueOf(user.getUserid()));
+            params.add("bookingId", String.valueOf(statusSevenJob.getId()));
+            HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
+        }
+    }
+
     public class PendingListLoader implements ResponseListener {
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
@@ -619,6 +691,24 @@ public class MainActivity extends AppCompatActivity {
                 if (pendingJobs.size() > 0) {
                     pendingIcon.setVisibility(View.VISIBLE);
                     playSound();
+                }
+            }
+        }
+    }
+
+    public class AssignedJobsChecker implements ResponseListener {
+        int id;
+
+        public AssignedJobsChecker(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
+                    db.clearConcept(id);
                 }
             }
         }
@@ -721,6 +811,7 @@ public class MainActivity extends AppCompatActivity {
                     playSound();
                 }
             }
+            checkJobsAssigned();
         }
     }
 }
