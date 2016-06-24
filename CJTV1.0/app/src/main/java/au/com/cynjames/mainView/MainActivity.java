@@ -490,6 +490,8 @@ public class MainActivity extends AppCompatActivity {
             params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getArrivedConcept())));
             params.add("conceptBookingStatus", String.valueOf(jobStatusEight.getConceptBookingStatus()));
             params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
+            params.add("conceptBookingPallets", String.valueOf(jobStatusEight.getPallets()));
+            params.add("conceptBookingParcels", String.valueOf(jobStatusEight.getParcels()));
             if (jobStatusEight.getConceptPickupSignature().contains("uploads")) {
                 params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
                 params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());

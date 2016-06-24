@@ -436,6 +436,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getArrivedConcept())));
             params.add("conceptBookingStatus", String.valueOf(jobStatusEight.getConceptBookingStatus()));
             params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
+            params.add("conceptBookingPallets", String.valueOf(jobStatusEight.getPallets()));
+            params.add("conceptBookingParcels", String.valueOf(jobStatusEight.getParcels()));
             if (jobStatusEight.getConceptPickupSignature().contains("uploads")) {
                 params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
                 params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());
@@ -443,7 +445,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 if (jobStatusEight.getConceptPickupSignature() != null) {
                     params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
                     params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
-                    jobStatusEight.setConceptDeliverySignature("uploads/" + jobStatusEight.getConceptPickupSignature());
+                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
                     db.updateJob(jobStatusEight);
                     Bitmap bitmap = null;
                     try {
@@ -472,6 +474,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             params.add("conceptDeliveryDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptDeliveryDate())));
             params.add("conceptDeliverySignature", "uploads/" + jobStausTen.getConceptDeliverySignature());
             params.add("conceptPickupName", jobStausTen.getConceptPickupName());
+            params.add("conceptBookingPallets", String.valueOf(jobStausTen.getPallets()));
+            params.add("conceptBookingParcels", String.valueOf(jobStausTen.getParcels()));
             params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
