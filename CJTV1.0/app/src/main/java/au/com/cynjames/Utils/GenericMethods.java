@@ -77,6 +77,30 @@ public class GenericMethods {
 
     }
 
+    public static String getDBTime(Date date) {
+        if (date == null) {
+            date = new Date();
+
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        String d=formatter.format(date);
+        return d;
+
+    }
+
+    public static String getDBDateOnly(Date date) {
+        if (date == null) {
+            date = new Date();
+
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String d=formatter.format(date);
+        return d;
+
+    }
+
     public static Date getDatefromString(String dateString) {
 
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");

@@ -226,6 +226,10 @@ public class MainActivity extends AppCompatActivity {
         getUser();
         invalidateOptionsMenu();
         updateLabels();
+        if (myApp.wasInBackground) {
+            Log.d("inBackground", "ONRESUME");
+            loadNewJobs();
+        }
         myApp.stopActivityTransitionTimer();
         resetDisconnectTimer();
     }
@@ -247,22 +251,31 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
                     Log.d("stopped", "ONSTOP");
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
                     if (myApp.wasInBackground) {
                         Log.d("inBackground", "ONSTOP");
                         uploadDatatoServer();
                     }
-
                 }
             }
         };
 
         Handler pdCanceller = new Handler();
         pdCanceller.postDelayed(progressRunnable, 3000);
+
+        Runnable logoutRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                if(logoutTimer) {
+                    prefsEditor.clear();
+                    finish();
+                }
+            }
+        };
+
+        Handler logoutTask = new Handler();
+        logoutTask.postDelayed(logoutRunnable, 1800000);
+//        logoutTask.postDelayed(logoutRunnable, 10000);
 
     }
 
@@ -356,11 +369,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateDriverStauts(String desc) {
-        Calendar c = Calendar.getInstance();
         DriverStatus status = new DriverStatus();
-        status.setDriverStatusDate(GenericMethods.getDBDate(GenericMethods.getDatefromString(null)));
-        status.setDriverStatusTime(c.getTime().toString());
-        status.setDriverStatus_driverId(user.getDriverId());
+        status.setDriverStatusDate(GenericMethods.getDBDateOnly(new Date()));
+        status.setDriverStatusTime(GenericMethods.getDBTime(new Date()));
+        status.setDriverStatus_driverId(user.getUserid());
         status.setDriverStatusDescription(desc);
         status.setDriverStatus_vehicleId(vehicle.getVehicleId());
         status.setDriverStatusLatitude(mLastLocation.getLatitude());
@@ -420,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void resetLogOutTimer() {
         logOutHandler.removeCallbacks(logOutCallback);
-        logOutHandler.postDelayed(logOutCallback, 3600000);
+        logOutHandler.postDelayed(logOutCallback, 1800000);
     }
 
     public void stopLogOutTimer() {
@@ -449,8 +461,7 @@ public class MainActivity extends AppCompatActivity {
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
         date.set(Calendar.AM_PM, Calendar.PM);
-        timer.schedule(task, date.getTime(), 1000 * 60 * 60 * 24 * 7
-        );
+        timer.schedule(task, date.getTime(), 1000 * 60 * 60 * 24 * 7);
     }
 
 
