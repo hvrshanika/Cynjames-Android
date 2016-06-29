@@ -78,4 +78,36 @@ public class HTTPHandler {
         }
     }
 
+    public static class ResponseManagerWithOutProgress extends JsonHttpResponseHandler {
+        final ResponseListener responseListener;
+
+        public ResponseManagerWithOutProgress(ResponseListener responseListener) {
+            this.responseListener = responseListener;
+        }
+
+        public void onStart() {
+            super.onStart();
+        }
+
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            super.onSuccess(statusCode, headers, response);
+            try {
+                this.responseListener.onSuccess(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //progressDialog.dismiss();
+        }
+
+        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            super.onFailure(statusCode, headers, responseString, throwable);
+            //progressDialog.dismiss();
+            Log.d("Failed", responseString);
+        }
+
+        public void onFinish() {
+            super.onFinish();
+        }
+    }
+
 }

@@ -60,6 +60,7 @@ import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
+import au.com.cynjames.utils.NewJobsUpdateService;
 import au.com.cynjames.utils.SQLiteHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -228,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         updateLabels();
         if (myApp.wasInBackground) {
             Log.d("inBackground", "ONRESUME");
+            stopNotificationService();
             loadNewJobs();
         }
         myApp.stopActivityTransitionTimer();
@@ -254,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
                     if (myApp.wasInBackground) {
                         Log.d("inBackground", "ONSTOP");
                         uploadDatatoServer();
+                        startNotificationService();
                     }
                 }
             }
@@ -386,6 +389,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void stopLocationService() {
         stopService(new Intent(getBaseContext(), LocationService.class));
+    }
+
+    public void startNotificationService() {
+        startService(new Intent(getBaseContext(), NewJobsUpdateService.class));
+    }
+
+    public void stopNotificationService() {
+        stopService(new Intent(getBaseContext(), NewJobsUpdateService.class));
     }
 
     private void playSound() {
