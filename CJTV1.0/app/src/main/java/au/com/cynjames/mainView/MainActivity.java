@@ -521,9 +521,6 @@ public class MainActivity extends AppCompatActivity {
                 if (jobStatusEight.getConceptPickupSignature() != null) {
                     params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
                     params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
-                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
-                    db.updateJob(jobStatusEight);
-                    updateLabels();
                     prejobsCount++;
                     Bitmap bitmap = null;
                     try {
@@ -541,6 +538,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
                     uploadPhotos(jobStatusEight.getPickupImages());
+                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
+                    db.updateJob(jobStatusEight);
+                    updateLabels();
                 }
             }
         }

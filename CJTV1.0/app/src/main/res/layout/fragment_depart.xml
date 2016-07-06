@@ -167,7 +167,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/list_item_sign_label"
-        android:background="@drawable/bg_white_rounded_with_border"
+        android:background="@drawable/bg_white_rounded_with_black_border"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"

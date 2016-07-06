@@ -44,6 +44,14 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!isTaskRoot()
+                && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
+                && getIntent().getAction() != null
+                && getIntent().getAction().equals(Intent.ACTION_MAIN)) {
+
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_login);
         init();
         context = this;
@@ -107,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
-            ArrayList<Vehicle> vehicleArrayList = ((Vehicles) gson.fromJson(jSONObject.toString(), Vehicles.class)).getVehicles();
+            ArrayList<Vehicle> vehicleArrayList = gson.fromJson(jSONObject.toString(), Vehicles.class).getVehicles();
             vehicleArrayList.add(0, new Vehicles().getAVehicle("Vehicle no", "-1"));
             vehicleList.setAdapter(new ArrayAdapter<>(context,R.layout.spinner_item,vehicleArrayList));
         }
@@ -130,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             if (jSONObject.getInt("success") == 1) {
-                User user = (User) gson.fromJson(jSONObject.toString(), User.class);
+                User user = gson.fromJson(jSONObject.toString(), User.class);
                 user.setVehicle(vehicle);
                 db.clearTable("user");
                 db.addUser(user);
