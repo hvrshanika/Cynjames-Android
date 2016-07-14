@@ -12,5 +12,6 @@
     <color name="orange">#f79520</color>
     <color name="green">#008000</color>
     <color name="camera_btn_back">#ff4502</color>
+    <color name="light_red">#ffb7b7</color>
 
 </resources>

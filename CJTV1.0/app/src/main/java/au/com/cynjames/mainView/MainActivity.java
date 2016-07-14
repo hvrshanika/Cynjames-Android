@@ -559,8 +559,8 @@ public class MainActivity extends AppCompatActivity {
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
                 params.add("conceptPickupSignature", jobStausTen.getConceptPickupSignature());
-                params.add("arrivedConcept", jobStausTen.getArrivedConcept());
-                params.add("conceptBookingPickupDate", jobStausTen.getConceptBookingPickupDate());
+                params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
+                params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
             } else {
                 if (jobStausTen.getConceptPickupSignature() != null) {
                     params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());

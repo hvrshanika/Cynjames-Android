@@ -445,8 +445,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 if (jobStatusEight.getConceptPickupSignature() != null) {
                     params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStatusEight.getConceptBookingPickupDate())));
                     params.add("conceptPickupSignature", "uploads/" + jobStatusEight.getConceptPickupSignature());
-                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
-                    db.updateJob(jobStatusEight);
                     Bitmap bitmap = null;
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStatusEight.getConceptPickupSignature() + ""));
@@ -462,6 +460,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                     }
                     HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId()), context, "Updating..."));
                     uploadPhotos(jobStatusEight.getPickupImages());
+                    jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
+                    db.updateJob(jobStatusEight);
                 }
             }
         }
@@ -480,8 +480,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
                 params.add("conceptPickupSignature", jobStausTen.getConceptPickupSignature());
-                params.add("arrivedConcept", jobStausTen.getArrivedConcept());
-                params.add("conceptBookingPickupDate", jobStausTen.getConceptBookingPickupDate());
+                params.add("arrivedConcept",  GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
+                params.add("conceptBookingPickupDate",  GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
             } else {
                 if (jobStausTen.getConceptPickupSignature() != null) {
                     params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());

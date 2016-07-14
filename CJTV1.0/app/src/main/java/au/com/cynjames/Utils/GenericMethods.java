@@ -59,7 +59,7 @@ public class GenericMethods {
 
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
         String d=formatter.format(date);
         return d;
 
@@ -71,7 +71,7 @@ public class GenericMethods {
 
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String d=formatter.format(date);
         return d;
 
@@ -103,7 +103,7 @@ public class GenericMethods {
 
     public static Date getDatefromString(String dateString) {
 
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
             Date date = null;
         if (dateString != null) {
             try {
