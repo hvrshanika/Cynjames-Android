@@ -178,6 +178,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
+            android:gestureStrokeWidth="3.0"
             android:background="@drawable/bg_white_rounded_with_black_border"
             android:eventsInterceptionEnabled="true"
             android:fadeEnabled="false"

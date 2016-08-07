@@ -31,9 +31,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.app.ActionBar;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.loopj.android.http.Base64;
 import com.loopj.android.http.RequestParams;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -168,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         startLocationService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
         setTimer();
+        uploadFirebaseToken();
     }
 
     @Override
@@ -224,6 +227,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int result = googleApiAvailability.isGooglePlayServicesAvailable(context);
+        if(result != 0) {
+            if(googleApiAvailability.isUserResolvableError(result)) {
+                googleApiAvailability.getErrorDialog(this, result,
+                        result).show();
+            }
+        }
         getUser();
         invalidateOptionsMenu();
         updateLabels();
@@ -306,12 +317,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void uploadFirebaseToken(){
+        String token = FirebaseInstanceId.getInstance().getToken();
+        if(token != null){
+            Log.d("Token:", token);
+            String userId = String.valueOf(user.getUserid());
+            RequestParams params = new RequestParams();
+            params.add("userId", userId);
+            params.add("firebaseToken", token);
+            HTTPHandler.post("cjt-updateFbToken.php", params, new HTTPHandler.ResponseManager(new TokenUploader(), context, "Updating..."));
+        }
+    }
+
     private void loadData() {
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
         HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new PendingListLoader(), context, "Updating..."));
-
     }
 
     public void logoutUser() {
@@ -552,37 +574,10 @@ public class MainActivity extends AppCompatActivity {
             params.add("conceptDeliveryName", jobStausTen.getConceptDeliveryName());
             params.add("conceptDeliveryDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptDeliveryDate())));
             params.add("conceptDeliverySignature", "uploads/" + jobStausTen.getConceptDeliverySignature());
-            params.add("conceptPickupName", jobStausTen.getConceptPickupName());
             params.add("conceptBookingPallets", String.valueOf(jobStausTen.getPallets()));
             params.add("conceptBookingParcels", String.valueOf(jobStausTen.getParcels()));
             params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
-            if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
-                params.add("conceptPickupSignature", jobStausTen.getConceptPickupSignature());
-                params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
-                params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
-            } else {
-                if (jobStausTen.getConceptPickupSignature() != null) {
-                    params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
-                    params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
-                    params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
-                    Bitmap bitmap = null;
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausTen.getConceptPickupSignature() + ""));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (bitmap != null) {
-                        preImagesCount += 1;
-                        String encoded = getStringImage(bitmap);
-                        RequestParams paramsImg = new RequestParams();
-                        paramsImg.add("image", encoded);
-                        paramsImg.add("name", jobStausTen.getConceptPickupSignature());
-                        HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
-                    }
-                    uploadPhotos(jobStausTen.getPickupImages());
-                }
-            }
 
             if (jobStausTen.getConceptDeliverySignature() != null) {
                 prejobsCount++;
@@ -600,8 +595,34 @@ public class MainActivity extends AppCompatActivity {
                     paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
                     HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
                 }
-                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
                 uploadPhotos(jobStausTen.getDeliveryImages());
+            }
+
+            if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
+                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+            } else {
+                if (jobStausTen.getConceptPickupSignature() != null) {
+                    params.add("conceptPickupName", jobStausTen.getConceptPickupName());
+                    params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
+                    params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
+                    params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getConceptBookingPickupDate())));
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausTen.getConceptPickupSignature() + ""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (bitmap != null) {
+                        preImagesCount += 1;
+                        String encoded = getStringImage(bitmap);
+                        RequestParams paramsImg = new RequestParams();
+                        paramsImg.add("image", encoded);
+                        paramsImg.add("name", jobStausTen.getConceptPickupSignature());
+                        HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
+                    }
+                    HTTPHandler.post("cjt-update-jobs-status-8-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+                    uploadPhotos(jobStausTen.getPickupImages());
+                }
             }
         }
         List<ConceptBooking> jobsStausTwo = db.getPendingJobsWithStatus("2");
@@ -836,6 +857,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             checkJobsAssigned();
+        }
+    }
+
+    public class TokenUploader implements ResponseListener {
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getInt("success") == 1) {
+
+            }
+            else {
+
+            }
         }
     }
 }
