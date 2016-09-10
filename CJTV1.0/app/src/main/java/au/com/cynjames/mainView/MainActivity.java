@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.app.ActionBar;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.loopj.android.http.Base64;
@@ -132,8 +133,8 @@ public class MainActivity extends AppCompatActivity {
     private Runnable logOutCallback = new Runnable() {
         @Override
         public void run() {
-            prefsEditor.clear();
-            finish();
+           // prefsEditor.clear();
+           // finish();
         }
     };
 
@@ -159,18 +160,21 @@ public class MainActivity extends AppCompatActivity {
         getUser();
         init();
         if (user == null) {
-            finish();
+            //finish();
+            GenericMethods.showMessage(context, "Error", "Please Login again!");
         }
-        if (GenericMethods.isConnectedToInternet(this)) {
+        if (GenericMethods.isConnectedToInternet(context)) {
             loadData();
         } else {
             GenericMethods.showNoInternetDialog(context);
-            logoutUser();
+            GenericMethods.showMessage(context, "Error", "Please Login again!");
+            //logoutUser();
         }
         startLocationService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
-        setTimer();
+        //setTimer();
         uploadFirebaseToken();
+        FirebaseCrash.log("MainActivity - onCreate");
     }
 
     @Override
@@ -186,7 +190,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                loadNewJobs();
+                if (GenericMethods.isConnectedToInternet(this)) {
+                    loadNewJobs();
+                }
+                else {
+                    GenericMethods.showNoInternetDialog(context);
+                }
                 break;
             case R.id.action_logout:
                 logoutUser();
@@ -227,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        FirebaseCrash.log("MainActivity - onResume - start");
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int result = googleApiAvailability.isGooglePlayServicesAvailable(context);
         if(result != 0) {
@@ -239,57 +249,63 @@ public class MainActivity extends AppCompatActivity {
         invalidateOptionsMenu();
         updateLabels();
         if (myApp.wasInBackground) {
-            Log.d("inBackground", "ONRESUME");
+            FirebaseCrash.log("MainActivity inBackground onResume");
             stopNotificationService();
-            loadNewJobs();
+            if (GenericMethods.isConnectedToInternet(context)) {
+                loadNewJobs();
+            }
         }
         myApp.stopActivityTransitionTimer();
         resetDisconnectTimer();
+        FirebaseCrash.log("MainActivity - onResume - end");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         myApp.startActivityTransitionTimer();
+        FirebaseCrash.log("MainActivity - onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        FirebaseCrash.log("MainActivity - onStop - start");
         stopDisconnectTimer();
-        stopLogOutTimer();
+        //stopLogOutTimer();
         Runnable progressRunnable = new Runnable() {
 
             @Override
             public void run() {
-                if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
-                    Log.d("stopped", "ONSTOP");
                     if (myApp.wasInBackground) {
-                        Log.d("inBackground", "ONSTOP");
-                        uploadDatatoServer();
+                        FirebaseCrash.log("MainActivity inBackground ONSTOP");
+                        if (GenericMethods.isConnectedToInternet(context)) {
+                            uploadDatatoServer();
+                        }
                         startNotificationService();
-                    }
                 }
             }
         };
 
-        Handler pdCanceller = new Handler();
-        pdCanceller.postDelayed(progressRunnable, 3000);
+        if(!logoutClicked) {
+            Handler pdCanceller = new Handler();
+            pdCanceller.postDelayed(progressRunnable, 3000);
+        }
 
-        Runnable logoutRunnable = new Runnable() {
-
-            @Override
-            public void run() {
-                if(logoutTimer) {
-                    prefsEditor.clear();
-                    finish();
-                }
-            }
-        };
-
-        Handler logoutTask = new Handler();
-        logoutTask.postDelayed(logoutRunnable, 1800000);
-//        logoutTask.postDelayed(logoutRunnable, 10000);
+//        Runnable logoutRunnable = new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                if(logoutTimer) {
+//                    prefsEditor.clear();
+//                    finish();
+//                }
+//            }
+//        };
+//
+//        Handler logoutTask = new Handler();
+//        logoutTask.postDelayed(logoutRunnable, 1800000);
+        FirebaseCrash.log("MainActivity - onStop");
 
     }
 
@@ -319,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void uploadFirebaseToken(){
         String token = FirebaseInstanceId.getInstance().getToken();
-        if(token != null){
+        if(token != null && GenericMethods.isConnectedToInternet(context)){
             Log.d("Token:", token);
             String userId = String.valueOf(user.getUserid());
             RequestParams params = new RequestParams();
@@ -354,7 +370,12 @@ public class MainActivity extends AppCompatActivity {
                     if(mLastLocation != null){
                         updateDriverStauts("Driver has logged out");
                     }
-                    uploadDatatoServer();
+                    if (GenericMethods.isConnectedToInternet(context)) {
+                        uploadDatatoServer();
+                    }
+                    else {
+                        GenericMethods.showNoInternetDialog(context);
+                    }
                 }
             });
             build.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -475,9 +496,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onUserInteraction() {
         resetDisconnectTimer();
-        if(logoutTimer) {
-            resetLogOutTimer();
-        }
+//        if(logoutTimer) {
+//            resetLogOutTimer();
+//        }
     }
 
     private void setTimer(){
@@ -580,7 +601,6 @@ public class MainActivity extends AppCompatActivity {
             params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
 
             if (jobStausTen.getConceptDeliverySignature() != null) {
-                prejobsCount++;
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausTen.getConceptDeliverySignature() + ""));
@@ -597,7 +617,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 uploadPhotos(jobStausTen.getDeliveryImages());
             }
-
+            prejobsCount++;
             if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
                 HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
             } else {
@@ -628,12 +648,14 @@ public class MainActivity extends AppCompatActivity {
         List<ConceptBooking> jobsStausTwo = db.getPendingJobsWithStatus("2");
         List<ConceptBooking> jobsStausNine = db.getPendingJobsWithStatus("9");
         for (ConceptBooking jobStausYwo : jobsStausTwo) {
+            prejobsCount++;
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStausYwo.getId()));
             params.add("conceptBookingStatus", String.valueOf(jobStausYwo.getConceptBookingStatus()));
             HTTPHandler.post("cjt-update-jobs-status-2-9.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausYwo.getId()), context, "Updating..."));
         }
         for (ConceptBooking jobStausNine : jobsStausNine) {
+            prejobsCount++;
             RequestParams params = new RequestParams();
             params.add("id", String.valueOf(jobStausNine.getId()));
             params.add("conceptBookingStatus", String.valueOf(jobStausNine.getConceptBookingStatus()));
@@ -665,7 +687,9 @@ public class MainActivity extends AppCompatActivity {
             finish();
         } else if (prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             initVariables();
-            loadNewJobs();
+            if (GenericMethods.isConnectedToInternet(this)) {
+                loadNewJobs();
+            }
         }
     }
 
@@ -856,7 +880,9 @@ public class MainActivity extends AppCompatActivity {
                     playSound();
                 }
             }
-            checkJobsAssigned();
+            if (GenericMethods.isConnectedToInternet(context)) {
+                checkJobsAssigned();
+            }
         }
     }
 

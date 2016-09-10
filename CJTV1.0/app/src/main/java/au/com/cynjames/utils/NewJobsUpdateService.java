@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -66,7 +68,9 @@ public class NewJobsUpdateService extends Service {
         @Override
         public void run() {
             try {
-                loadNewJobs();
+                if (GenericMethods.isConnectedToInternet(NewJobsUpdateService.this)) {
+                    loadNewJobs();
+                }
             } finally {
                 mHandler.postDelayed(mStatusChecker, mInterval);
             }
@@ -104,14 +108,15 @@ public class NewJobsUpdateService extends Service {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
 
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification noti = new Notification.Builder(this)
                 .setContentTitle("Cynjames Notification")
                 .setContentText("You have New Jobs")
                 .setSmallIcon(R.mipmap.app_icon)
                 .setLargeIcon(icon)
+                .setSound(defaultSoundUri)
                 .setContentIntent(pIntent).build();
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // hide the notification after its selected
         noti.flags |= Notification.FLAG_AUTO_CANCEL;
 
         notificationManager.notify(0, noti);

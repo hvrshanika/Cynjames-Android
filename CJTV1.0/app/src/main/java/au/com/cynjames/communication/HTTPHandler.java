@@ -4,19 +4,32 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.loopj.android.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 
 import au.com.cynjames.utils.GenericMethods;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpClientConnection;
+import cz.msebera.android.httpclient.HttpConnectionMetrics;
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.HttpEntityEnclosingRequest;
+import cz.msebera.android.httpclient.HttpException;
+import cz.msebera.android.httpclient.HttpRequest;
 import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.client.methods.HttpPut;
+import cz.msebera.android.httpclient.client.protocol.HttpClientContext;
 import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.mime.MultipartEntityBuilder;
+import cz.msebera.android.httpclient.protocol.HttpRequestExecutor;
+import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class HTTPHandler {
 
@@ -53,7 +66,13 @@ public class HTTPHandler {
 
         public void onStart() {
             super.onStart();
-            progressDialog.show();
+            try {
+                progressDialog.show();
+            } catch (WindowManager.BadTokenException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -74,7 +93,13 @@ public class HTTPHandler {
 
         public void onFinish() {
             super.onFinish();
-            progressDialog.dismiss();
+            try {
+                progressDialog.dismiss();
+            } catch (WindowManager.BadTokenException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -96,12 +121,10 @@ public class HTTPHandler {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //progressDialog.dismiss();
         }
 
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
-            //progressDialog.dismiss();
             Log.d("Failed", responseString);
         }
 
@@ -109,5 +132,4 @@ public class HTTPHandler {
             super.onFinish();
         }
     }
-
 }

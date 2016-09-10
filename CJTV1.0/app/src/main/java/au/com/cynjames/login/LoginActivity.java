@@ -1,6 +1,5 @@
 package au.com.cynjames.login;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
         prefsEditor = mPrefs.edit();
         db = new SQLiteHelper(this);
+        //FirebaseCrash.report(new Exception("My first Android non-fatal error"));
     }
 
     private void init(){

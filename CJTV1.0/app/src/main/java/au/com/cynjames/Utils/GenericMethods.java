@@ -6,24 +6,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import au.com.cynjames.communication.HTTPHandler;
+import au.com.cynjames.communication.ResponseListener;
+
 /**
  * Created by eleos on 5/13/2016.
  */
 public class GenericMethods {
+    int response = 0;
 
     public static boolean isConnectedToInternet(Context con) {
         ConnectivityManager connectivity = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
-            if (info != null && info.isConnected()){
-                        return true;
-                }
+            if (info != null && info.isConnected()) {
+                return true;
+            }
+
         }
         return false;
     }
@@ -44,6 +53,19 @@ public class GenericMethods {
         Builder build = new Builder(con);
         build.setTitle("No Internet Connection");
         build.setMessage("Please check your connection.");
+        build.setCancelable(false);
+        build.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        build.create().show();
+    }
+
+    public static void showMessage(Context con, String title, String message) {
+        Builder build = new Builder(con);
+        build.setTitle(title);
+        build.setMessage(message);
         build.setCancelable(false);
         build.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
