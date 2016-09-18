@@ -24,6 +24,8 @@ import au.com.cynjames.communication.ResponseListener;
  */
 public class GenericMethods {
     int response = 0;
+    static Context context;
+    static ProgressDialog progressDialog;
 
     public static boolean isConnectedToInternet(Context con) {
         ConnectivityManager connectivity = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -41,8 +43,11 @@ public class GenericMethods {
         Toast.makeText(con, message, Toast.LENGTH_SHORT).show();
     }
 
-    public static ProgressDialog getProgressDialog(Context context, String message) {
-        ProgressDialog progressDialog = new ProgressDialog(context);
+    public static ProgressDialog getProgressDialog(Context con, String message) {
+        if(context == null || context != con){
+            context = con;
+            progressDialog = new ProgressDialog(con);
+        }
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
         progressDialog.setMessage(message);

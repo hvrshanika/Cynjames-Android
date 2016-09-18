@@ -48,7 +48,7 @@ public class HTTPHandler {
     public static AsyncHttpClient getAsyncClient() {
         if (httpClient == null) {
             httpClient = new AsyncHttpClient();
-            httpClient.setMaxRetriesAndTimeout(1, 20000);
+            httpClient.setMaxRetriesAndTimeout(1, 30000);
         }
         return httpClient;
     }
@@ -82,12 +82,24 @@ public class HTTPHandler {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //progressDialog.dismiss();
+            try {
+                progressDialog.dismiss();
+            } catch (WindowManager.BadTokenException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
-            //progressDialog.dismiss();
+            try {
+                progressDialog.dismiss();
+            } catch (WindowManager.BadTokenException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Log.d("Failed", responseString);
         }
 
@@ -100,36 +112,6 @@ public class HTTPHandler {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public static class ResponseManagerWithOutProgress extends JsonHttpResponseHandler {
-        final ResponseListener responseListener;
-
-        public ResponseManagerWithOutProgress(ResponseListener responseListener) {
-            this.responseListener = responseListener;
-        }
-
-        public void onStart() {
-            super.onStart();
-        }
-
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            super.onSuccess(statusCode, headers, response);
-            try {
-                this.responseListener.onSuccess(response);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-            super.onFailure(statusCode, headers, responseString, throwable);
-            Log.d("Failed", responseString);
-        }
-
-        public void onFinish() {
-            super.onFinish();
         }
     }
 }

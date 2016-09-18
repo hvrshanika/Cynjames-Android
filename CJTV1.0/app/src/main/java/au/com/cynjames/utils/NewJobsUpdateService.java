@@ -101,7 +101,7 @@ public class NewJobsUpdateService extends Service {
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
-        HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManagerWithOutProgress(new NewJobsLoader()));
+        HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(),NewJobsUpdateService.this,"Updating..."));
     }
 
     private void sendNotification(){

@@ -499,11 +499,10 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 }
                 uploadPhotos(jobStausTen.getDeliveryImages());
             }
-
-            if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
-                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
-            } else {
-                if (jobStausTen.getConceptPickupSignature() != null) {
+            if (jobStausTen.getConceptPickupSignature() != null) {
+                if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
+                    HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+                } else {
                     params.add("conceptPickupName", jobStausTen.getConceptPickupName());
                     params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
                     params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
@@ -524,6 +523,8 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                     HTTPHandler.post("cjt-update-jobs-status-8-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
                     uploadPhotos(jobStausTen.getPickupImages());
                 }
+            } else {
+                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
             }
         }
         List<ConceptBooking> jobsStausTwo = db.getPendingJobsWithStatus("2");
@@ -539,6 +540,33 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             params.add("id", String.valueOf(jobStausNine.getId()));
             params.add("conceptBookingStatus", String.valueOf(jobStausNine.getConceptBookingStatus()));
             HTTPHandler.post("cjt-update-jobs-status-2-9.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId()), context, "Updating..."));
+            if (jobStausNine.getConceptPickupSignature() != null) {
+                if (!(jobStausNine.getConceptPickupSignature().contains("uploads"))) {
+                    params.add("conceptPickupName", jobStausNine.getConceptPickupName());
+                    params.add("conceptPickupSignature", "uploads/" + jobStausNine.getConceptPickupSignature());
+                    params.add("conceptBookingPallets", String.valueOf(jobStausNine.getPallets()));
+                    params.add("conceptBookingParcels", String.valueOf(jobStausNine.getParcels()));
+                    params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausNine.getArrivedConcept())));
+                    params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausNine.getConceptBookingPickupDate())));
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausNine.getConceptPickupSignature() + ""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (bitmap != null) {
+                        String encoded = getStringImage(bitmap);
+                        RequestParams paramsImg = new RequestParams();
+                        paramsImg.add("image", encoded);
+                        paramsImg.add("name", jobStausNine.getConceptPickupSignature());
+                        HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausNine.getConceptPickupSignature()), context, "Uploading Image..."));
+                    }
+                    HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId()), context, "Updating..."));
+                    uploadPhotos(jobStausNine.getPickupImages());
+                    jobStausNine.setConceptPickupSignature("uploads/" + jobStausNine.getConceptPickupSignature());
+                    db.updateJob(jobStausNine);
+                }
+            }
         }
         stopDisconnectTimer();
     }

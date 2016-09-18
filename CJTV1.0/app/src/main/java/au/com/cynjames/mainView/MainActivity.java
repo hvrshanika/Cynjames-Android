@@ -104,11 +104,10 @@ public class MainActivity extends AppCompatActivity {
             Bundle b = intent.getBundleExtra("Location");
             mLastLocation = b.getParcelable("Location");
             if (mLastLocation != null) {
-                if(firstStatus){
+                if (firstStatus) {
                     updateDriverStauts("Driver has logged in");
                     firstStatus = false;
-                }
-                else {
+                } else {
                     updateDriverStauts("Locating Driver");
                 }
             }
@@ -133,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
     private Runnable logOutCallback = new Runnable() {
         @Override
         public void run() {
-           // prefsEditor.clear();
-           // finish();
+            // prefsEditor.clear();
+            // finish();
         }
     };
 
@@ -192,8 +191,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 if (GenericMethods.isConnectedToInternet(this)) {
                     loadNewJobs();
-                }
-                else {
+                } else {
                     GenericMethods.showNoInternetDialog(context);
                 }
                 break;
@@ -239,8 +237,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseCrash.log("MainActivity - onResume - start");
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int result = googleApiAvailability.isGooglePlayServicesAvailable(context);
-        if(result != 0) {
-            if(googleApiAvailability.isUserResolvableError(result)) {
+        if (result != 0) {
+            if (googleApiAvailability.isUserResolvableError(result)) {
                 googleApiAvailability.getErrorDialog(this, result,
                         result).show();
             }
@@ -250,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         updateLabels();
         if (myApp.wasInBackground) {
             FirebaseCrash.log("MainActivity inBackground onResume");
-            stopNotificationService();
+            //stopNotificationService();
             if (GenericMethods.isConnectedToInternet(context)) {
                 loadNewJobs();
             }
@@ -277,17 +275,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                    if (myApp.wasInBackground) {
-                        FirebaseCrash.log("MainActivity inBackground ONSTOP");
-                        if (GenericMethods.isConnectedToInternet(context)) {
-                            uploadDatatoServer();
-                        }
-                        startNotificationService();
+                if (myApp.wasInBackground) {
+                    FirebaseCrash.log("MainActivity inBackground ONSTOP");
+                    if (GenericMethods.isConnectedToInternet(context)) {
+                        uploadDatatoServer();
+                    }
+                    //startNotificationService();
                 }
             }
         };
 
-        if(!logoutClicked) {
+        if (!logoutClicked) {
             Handler pdCanceller = new Handler();
             pdCanceller.postDelayed(progressRunnable, 3000);
         }
@@ -333,9 +331,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void uploadFirebaseToken(){
+    private void uploadFirebaseToken() {
         String token = FirebaseInstanceId.getInstance().getToken();
-        if(token != null && GenericMethods.isConnectedToInternet(context)){
+        if (token != null && GenericMethods.isConnectedToInternet(context)) {
             Log.d("Token:", token);
             String userId = String.valueOf(user.getUserid());
             RequestParams params = new RequestParams();
@@ -367,13 +365,12 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int id) {
                     initVariables();
                     logoutClicked = true;
-                    if(mLastLocation != null){
+                    if (mLastLocation != null) {
                         updateDriverStauts("Driver has logged out");
                     }
                     if (GenericMethods.isConnectedToInternet(context)) {
                         uploadDatatoServer();
-                    }
-                    else {
+                    } else {
                         GenericMethods.showNoInternetDialog(context);
                     }
                 }
@@ -501,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    private void setTimer(){
+    private void setTimer() {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             public void run() {
@@ -618,10 +615,10 @@ public class MainActivity extends AppCompatActivity {
                 uploadPhotos(jobStausTen.getDeliveryImages());
             }
             prejobsCount++;
-            if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
-                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
-            } else {
-                if (jobStausTen.getConceptPickupSignature() != null) {
+            if (jobStausTen.getConceptPickupSignature() != null) {
+                if (jobStausTen.getConceptPickupSignature().contains("uploads")) {
+                    HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
+                } else {
                     params.add("conceptPickupName", jobStausTen.getConceptPickupName());
                     params.add("conceptPickupSignature", "uploads/" + jobStausTen.getConceptPickupSignature());
                     params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausTen.getArrivedConcept())));
@@ -643,6 +640,8 @@ public class MainActivity extends AppCompatActivity {
                     HTTPHandler.post("cjt-update-jobs-status-8-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
                     uploadPhotos(jobStausTen.getPickupImages());
                 }
+            } else {
+                HTTPHandler.post("cjt-update-jobs-status-10.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId()), context, "Updating..."));
             }
         }
         List<ConceptBooking> jobsStausTwo = db.getPendingJobsWithStatus("2");
@@ -660,6 +659,35 @@ public class MainActivity extends AppCompatActivity {
             params.add("id", String.valueOf(jobStausNine.getId()));
             params.add("conceptBookingStatus", String.valueOf(jobStausNine.getConceptBookingStatus()));
             HTTPHandler.post("cjt-update-jobs-status-2-9.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId()), context, "Updating..."));
+            if (jobStausNine.getConceptPickupSignature() != null) {
+                if (!(jobStausNine.getConceptPickupSignature().contains("uploads"))) {
+                    params.add("conceptPickupName", jobStausNine.getConceptPickupName());
+                    params.add("conceptPickupSignature", "uploads/" + jobStausNine.getConceptPickupSignature());
+                    params.add("conceptBookingPallets", String.valueOf(jobStausNine.getPallets()));
+                    params.add("conceptBookingParcels", String.valueOf(jobStausNine.getParcels()));
+                    params.add("arrivedConcept", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausNine.getArrivedConcept())));
+                    params.add("conceptBookingPickupDate", GenericMethods.getDBDate(GenericMethods.getDatefromString(jobStausNine.getConceptBookingPickupDate())));
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + jobStausNine.getConceptPickupSignature() + ""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (bitmap != null) {
+                        preImagesCount += 1;
+                        String encoded = getStringImage(bitmap);
+                        RequestParams paramsImg = new RequestParams();
+                        paramsImg.add("image", encoded);
+                        paramsImg.add("name", jobStausNine.getConceptPickupSignature());
+                        HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausNine.getConceptPickupSignature()), context, "Uploading Image..."));
+                    }
+                    prejobsCount++;
+                    HTTPHandler.post("cjt-update-jobs-status-8.php", params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId()), context, "Updating..."));
+                    uploadPhotos(jobStausNine.getPickupImages());
+                    jobStausNine.setConceptPickupSignature("uploads/" + jobStausNine.getConceptPickupSignature());
+                    db.updateJob(jobStausNine);
+                }
+            }
         }
         stopDisconnectTimer();
         isUpdatefinished();
@@ -732,10 +760,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkJobsAssigned(){
+    private void checkJobsAssigned() {
         List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7");
 
-        for(ConceptBooking statusSevenJob: statusSevenJobs){
+        for (ConceptBooking statusSevenJob : statusSevenJobs) {
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
@@ -789,7 +817,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             postlogCount++;
             if (jSONObject.getInt("success") == 1) {
-                if(!logoutClicked) {
+                if (!logoutClicked) {
                     GenericMethods.showToast(MainActivity.this, "Log data upload successful.");
                 }
                 db.clearTable("conceptBookingLog");
@@ -804,7 +832,7 @@ public class MainActivity extends AppCompatActivity {
             postStatusCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if(!logoutClicked) {
+                if (!logoutClicked) {
                     GenericMethods.showToast(MainActivity.this, "Driver data upload successful.");
                 }
                 db.clearTable("driverStatus");
@@ -825,7 +853,7 @@ public class MainActivity extends AppCompatActivity {
             postjobsCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if(!logoutClicked) {
+                if (!logoutClicked) {
                     GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
                 }
                 if (jSONObject.getInt("status") == 10) {
@@ -848,7 +876,7 @@ public class MainActivity extends AppCompatActivity {
             postImagesCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if(!logoutClicked) {
+                if (!logoutClicked) {
                     GenericMethods.showToast(MainActivity.this, "Image upload successful.");
                 }
                 File file = new File(FILE_PATH, name);
@@ -892,8 +920,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
 
-            }
-            else {
+            } else {
 
             }
         }
