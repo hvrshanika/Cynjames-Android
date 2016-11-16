@@ -1,5 +1,6 @@
 package au.com.cynjames.utils;
 
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -26,6 +27,7 @@ public class GenericMethods {
     int response = 0;
     static Context context;
     static ProgressDialog progressDialog;
+    static AlertDialog builder;
 
     public static boolean isConnectedToInternet(Context con) {
         ConnectivityManager connectivity = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -78,6 +80,23 @@ public class GenericMethods {
             }
         });
         build.create().show();
+    }
+
+    public static void showServerError(Context con, String title, String message) {
+        builder = new AlertDialog.Builder(con).create();
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setButton(AlertDialog.BUTTON_NEUTRAL,"OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    public static AlertDialog getBuilderObj(){
+        return builder;
     }
 
     public static String getDisplayDate(Date date) {

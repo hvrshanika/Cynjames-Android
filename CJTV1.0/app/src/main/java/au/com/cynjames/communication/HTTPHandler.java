@@ -5,8 +5,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.loopj.android.http.*;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,7 +36,7 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class HTTPHandler {
 
-    private static final String BASE_URL = "http://www.cynjamestransport.com.au/webservice-one/";
+    private static final String BASE_URL = "http://220.244.244.217:9000/webservice-one/";
 
     private static AsyncHttpClient httpClient;
 
@@ -48,7 +51,7 @@ public class HTTPHandler {
     public static AsyncHttpClient getAsyncClient() {
         if (httpClient == null) {
             httpClient = new AsyncHttpClient();
-            httpClient.setMaxRetriesAndTimeout(1, 30000);
+            httpClient.setMaxRetriesAndTimeout(1, 20000);
         }
         return httpClient;
     }
@@ -81,26 +84,45 @@ public class HTTPHandler {
                 this.responseListener.onSuccess(response);
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-            try {
-                progressDialog.dismiss();
-            } catch (WindowManager.BadTokenException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+            super.onSuccess(statusCode,headers,response);
+            Log.d("HTTPHandler", "On-Success JSONArray");
+        }
+
+        public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            super.onSuccess(statusCode,headers,responseString);
+            Log.d("HTTPHandler", "On-Success String");
+        }
+
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
-            try {
-                progressDialog.dismiss();
-            } catch (WindowManager.BadTokenException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+            Log.d("Handler Fail String", responseString);
+            if(GenericMethods.getBuilderObj() != null){
+                if(!GenericMethods.getBuilderObj().isShowing()){
+                    GenericMethods.getBuilderObj().dismiss();
+                    GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
+                }
             }
-            Log.d("Failed", responseString);
+            else {
+                GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
+            }
+        }
+
+        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+            super.onFailure(statusCode,headers,throwable,errorResponse);
+            Log.d("Handler Fail JSONArray", String.valueOf(errorResponse));
+            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
+        }
+
+        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+            super.onFailure(statusCode,headers,throwable,errorResponse);
+            Log.d("Handler Fail JSONObject", String.valueOf(errorResponse));
+            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
         }
 
         public void onFinish() {
