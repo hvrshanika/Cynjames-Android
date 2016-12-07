@@ -4,13 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.RequestParams;
@@ -30,6 +34,7 @@ import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles;
 import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.SQLiteHelper;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
     Gson gson;
@@ -39,6 +44,11 @@ public class LoginActivity extends AppCompatActivity {
     EditText password;
     Editor prefsEditor;
     SQLiteHelper db;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +82,22 @@ public class LoginActivity extends AppCompatActivity {
         password = (EditText) findViewById(R.id.login_txt_password);
         password.setTypeface(username.getTypeface());
         vehicleList = (Spinner) findViewById(R.id.login_vehicle_list);
+        vehicleList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                ((TextView) view).setTextColor(Color.WHITE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+            }
+        });
 
         Button loginBtn = (Button) findViewById(R.id.login_btn_login);
+        loginBtn.setTypeface(loginBtn.getTypeface(), Typeface.BOLD);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
             ArrayList<Vehicle> vehicleArrayList = gson.fromJson(jSONObject.toString(), Vehicles.class).getVehicles();
             vehicleArrayList.add(0, new Vehicles().getAVehicle("Vehicle no", "-1"));
             vehicleList.setAdapter(new ArrayAdapter<>(context,R.layout.spinner_item,vehicleArrayList));
+            vehicleList.setSelection(0, true);
         }
     }
 

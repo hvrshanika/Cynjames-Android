@@ -20,7 +20,7 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 12;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
@@ -35,10 +35,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
+        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
+        String createAdhocBookingLogTable = "CREATE TABLE adhocBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         db.execSQL(createUserTable);
         db.execSQL(createJobsTable);
         db.execSQL(createDriverStatusTable);
         db.execSQL(createconceptBookingLogTable);
+        db.execSQL(createAdhocJobsTable);
+        db.execSQL(createAdhocBookingLogTable);
 
     }
 
@@ -48,6 +52,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS conceptBooking");
         db.execSQL("DROP TABLE IF EXISTS driverStatus");
         db.execSQL("DROP TABLE IF EXISTS conceptBookingLog");
+        db.execSQL("DROP TABLE IF EXISTS adhocBooking");
+        db.execSQL("DROP TABLE IF EXISTS adhocBookingLog");
         this.onCreate(db);
     }
 
@@ -114,7 +120,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void addJob(ConceptBooking job){
+    public void addJob(ConceptBooking job, boolean isConcept){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("conceptBookingId", job.getId());
@@ -141,12 +147,19 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("conceptDeliverySignature", job.getConceptDeliverySignature());
         values.put("conceptDeliveryName", job.getConceptDeliveryName());
 
-        db.insert("conceptBooking", null, values);
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+        db.insert(table, null, values);
 
         db.close();
     }
 
-    public void updateJob(ConceptBooking job){
+    public void updateJob(ConceptBooking job, boolean isConcept){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 //        values.put("conceptBookingId", job.getId());
@@ -175,8 +188,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("deliveryImages", job.getDeliveryImages());
         values.put("pickupImages", job.getPickupImages());
 
-
-        db.update("conceptBooking", values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+        db.update(table, values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
 
         db.close();
     }
@@ -218,20 +237,23 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 count = cursor.getInt(0);
             } while (cursor.moveToNext());
         }
-        if(count == 0){
-            exist = false;
-        }
-        else{
-            exist = true;
-        }
+        exist = count != 0;
         db.close();
         return exist;
     }
 
-    public List<ConceptBooking> getPendingJobs(){
+    public List<ConceptBooking> getPendingJobs(boolean isConcept){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
-        String query = "SELECT * FROM conceptBooking where conceptBookingStatus in (2,7)";
+        String table;
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+
+        String query = "SELECT * FROM "+ table +" where conceptBookingStatus in (2,7)";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -276,10 +298,17 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public List<ConceptBooking> getPendingJobsWithStatus(String status){
+    public List<ConceptBooking> getPendingJobsWithStatus(String status, boolean isConcept){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
-        String query = "SELECT * FROM conceptBooking where conceptBookingStatus = " + status + "";
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+        String query = "SELECT * FROM "+ table +" where conceptBookingStatus = " + status + "";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -324,10 +353,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public List<ConceptBooking> getReadyJobs(){
+    public List<ConceptBooking> getReadyJobs(boolean isConcept){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
-        String query = "SELECT * FROM conceptBooking where conceptBookingStatus in (8,9)";
+        String query;
+        if(isConcept){
+            query = "SELECT * FROM conceptBooking where conceptBookingStatus in (8,9)";
+        }
+        else{
+            query = "SELECT * FROM adhocBooking where conceptBookingStatus in (8,9)";
+        }
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -372,10 +407,17 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public void clearConcept(int id) {
+    public void clearConcept(int id, boolean isConcept) {
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
         String idString = String.valueOf(id);
         SQLiteDatabase db = this.getReadableDatabase();
-        db.execSQL("delete from conceptBooking WHERE conceptBookingId = " + idString);
+        db.execSQL("delete from "+ table +" WHERE conceptBookingId = " + idString);
         db.close();
     }
 
@@ -426,7 +468,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public void addLog(ConceptBookingLog log){
+    public void addLog(ConceptBookingLog log, boolean isConcept){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("conceptBookingLog_bookingId", log.getConceptBookingLog_bookingId());
@@ -438,15 +480,29 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("conceptBookingLogStatus", log.getConceptBookingLogStatus());
         values.put("hasDeparted", log.getHasDeparted());
 
-        db.insert("conceptBookingLog", null, values);
+        String table = "";
+        if(isConcept){
+            table = "conceptBookingLog";
+        }
+        else{
+            table = "adhocBookingLog";
+        }
+        db.insert(table, null, values);
 
         db.close();
     }
 
-    public List<ConceptBookingLog> getAllLogs() {
+    public List<ConceptBookingLog> getAllLogs(boolean isConcept) {
         List<ConceptBookingLog> jobs = new LinkedList<ConceptBookingLog>();
 
-        String query = "SELECT * FROM conceptBookingLog";
+        String table = "";
+        if(isConcept){
+            table = "conceptBookingLog";
+        }
+        else{
+            table = "adhocBookingLog";
+        }
+        String query = "SELECT * FROM " + table;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);

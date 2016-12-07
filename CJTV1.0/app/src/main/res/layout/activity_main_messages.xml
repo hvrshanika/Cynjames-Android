@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/main_messages_count"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="30dp"
+        android:background="@color/dark_red"
+        android:text="0"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/main_unread_msgs_text"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/main_messages_count"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/main_unread"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/main_messages_view"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/login_button_bg"
+        android:text="@string/main_view_now"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+
+</RelativeLayout>

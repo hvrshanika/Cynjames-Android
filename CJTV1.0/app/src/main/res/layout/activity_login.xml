@@ -3,143 +3,143 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
+    android:background="@mipmap/bg_image"
     tools:context="au.com.cynjames.login.LoginActivity">
 
     <RelativeLayout
-        android:id="@+id/login_header_layout"
+        android:id="@+id/login_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gray">
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:background="@color/login_bg">
 
         <ImageView
+            android:id="@+id/login_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
-            android:src="@mipmap/logo_red" />
+            android:layout_marginTop="80dp"
+            android:src="@mipmap/logo_white" />
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/login_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/login_header_layout"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/login_content_bg">
-
-        <TextView
-            android:id="@+id/login_header_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_button"
-            android:layout_marginTop="20dp"
-            android:layout_centerHorizontal="true"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/black"/>
-
-        <ImageView
+        <RelativeLayout
             android:id="@+id/img_bu"
-            android:layout_width="55dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/login_header_text"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:background="@drawable/login_image_bg" />
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/login_logo"
+            android:layout_marginTop="40dp"
+            android:background="@color/login_text_bg">
 
-        <ImageView
-            android:id="@+id/img_u"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignBottom="@+id/img_bu"
-            android:layout_marginLeft="20dp"
-            android:src="@mipmap/user_gray"
-            android:background="@drawable/login_image_bg"/>
+            <ImageView
+                android:id="@+id/img_u"
+                android:layout_width="16dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:src="@mipmap/user_icon" />
 
-        <EditText
-            android:id="@+id/login_txt_username"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:layout_toRightOf="@+id/img_bu"
-            android:layout_alignTop="@+id/img_bu"
-            android:background="@drawable/login_username_bg"
-            android:layout_marginRight="20dp"
-            android:ems="10"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:hint="@string/login_username"
-            android:inputType="textEmailAddress" />
+            <EditText
+                android:id="@+id/login_txt_username"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/img_u"
+                android:ems="10"
+                android:hint="@string/login_username"
+                android:background="@color/transparent"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:inputType="textEmailAddress"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <ImageView
+        </RelativeLayout>
+
+
+        <RelativeLayout
             android:id="@+id/img_bp"
-            android:layout_width="55dp"
-            android:layout_height="40dp"
-            android:layout_alignLeft="@+id/img_bu"
-            android:layout_alignStart="@+id/img_bu"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
             android:layout_below="@+id/img_bu"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/login_image_bg" />
+            android:layout_marginTop="2dp"
+            android:background="@color/login_text_bg">
 
-        <ImageView
-            android:id="@+id/img_p"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignLeft="@+id/img_bp"
-            android:layout_alignStart="@+id/img_bp"
-            android:layout_alignTop="@+id/img_bp"
-            android:src="@mipmap/lock_gray"
-            android:background="@drawable/login_image_bg"/>
+            <ImageView
+                android:id="@+id/img_p"
+                android:layout_width="16dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:src="@mipmap/lock_icon" />
 
-        <EditText
-            android:id="@+id/login_txt_password"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:layout_alignBottom="@+id/img_bp"
-            android:layout_toRightOf="@+id/img_bp"
-            android:background="@drawable/login_username_bg"
-            android:ems="10"
-            android:hint="@string/login_password"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:inputType="textPassword"/>
+            <EditText
+                android:id="@+id/login_txt_password"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_toRightOf="@+id/img_p"
+                android:background="@color/transparent"
+                android:ems="10"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:hint="@string/login_password"
+                android:inputType="textPassword"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <Spinner
-            android:id="@+id/login_vehicle_list"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_alignLeft="@+id/img_bp"
-            android:layout_alignRight="@+id/login_txt_password"
-            android:layout_below="@+id/login_txt_password"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/login_vehicle_bg"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/black"
-            android:gravity="center|left"
-            android:paddingLeft="45dp"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/login_vehicle_down_arrow"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignRight="@+id/login_txt_password"
-            android:layout_below="@+id/login_txt_password"
-            android:layout_marginTop="20dp"
-            android:src="@mipmap/icon_arrow_down_black" />
+        <RelativeLayout
+            android:id="@+id/img_bv"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/img_bp"
+            android:layout_marginTop="2dp"
+            android:background="@color/login_text_bg">
+
+
+            <ImageView
+                android:id="@+id/img_v"
+                android:layout_width="25dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginLeft="12dp"
+                android:src="@mipmap/truckicon" />
+
+            <Spinner
+                android:id="@+id/login_vehicle_list"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@+id/img_v"
+                android:layout_marginLeft="5dp"
+                android:gravity="center|left"
+                android:spinnerMode="dropdown"
+                android:popupBackground="@color/spinner_bg"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+<!--            <ImageView
+                android:id="@+id/login_vehicle_down_arrow"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignRight="@+id/login_txt_password"
+                android:layout_below="@+id/login_txt_password"
+                android:layout_marginTop="20dp"
+                android:src="@mipmap/icon_arrow_down_black" />-->
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/login_btn_login"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_alignLeft="@+id/img_bp"
-            android:layout_alignRight="@+id/login_txt_password"
-            android:layout_below="@+id/login_vehicle_list"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/login_button_bg"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/img_bv"
+            android:layout_marginTop="1dp"
+            android:background="@color/login_btn_bg"
             android:text="@string/login_button"
-            android:textColor="@color/white"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
 
 
     </RelativeLayout>

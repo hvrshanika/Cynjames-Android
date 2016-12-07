@@ -41,15 +41,17 @@ public class DepartFragment extends DialogFragment {
     GestureOverlayView sign;
     String signtureId;
     String type;
+    boolean isConcept;
 
     public DepartFragment() {
 
     }
 
-    public DepartFragment(Context context, WindowManager.LayoutParams params, String type) {
+    public DepartFragment(Context context, WindowManager.LayoutParams params, String type, boolean isConcept) {
         this.context = context;
         this.params = params;
         this.type = type;
+        this.isConcept = isConcept;
 
     }
 
@@ -155,7 +157,7 @@ public class DepartFragment extends DialogFragment {
         else {
             saveSig();
             if(type.equals("JobsPending")) {
-                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("2");
+                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("2", isConcept);
                 for (ConceptBooking job : jobs) {
                     ConceptBookingLog log = new ConceptBookingLog();
                     log.setConceptBookingLog_bookingId(job.getId());
@@ -167,18 +169,18 @@ public class DepartFragment extends DialogFragment {
                     log.setConceptBookingLogStatus(8);
                     log.setHasDeparted(1);
 
-                    db.addLog(log);
+                    db.addLog(log, isConcept);
 
                     job.setConceptPickupSignature(signtureId);
                     job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
                     job.setConceptPickupName(name.getText().toString());
                     job.setConceptBookingStatus(8);
                     job.setArrivedConcept(user.getUserArriveConcept());
-                    db.updateJob(job);
+                    db.updateJob(job, isConcept);
                 }
                 user.setUserArriveConcept(null);
             }else if(type.equals("DeliveryJobs")){
-                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9");
+                List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9", isConcept);
                 for (ConceptBooking job : jobs) {
                     ConceptBookingLog log = new ConceptBookingLog();
                     log.setConceptBookingLog_bookingId(job.getId());
@@ -190,14 +192,14 @@ public class DepartFragment extends DialogFragment {
                     log.setConceptBookingLogStatus(10);
                     log.setHasDeparted(1);
 
-                    db.addLog(log);
+                    db.addLog(log, isConcept);
 
                     job.setConceptDeliverySignature(signtureId);
                     job.setConceptDeliveryDate(GenericMethods.getDisplayDate(new Date()));
                     job.setConceptDeliveryName(name.getText().toString());
                     job.setConceptBookingStatus(10);
                     job.setArrivedClient(user.getUserArriveClient());
-                    db.updateJob(job);
+                    db.updateJob(job, isConcept);
                 }
                 user.setUserArriveClient(null);
             }

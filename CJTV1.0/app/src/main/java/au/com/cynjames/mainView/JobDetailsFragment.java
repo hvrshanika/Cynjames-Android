@@ -60,16 +60,18 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     ArrayList<String> images;
     String imageFileName;
     boolean rejected = false;
+    boolean isConcept;
 
     public JobDetailsFragment() {
 
     }
 
-    public JobDetailsFragment(Context context, ConceptBooking job, WindowManager.LayoutParams params, String type) {
+    public JobDetailsFragment(Context context, ConceptBooking job, WindowManager.LayoutParams params, String type, boolean isConcept) {
         this.job = job;
         this.context = context;
         this.params = params;
         this.type = type;
+        this.isConcept = isConcept;
     }
 
     @Override
@@ -219,14 +221,14 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             } else if (job.getConceptBookingStatus() == 2) {
                 job.setConceptBookingStatus(7);
             }
-            db.updateJob(job);
+            db.updateJob(job, isConcept);
             listener.handleDialogClose();
             dismiss();
         }
         if (type.equals("DeliveryJobs")) {
             if (job.getConceptBookingStatus() == 9) {
                 job.setConceptBookingStatus(8);
-                db.updateJob(job);
+                db.updateJob(job, isConcept);
                 listener.handleDialogClose();
                 dismiss();
             } else if (job.getConceptBookingStatus() == 8) {
@@ -254,7 +256,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 job.setParcels(Integer.parseInt(parcels.getText().toString()));
                 job.setConceptDeliveryDate(GenericMethods.getDisplayDate(new Date()));
                 job.setDeliveryImages(createImageString());
-                db.updateJob(job);
+                db.updateJob(job, isConcept);
                 listener.handleDialogClose();
                 dismiss();
             }

@@ -13,5 +13,11 @@
     <color name="green">#008000</color>
     <color name="camera_btn_back">#ff4502</color>
     <color name="light_red">#ffb7b7</color>
+    <color name="transparent">#00000000</color>
+    <color name="login_bg">#f20a000d</color>
+    <color name="login_text_bg">#99bf1e2e</color>
+    <color name="login_btn_bg">#f7951f</color>
+    <color name="spinner_bg">#E6FFFF</color>
+
 
 </resources>
