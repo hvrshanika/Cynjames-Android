@@ -132,7 +132,7 @@ public class NewJobsUpdateService extends Service {
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
-                    if (!db.jobExist(job.getId())) {
+                    if (!db.jobExist(job.getId(), true)) {
                         db.addJob(job, true);
                         newJobs.add(job);
                     }

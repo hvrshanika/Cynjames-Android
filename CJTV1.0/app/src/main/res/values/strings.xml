@@ -16,6 +16,7 @@
     <string name="fragment_jobs_list_depart">Depart</string>
     <string name="jobs_list_item_order_no">Order No:</string>
     <string name="jobs_list_item_booking_time">Booking Time:</string>
+    <string name="jobs_list_item_eta">ETA:</string>
     <string name="jobs_list_item_pallets">Pallets:</string>
     <string name="jobs_list_item_parcels">Parcels:</string>
     <string name="job_details_process">Process</string>

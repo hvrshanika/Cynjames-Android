@@ -48,6 +48,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     boolean logoutTimer = false;
     boolean isConcept;
     CustomPagerAdapter adapter;
+    int conceptNewJobsCount = 0;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -273,6 +275,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_directions:
+                openGMapsWithPosition();
             case R.id.action_refresh:
                 if (GenericMethods.isConnectedToInternet(this)) {
                     loadNewJobs();
@@ -313,6 +317,18 @@ public class MainActivity extends AppCompatActivity {
         }
         if (user.getUserArriveClient() != null) {
             arriveClient.setTitle(user.getUserArriveClient());
+        }
+    }
+
+    private void openGMapsWithPosition() {
+        Uri gmmIntentUri = Uri.parse("google.navigation:q= &mode=d");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+        else{
+            GenericMethods.showToast(context, "No supported application found");
         }
     }
 
@@ -932,7 +948,16 @@ public class MainActivity extends AppCompatActivity {
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
+        isConcept = true;
         HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(), context, "Updating..."));
+    }
+
+    private void loadNewAdhocJobs() {
+        String userId = String.valueOf(user.getUserid());
+        RequestParams params = new RequestParams();
+        params.add("userid", userId);
+        isConcept = false;
+        HTTPHandler.post("cjt-adhoc-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(), context, "Updating..."));
     }
 
     private void uploadPhotos(String imageString) {
@@ -974,7 +999,20 @@ public class MainActivity extends AppCompatActivity {
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
+            isConcept = true;
             HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
+        }
+    }
+
+    private void checkAdhocJobsAssigned() {
+        List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7", false);
+
+        for (ConceptBooking statusSevenJob : statusSevenJobs) {
+            RequestParams params = new RequestParams();
+            params.add("userid", String.valueOf(user.getUserid()));
+            params.add("bookingId", String.valueOf(statusSevenJob.getId()));
+            isConcept = false;
+            HTTPHandler.post("cjt-adhoc-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
     }
 
@@ -1021,8 +1059,16 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
-                    db.clearConcept(id, true);
+                    db.clearConcept(id, isConcept);
                 }
+//                if(isConcept){
+//                    checkAdhocJobsAssigned();
+//                }
+//                else{
+//                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+//                    String d=formatter.format(new Date());
+//                    GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
+//                }
             }
         }
     }
@@ -1034,7 +1080,7 @@ public class MainActivity extends AppCompatActivity {
             postlogCount++;
             if (jSONObject.getInt("success") == 1) {
                 if (!logoutClicked) {
-                    GenericMethods.showToast(MainActivity.this, "Log data upload successful.");
+//                    GenericMethods.showToast(MainActivity.this, "Log data upload successful.");
                 }
                 db.clearTable("conceptBookingLog");
                 db.clearTable("adhocBookingLog");
@@ -1050,7 +1096,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (!logoutClicked) {
-                    GenericMethods.showToast(MainActivity.this, "Driver data upload successful.");
+//                    GenericMethods.showToast(MainActivity.this, "Driver data upload successful.");
                 }
                 db.clearTable("driverStatus");
             }
@@ -1073,7 +1119,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (!logoutClicked) {
-                    GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
+//                    GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
                 }
                 if (jSONObject.getInt("status") == 10) {
                     db.clearConcept(id, concept);
@@ -1096,7 +1142,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (!logoutClicked) {
-                    GenericMethods.showToast(MainActivity.this, "Image upload successful.");
+//                    GenericMethods.showToast(MainActivity.this, "Image upload successful.");
                 }
                 File file = new File(FILE_PATH, name);
                 file.delete();
@@ -1115,20 +1161,32 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
-                    if (!db.jobExist(job.getId())) {
-                        db.addJob(job, true);
+                    if (!db.jobExist(job.getId(), isConcept)) {
+                        db.addJob(job, isConcept);
                         newJobs.add(job);
                     }
 
                 }
                 updateLabels();
-                if (newJobs.size() > 0) {
-                    pendingIcon.setVisibility(View.VISIBLE);
-                    playSound();
+                if(isConcept){
+                    conceptNewJobsCount = newJobs.size();
+                    loadNewAdhocJobs();
                 }
-            }
-            if (GenericMethods.isConnectedToInternet(context)) {
-                checkJobsAssigned();
+                else{
+                    if (conceptNewJobsCount > 0 || newJobs.size() > 0) {
+                        pendingIcon.setVisibility(View.VISIBLE);
+                        playSound();
+                    }
+                    conceptNewJobsCount = 0;
+
+                    if (GenericMethods.isConnectedToInternet(context)) {
+                        checkJobsAssigned();
+                    }
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+                    String d=formatter.format(new Date());
+                    GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
+                }
             }
         }
     }

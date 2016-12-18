@@ -19,6 +19,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import au.com.cynjames.CJT;
+
 public class LocationService extends Service implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -55,6 +57,7 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
+        ((CJT) getApplication()).lastLocation = location;
         sendLocationToActivity(location);
     }
 

@@ -2,6 +2,7 @@ package au.com.cynjames.communication;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Location;
 import android.os.Environment;
 import android.util.Log;
 import android.view.WindowManager;
@@ -44,6 +45,12 @@ public class HTTPHandler {
         getAsyncClient().post(getAbsoluteUrl(url), params, responseHandler);
     }
 
+    public static void directionsRequest(Location origin, String destinations, RequestParams params, JsonHttpResponseHandler responseHandler) {
+        String destinationsF = destinations.replace(" ", "+");
+        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
+        getAsyncClient().post(url, params, responseHandler);
+    }
+
     private static String getAbsoluteUrl(String relativeUrl) {
         return BASE_URL + relativeUrl;
     }
@@ -59,23 +66,23 @@ public class HTTPHandler {
     public static class ResponseManager extends JsonHttpResponseHandler {
         final ResponseListener responseListener;
         final Context context;
-        ProgressDialog progressDialog;
+//        ProgressDialog progressDialog;
 
         public ResponseManager(ResponseListener responseListener, Context context, String msg) {
             this.responseListener = responseListener;
             this.context = context;
-            progressDialog = GenericMethods.getProgressDialog(context, msg);
+//            progressDialog = GenericMethods.getProgressDialog(context, msg);
         }
 
         public void onStart() {
             super.onStart();
-            try {
-                progressDialog.show();
-            } catch (WindowManager.BadTokenException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                progressDialog.show();
+//            } catch (WindowManager.BadTokenException e) {
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
 
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -127,13 +134,13 @@ public class HTTPHandler {
 
         public void onFinish() {
             super.onFinish();
-            try {
-                progressDialog.dismiss();
-            } catch (WindowManager.BadTokenException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                progressDialog.dismiss();
+//            } catch (WindowManager.BadTokenException e) {
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     }
 }

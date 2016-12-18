@@ -4,15 +4,19 @@ package au.com.cynjames.mainView;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -24,9 +28,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +51,7 @@ import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.User;
 import au.com.cynjames.utils.GenericMethods;
+import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
 
 public class JobDetailsFragment extends DialogFragment implements JobsDetailsFragmentListener {
@@ -61,6 +69,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     String imageFileName;
     boolean rejected = false;
     boolean isConcept;
+    TextView eta;
+    Location loc;
+    String addressStr;
 
     public JobDetailsFragment() {
 
@@ -112,6 +123,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         getDialog().setCanceledOnTouchOutside(false);
         rootView = inflater.inflate(R.layout.fragment_job_details, container, false);
         setLabels(rootView);
+
+        loc = ((CJT) getActivity().getApplication()).lastLocation;
+//        addressStr = "307,Galle Road, Colombo 3";
+        HTTPHandler.directionsRequest(loc,addressStr, new RequestParams(), new HTTPHandler.ResponseManager(new ETADownload(), context, "Updating..."));
+
         return rootView;
     }
 
@@ -128,6 +144,13 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             @Override
             public void onClick(View v) {
                 cameraBtnClicked();
+            }
+        });
+        ImageView btnDirections = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_directions_button);
+        btnDirections.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGMapsWithPosition();
             }
         });
         TextView btnViewImages = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_images_view_button);
@@ -147,6 +170,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
         TextView address = (TextView) viewRef.findViewById(R.id.list_item_address);
         TextView notes = (TextView) viewRef.findViewById(R.id.list_item_notes);
+        eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
+        TextView etaLbl = (TextView) viewRef.findViewById(R.id.list_item_eta_label);
         TextView btnProcess = (TextView) viewRef.findViewById(R.id.list_item_process_button);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +180,27 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             }
         });
 
-        suburb.setText(job.getConceptBookingDeliverySuburb());
+        eta.setVisibility(View.VISIBLE);
+        etaLbl.setVisibility(View.VISIBLE);
+
+        if(isConcept){
+            suburb.setText(job.getConceptBookingDeliverySuburb());
+            address.setText(job.getAddress());
+            addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+        }
+        else{
+            if (type.equals("JobsPending")){
+                suburb.setText(job.getConceptBookingPickupSuburb());
+                address.setText(job.getConceptBookingPickupAddress());
+                addressStr = job.getConceptBookingPickupAddress() + "," + job.getConceptBookingPickupSuburb();
+            }
+            else{
+                suburb.setText(job.getConceptBookingDeliverySuburb());
+                address.setText(job.getAddress());
+                addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+            }
+        }
+
         orderNo.setText(job.getOrderno());
         if (job.getConceptBookingTailLift() == 1) {
             orderNoTypeTL.setVisibility(View.VISIBLE);
@@ -176,7 +221,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         }
         pallets.setText(String.valueOf(job.getPallets()));
         parcels.setText(String.valueOf(job.getParcels()));
-        address.setText(job.getAddress());
         notes.setText(job.getSpecialNotes());
 
         if (type.equals("JobsPending") && user.getUserArriveConcept() != null) {
@@ -347,6 +391,22 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         }
     }
 
+    public class ETADownload implements ResponseListener {
+        @Override
+        public void onSuccess(JSONObject jSONObject) throws JSONException {
+            Log.d("Response", jSONObject.toString());
+            if (jSONObject.getString("status").equals("OK")) {
+                JSONArray rows = jSONObject.getJSONArray("rows");
+                JSONObject elements = rows.getJSONObject(0);
+                JSONArray eleArr = elements.getJSONArray("elements");
+                JSONObject row = eleArr.getJSONObject(0);
+                JSONObject duration = row.getJSONObject("duration");
+                String time = duration.getString("text");
+                eta.setText(time);
+            }
+        }
+    }
+
     private void cameraBtnClicked() {
         if (images.size() == 3) {
             GenericMethods.showToast(context, "Maximum of 3 photos are allowed.");
@@ -364,6 +424,19 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
+        }
+    }
+
+    private void openGMapsWithPosition() {
+        String destinationsF = addressStr.replace(" ", "+");
+        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ destinationsF +"&mode=d");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(context.getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+        else{
+            GenericMethods.showToast(context, "No supported application found");
         }
     }
 

@@ -1,6 +1,7 @@
 package au.com.cynjames;
 
 import android.app.Application;
+import android.location.Location;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,6 +18,7 @@ public class CJT extends Application {
     private TimerTask mActivityTransitionTimerTask;
     public boolean wasInBackground;
     private final long MAX_ACTIVITY_TRANSITION_TIME_MS = 3000;
+    public Location lastLocation;
 
     @Override
     public void onCreate() {

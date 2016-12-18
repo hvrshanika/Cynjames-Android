@@ -143,6 +143,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:ems="10"
+        android:inputType="text"
         android:layout_toRightOf="@+id/list_item_name_label"
         android:background="@drawable/bg_white_rounded_with_border"
         android:gravity="left|center"

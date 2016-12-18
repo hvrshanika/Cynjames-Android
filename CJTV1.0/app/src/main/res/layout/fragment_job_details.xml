@@ -56,6 +56,15 @@
         android:textColor="@color/white"
         android:textStyle="bold" />
 
+    <ImageView
+        android:id="@+id/fragment_job_details_header_directions_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignTop="@+id/fragment_job_details_header_back_button"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_images_view_button"
+        android:src="@mipmap/imgpsh_fullsize" />
+
     <View
         android:id="@+id/view_seperator"
         android:layout_width="match_parent"
@@ -295,10 +304,36 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
+                android:id="@+id/list_item_eta_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_booking_time"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_eta"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_eta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_booking_time"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_notes_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
                 android:id="@+id/list_item_process_button"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/list_item_booking_time"
+                android:layout_below="@+id/list_item_eta"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"
@@ -309,6 +344,7 @@
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:visibility="gone" />
+
 
         </RelativeLayout>
 

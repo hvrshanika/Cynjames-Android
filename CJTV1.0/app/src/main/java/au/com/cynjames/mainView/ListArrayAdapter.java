@@ -19,12 +19,14 @@ import au.com.cynjames.models.ConceptBooking;
 public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
     private final Context context;
     private final List<ConceptBooking> jobsList;
+    private final boolean isConcept;
 
 
-    public ListArrayAdapter(Context context, List<ConceptBooking> jobsList) {
+    public ListArrayAdapter(Context context, List<ConceptBooking> jobsList, boolean isConcept) {
         super(context, -1, jobsList);
         this.context = context;
         this.jobsList = jobsList;
+        this.isConcept = isConcept;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         ConceptBooking job = jobsList.get(position);
         if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8 ){
             rowView.setBackgroundColor(context.getResources().getColor(R.color.dark_red));
-        }else if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9 ){
+        }else if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9 ) {
             rowView.setBackgroundColor(context.getResources().getColor(R.color.green));
         }
 
@@ -46,7 +48,18 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView pallets = (TextView) rowView.findViewById(R.id.list_item_pallets);
         TextView parcels = (TextView) rowView.findViewById(R.id.list_item_parcels);
 
-        suburb.setText(job.getConceptBookingDeliverySuburb());
+        if(isConcept){
+            suburb.setText(job.getConceptBookingDeliverySuburb());
+        }
+        else{
+            if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2){
+                suburb.setText(job.getConceptBookingPickupSuburb());
+            }
+            else if(job.getConceptBookingStatus() == 8 || job.getConceptBookingStatus() == 9){
+                suburb.setText(job.getConceptBookingDeliverySuburb());
+            }
+        }
+
         orderNo.setText(job.getOrderno());
         if(job.getConceptBookingTailLift() == 1){
             orderNoType.setText("[TL]");

@@ -20,7 +20,7 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
@@ -35,7 +35,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
-        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
+        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT)";
         String createAdhocBookingLogTable = "CREATE TABLE adhocBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         db.execSQL(createUserTable);
         db.execSQL(createJobsTable);
@@ -153,6 +153,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         else{
             table = "adhocBooking";
+            values.put("conceptBookingPickupAddress", job.getConceptBookingPickupAddress());
+            values.put("conceptBookingPickupSuburb", job.getConceptBookingPickupSuburb());
         }
         db.insert(table, null, values);
 
@@ -194,6 +196,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         else{
             table = "adhocBooking";
+            values.put("conceptBookingPickupAddress", job.getConceptBookingPickupAddress());
+            values.put("conceptBookingPickupSuburb", job.getConceptBookingPickupSuburb());
         }
         db.update(table, values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
 
@@ -226,9 +230,18 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return jobs;
     }
 
-    public boolean jobExist(int id){
+    public boolean jobExist(int id, boolean isConcept){
         boolean exist;
-        String query = "SELECT COUNT(conceptBookingId) FROM conceptBooking WHERE conceptBookingId =" + id +"";
+
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+
+        String query = "SELECT COUNT(conceptBookingId) FROM " + table + " WHERE conceptBookingId =" + id +"";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         int count = 0;
@@ -288,6 +301,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setDeliveryImages(cursor.getString(23));
                 job.setPickupImages(cursor.getString(24));
 
+                if(!isConcept){
+                    job.setConceptBookingPickupAddress(cursor.getString(25));
+                    job.setConceptBookingPickupSuburb(cursor.getString(26));
+                }
+
                 jobs.add(job);
             } while (cursor.moveToNext());
         }
@@ -343,6 +361,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setDeliveryImages(cursor.getString(23));
                 job.setPickupImages(cursor.getString(24));
 
+                if(!isConcept){
+                    job.setConceptBookingPickupAddress(cursor.getString(25));
+                    job.setConceptBookingPickupSuburb(cursor.getString(26));
+                }
+
                 jobs.add(job);
             } while (cursor.moveToNext());
         }
@@ -396,6 +419,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 job.setConceptDeliveryName(cursor.getString(22));
                 job.setDeliveryImages(cursor.getString(23));
                 job.setPickupImages(cursor.getString(24));
+
+                if(!isConcept){
+                    job.setConceptBookingPickupAddress(cursor.getString(25));
+                    job.setConceptBookingPickupSuburb(cursor.getString(26));
+                }
 
                 jobs.add(job);
             } while (cursor.moveToNext());

@@ -12,6 +12,8 @@ public class ConceptBooking implements Serializable {
     private String conceptBookingDeliverySuburb;
     private String client;
     private String address;
+    private String conceptBookingPickupAddress;
+    private String conceptBookingPickupSuburb;
     private String specialNotes;
     private String date;
     private String conceptBookingTimeFor;
@@ -231,6 +233,22 @@ public class ConceptBooking implements Serializable {
 
     public void setConceptBookingStatus(int conceptBookingStatus) {
         this.conceptBookingStatus = conceptBookingStatus;
+    }
+
+    public String getConceptBookingPickupSuburb() {
+        return conceptBookingPickupSuburb;
+    }
+
+    public void setConceptBookingPickupSuburb(String conceptBookingPickupSuburb) {
+        this.conceptBookingPickupSuburb = conceptBookingPickupSuburb;
+    }
+
+    public String getConceptBookingPickupAddress() {
+        return conceptBookingPickupAddress;
+    }
+
+    public void setConceptBookingPickupAddress(String conceptBookingPickupAddress) {
+        this.conceptBookingPickupAddress = conceptBookingPickupAddress;
     }
 
 
