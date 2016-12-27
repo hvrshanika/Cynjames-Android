@@ -22,7 +22,6 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:support-v4:23.3.0'
     compile 'com.android.support:recyclerview-v7:23.3.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
@@ -30,6 +29,7 @@ dependencies {
     compile 'com.google.firebase:firebase-crash:9.4.0'
     compile 'com.android.support:design:23.3.0'
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
+    compile 'com.android.support:appcompat-v7:23.3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

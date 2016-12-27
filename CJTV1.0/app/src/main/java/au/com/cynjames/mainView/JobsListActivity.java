@@ -92,7 +92,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         db = new SQLiteHelper(this);
         sortedJobsList = new ArrayList<>();
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#bec2cb")));
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFFFFF")));
         actionBar.setLogo(R.mipmap.logo_red);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);

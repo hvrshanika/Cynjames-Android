@@ -18,6 +18,8 @@
     <color name="login_text_bg">#99bf1e2e</color>
     <color name="login_btn_bg">#f7951f</color>
     <color name="spinner_bg">#E6FFFF</color>
+    <color name="tabs_bg">#1E0425</color>
+    <color name="tabs_seperator">#4C3C50</color>
 
 
 </resources>

@@ -3,20 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_directions"
-        android:icon="@mipmap/imgpsh_fullsize"
-        app:showAsAction="ifRoom"
-        android:title="Get Directions"/>
-    <item
-        android:id="@+id/action_refresh"
-        android:icon="@mipmap/icon_refresh"
-        app:showAsAction="ifRoom"
-        android:title="Refresh"/>
-    <item
         android:id="@+id/action_logout"
-        android:icon="@mipmap/icon_logout"
+        android:icon="@mipmap/logout_resize"
         app:showAsAction="ifRoom"
         android:title="Logout"/>
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@mipmap/refresh_resize"
+        app:showAsAction="never"
+        android:title="Refresh"/>
     <item
         android:id="@+id/action_version"
         android:title="@string/app_name">

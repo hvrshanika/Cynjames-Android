@@ -9,7 +9,7 @@
         android:id="@+id/fragment_job_details_header"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/dark_gray" />
+        android:background="@color/white" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -58,10 +58,11 @@
 
     <ImageView
         android:id="@+id/fragment_job_details_header_directions_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_alignTop="@+id/fragment_job_details_header_back_button"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="2.5dp"
         android:layout_toLeftOf="@+id/fragment_job_details_header_images_view_button"
         android:src="@mipmap/imgpsh_fullsize" />
 

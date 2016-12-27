@@ -9,7 +9,7 @@
         android:id="@+id/fragment_job_details_header"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/dark_gray" />
+        android:background="@color/white" />
 
     <ImageView
         android:layout_width="wrap_content"

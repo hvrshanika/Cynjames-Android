@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:text="CONCEPT"
             android:textAlignment="center"
+            android:textColor="@color/white"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
 
@@ -49,10 +50,10 @@
             android:id="@+id/tab_view_count"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:background="@drawable/delivery_count_bg"
+            android:background="@drawable/pending_count_bg"
             android:text="0"
             android:layout_marginLeft="10dp"
-            android:textColor="@color/white"
+            android:textColor="@color/tabs_bg"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
