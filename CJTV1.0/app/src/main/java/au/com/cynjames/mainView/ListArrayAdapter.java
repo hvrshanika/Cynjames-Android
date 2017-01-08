@@ -35,9 +35,9 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         View rowView = inflater.inflate(R.layout.jobs_list_item, parent, false);
         ConceptBooking job = jobsList.get(position);
         if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8 ){
-            rowView.setBackgroundColor(context.getResources().getColor(R.color.dark_red));
+            rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
         }else if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9 ) {
-            rowView.setBackgroundColor(context.getResources().getColor(R.color.green));
+            rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
         }
 
         TextView suburb = (TextView) rowView.findViewById(R.id.list_item_suburb);

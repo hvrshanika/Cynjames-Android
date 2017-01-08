@@ -221,7 +221,13 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         }
         pallets.setText(String.valueOf(job.getPallets()));
         parcels.setText(String.valueOf(job.getParcels()));
-        notes.setText(job.getSpecialNotes());
+
+        if (job.getSpecialNotes() == null || job.getSpecialNotes().equals("")) {
+            notes.setVisibility(View.GONE);
+            viewRef.findViewById(R.id.list_item_notes_label).setVisibility(View.GONE);
+        } else {
+            notes.setText(job.getSpecialNotes());
+        }
 
         if (type.equals("JobsPending") && user.getUserArriveConcept() != null) {
             if (job.getConceptBookingStatus() == 7) {

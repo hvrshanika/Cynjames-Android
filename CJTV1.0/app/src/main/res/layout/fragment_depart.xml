@@ -153,11 +153,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/list_item_name"
         android:layout_marginTop="10dp"
-        android:paddingBottom="20dp"
-        android:background="@color/dark_red">
+        android:paddingBottom="10dp">
 
         <TextView
             android:id="@+id/list_item_sign_label"
@@ -168,14 +167,13 @@
             android:layout_marginTop="10dp"
             android:gravity="left|center"
             android:text="@string/depart_sign"
-            android:textColor="@color/white"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
         <android.gesture.GestureOverlayView
             android:id="@+id/list_item_sign"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:layout_below="@+id/list_item_sign_label"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"

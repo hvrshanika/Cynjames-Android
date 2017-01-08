@@ -13,10 +13,6 @@
         app:showAsAction="never"
         android:title="Refresh"/>
     <item
-        android:id="@+id/action_version"
-        android:title="@string/app_name">
-    </item>
-    <item
         android:id="@+id/action_ariive_concept"
         android:title="">
     </item>
@@ -25,12 +21,16 @@
         android:title="">
     </item>
     <item
-        android:id="@+id/action_difference"
-        android:title="">
+        android:id="@+id/action_version"
+        android:title="@string/app_name">
     </item>
-    <item
-        android:id="@+id/action_log"
-        android:title="Logs">
-    </item>
+    <!--<item-->
+        <!--android:id="@+id/action_difference"-->
+        <!--android:title="">-->
+    <!--</item>-->
+    <!--<item-->
+        <!--android:id="@+id/action_log"-->
+        <!--android:title="Logs">-->
+    <!--</item>-->
 
 </menu>

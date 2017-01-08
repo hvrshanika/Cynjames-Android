@@ -20,6 +20,8 @@
     <color name="spinner_bg">#E6FFFF</color>
     <color name="tabs_bg">#1E0425</color>
     <color name="tabs_seperator">#4C3C50</color>
+    <color name="list_red">#f34c54</color>
+    <color name="list_green">#12ad71</color>
 
 
 </resources>

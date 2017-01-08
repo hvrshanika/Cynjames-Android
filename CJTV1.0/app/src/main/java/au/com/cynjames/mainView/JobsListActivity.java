@@ -163,6 +163,10 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             headerText = "Adhoc Jobs";
         }
         header.setText(headerText);
+
+        if(sortedJobsList.size() == 0){
+            findViewById(R.id.fragment_jobs_list_no_jobs_view).setVisibility(View.VISIBLE);
+        }
     }
 
     private void setButtonListeners() {

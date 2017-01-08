@@ -298,9 +298,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_logout:
                 logoutUser();
                 break;
-            case R.id.action_log:
-                logsBtnClicked();
-                break;
+//            case R.id.action_log:
+//                logsBtnClicked();
+//                break;
             default:
                 break;
         }
@@ -322,12 +322,18 @@ public class MainActivity extends AppCompatActivity {
     private void updateMenuTitles() {
         MenuItem arriveConcept = menu.findItem(R.id.action_ariive_concept);
         MenuItem arriveClient = menu.findItem(R.id.action_arrive_client);
-        MenuItem timeDifference = menu.findItem(R.id.action_difference);
+//        MenuItem timeDifference = menu.findItem(R.id.action_difference);
         if (user.getUserArriveConcept() != null) {
-            arriveConcept.setTitle(user.getUserArriveConcept());
+            arriveConcept.setTitle("Concept: " + user.getUserArriveConcept());
+        }
+        else{
+            arriveConcept.setVisible(false);
         }
         if (user.getUserArriveClient() != null) {
-            arriveClient.setTitle(user.getUserArriveClient());
+            arriveClient.setTitle("Client: " + user.getUserArriveClient());
+        }
+        else{
+            arriveClient.setVisible(false);
         }
     }
 
@@ -517,6 +523,7 @@ public class MainActivity extends AppCompatActivity {
                     logoutClicked = true;
                     if(logoutTimer){
                         timer.cancel();
+                        stopLogOutTimer();
                     }
                     if (mLastLocation != null) {
                         updateDriverStauts("Driver has logged out");

@@ -47,8 +47,10 @@ public class HTTPHandler {
 
     public static void directionsRequest(Location origin, String destinations, RequestParams params, JsonHttpResponseHandler responseHandler) {
         String destinationsF = destinations.replace(" ", "+");
-        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
-        getAsyncClient().post(url, params, responseHandler);
+        if(origin != null){
+            String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
+            getAsyncClient().post(url, params, responseHandler);
+        }
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

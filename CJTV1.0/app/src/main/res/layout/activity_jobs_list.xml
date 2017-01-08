@@ -74,4 +74,13 @@
         android:layout_below="@+id/fragment_jobs_list_header_text"
         android:layout_marginTop="2dp"/>
 
+    <View
+        android:id="@+id/fragment_jobs_list_no_jobs_view"
+        android:layout_width="200dp"
+        android:layout_height="210dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@mipmap/image_no_jobs"
+        android:visibility="gone"/>
+
 </RelativeLayout>
