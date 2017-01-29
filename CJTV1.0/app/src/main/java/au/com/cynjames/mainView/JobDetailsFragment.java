@@ -164,7 +164,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView orderNo = (TextView) viewRef.findViewById(R.id.list_item_order_no);
         TextView orderNoTypeTL = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_tl);
         TextView orderNoTypeHU = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_hu);
+        TextView clientNameLbl = (TextView) viewRef.findViewById(R.id.list_item_client_name_label);
         TextView clientName = (TextView) viewRef.findViewById(R.id.list_item_client_name);
+        TextView customerName = (TextView) viewRef.findViewById(R.id.list_item_customer_name);
+        TextView customerNameLbl = (TextView) viewRef.findViewById(R.id.list_item_customer_name_label);
         TextView bookingTime = (TextView) viewRef.findViewById(R.id.list_item_booking_time);
         pallets = (TextView) viewRef.findViewById(R.id.list_item_pallets);
         parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
@@ -187,17 +190,25 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             suburb.setText(job.getConceptBookingDeliverySuburb());
             address.setText(job.getAddress());
             addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+            clientName.setText(job.getClient());
         }
         else{
+            customerName.setVisibility(View.VISIBLE);
+            customerNameLbl.setVisibility(View.VISIBLE);
+            customerName.setText(job.getConceptClientsName());
             if (type.equals("JobsPending")){
                 suburb.setText(job.getConceptBookingPickupSuburb());
                 address.setText(job.getConceptBookingPickupAddress());
                 addressStr = job.getConceptBookingPickupAddress() + "," + job.getConceptBookingPickupSuburb();
+                clientName.setText(job.getConceptBookingPickupClientName());
+                clientNameLbl.setText("Pickup \nClient Name:");
             }
             else{
                 suburb.setText(job.getConceptBookingDeliverySuburb());
                 address.setText(job.getAddress());
                 addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+                clientName.setText(job.getClient());
+                clientNameLbl.setText("Delivery \nClient Name:");
             }
         }
 
@@ -212,7 +223,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
         }
 
-        clientName.setText(job.getClient());
         if (job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")) {
             bookingTime.setVisibility(View.GONE);
             viewRef.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);

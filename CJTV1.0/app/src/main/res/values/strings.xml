@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App Ver: 08/01/17 TEST</string>
+    <string name="app_name">App Ver: 29/01/17 TEST</string>
     <string name="app_header">CJT</string>
     <string name="login_username">Username</string>
     <string name="login_password">Password</string>
@@ -24,6 +24,7 @@
     <string name="job_details_process">Process</string>
     <string name="job_details_suburb">Suburb:</string>
     <string name="job_details_client_name">Client Name:</string>
+    <string name="job_details_customer_name">Customer Name:</string>
     <string name="job_details_address">Address:</string>
     <string name="job_details_notes">Notes:</string>
     <string name="depart_arrive_concept">Arrive Concept:</string>

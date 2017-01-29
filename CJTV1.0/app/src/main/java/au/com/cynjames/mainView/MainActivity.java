@@ -537,10 +537,6 @@ public class MainActivity extends AppCompatActivity {
             });
             build.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    if(logoutTimer) {
-                        notificationSent = false;
-                        resetLogOutTimer();
-                    }
                     dialog.dismiss();
                 }
             });
@@ -692,7 +688,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onUserInteraction() {
         resetDisconnectTimer();
-        if(logoutTimer) {
+        if(logoutTimer && !notificationSent) {
             resetLogOutTimer();
         }
     }
@@ -1036,10 +1032,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    int preJobsAssignedCheck = 0;
+    int postJobsAssignedCheck = 0;
+
     private void checkJobsAssigned() {
         List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7", true);
+        preJobsAssignedCheck = statusSevenJobs.size();
+        postJobsAssignedCheck = 0;
 
         for (ConceptBooking statusSevenJob : statusSevenJobs) {
+
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
@@ -1105,14 +1107,10 @@ public class MainActivity extends AppCompatActivity {
                 if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
                     db.clearConcept(id, isConcept);
                 }
-//                if(isConcept){
-//                    checkAdhocJobsAssigned();
-//                }
-//                else{
-//                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
-//                    String d=formatter.format(new Date());
-//                    GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
-//                }
+                postJobsAssignedCheck ++;
+                if(isConcept && preJobsAssignedCheck == postJobsAssignedCheck){
+                    checkAdhocJobsAssigned();
+                }
             }
         }
     }
@@ -1223,9 +1221,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     conceptNewJobsCount = 0;
 
-//                    if (GenericMethods.isConnectedToInternet(context)) {
-//                        checkJobsAssigned();
-//                    }
+                    if (GenericMethods.isConnectedToInternet(context)) {
+                        checkJobsAssigned();
+                    }
 
                     SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
                     String d=formatter.format(new Date());

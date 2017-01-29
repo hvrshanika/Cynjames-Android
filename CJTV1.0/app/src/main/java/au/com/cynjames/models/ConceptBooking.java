@@ -32,6 +32,26 @@ public class ConceptBooking implements Serializable {
     private int conceptBookingHandUnload;
     private int conceptBookingUrgent;
 
+    public String getConceptClientsName() {
+        return conceptClientsName;
+    }
+
+    public void setConceptClientsName(String conceptClientsName) {
+        this.conceptClientsName = conceptClientsName;
+    }
+
+    private String conceptClientsName;
+
+    public String getConceptBookingPickupClientName() {
+        return conceptBookingPickupClientName;
+    }
+
+    public void setConceptBookingPickupClientName(String conceptBookingPickupClientName) {
+        this.conceptBookingPickupClientName = conceptBookingPickupClientName;
+    }
+
+    private String conceptBookingPickupClientName;
+
     public String getDeliveryImages() {
         return deliveryImages;
     }

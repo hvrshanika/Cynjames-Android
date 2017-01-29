@@ -44,19 +44,30 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView orderNo = (TextView) rowView.findViewById(R.id.list_item_order_no);
         TextView orderNoType = (TextView) rowView.findViewById(R.id.list_item_order_no_type);
         TextView clientName = (TextView) rowView.findViewById(R.id.list_item_client_name);
+        TextView clientNameLbl = (TextView) rowView.findViewById(R.id.list_item_client_label);
+        TextView customerName = (TextView) rowView.findViewById(R.id.list_item_customer_name);
+        TextView customerNameLbl = (TextView) rowView.findViewById(R.id.list_item_customer_label);
         TextView bookingTime = (TextView) rowView.findViewById(R.id.list_item_booking_time);
         TextView pallets = (TextView) rowView.findViewById(R.id.list_item_pallets);
         TextView parcels = (TextView) rowView.findViewById(R.id.list_item_parcels);
 
         if(isConcept){
             suburb.setText(job.getConceptBookingDeliverySuburb());
+            clientName.setText(job.getClient());
         }
         else{
+            customerName.setVisibility(View.VISIBLE);
+            customerNameLbl.setVisibility(View.VISIBLE);
+            customerName.setText(job.getConceptClientsName());
             if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2){
                 suburb.setText(job.getConceptBookingPickupSuburb());
+                clientName.setText(job.getConceptBookingPickupClientName());
+                clientNameLbl.setText("Pickup Client Name:");
             }
             else if(job.getConceptBookingStatus() == 8 || job.getConceptBookingStatus() == 9){
                 suburb.setText(job.getConceptBookingDeliverySuburb());
+                clientName.setText(job.getClient());
+                clientNameLbl.setText("Delivery Client Name:");
             }
         }
 
@@ -69,7 +80,6 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             orderNoType.setText("[U]");
         }
 
-        clientName.setText(job.getClient());
         if(job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")){
             bookingTime.setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);
