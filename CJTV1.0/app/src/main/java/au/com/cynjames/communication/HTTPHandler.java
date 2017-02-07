@@ -37,7 +37,7 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class HTTPHandler {
 
-    private static final String BASE_URL = "http://cynjames.trotic.com/webservice-one/";
+    private static final String BASE_URL = "http://cynjames-stage.trotic.com/webservice-one/";
 
     private static AsyncHttpClient httpClient;
 
@@ -46,7 +46,7 @@ public class HTTPHandler {
     }
 
     public static void directionsRequest(Location origin, String destinations, RequestParams params, JsonHttpResponseHandler responseHandler) {
-        String destinationsF = destinations.replace(" ", "+");
+        String destinationsF = (destinations.replace(" ", "+")).replaceAll("[\u0000-\u001f]", "");
         if(origin != null){
             String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
             getAsyncClient().post(url, params, responseHandler);

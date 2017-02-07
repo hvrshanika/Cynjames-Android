@@ -31,6 +31,19 @@ public class ConceptBooking implements Serializable {
     private String conceptBookingPickupDate;
     private int conceptBookingHandUnload;
     private int conceptBookingUrgent;
+    private String deliveryImages;
+    private String pickupImages;
+    private String conceptClientsName;
+    private String conceptBookingPickupClientName;
+    private int customerType;
+
+    public int getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(int customerType) {
+        this.customerType = customerType;
+    }
 
     public String getConceptClientsName() {
         return conceptClientsName;
@@ -40,8 +53,6 @@ public class ConceptBooking implements Serializable {
         this.conceptClientsName = conceptClientsName;
     }
 
-    private String conceptClientsName;
-
     public String getConceptBookingPickupClientName() {
         return conceptBookingPickupClientName;
     }
@@ -50,8 +61,6 @@ public class ConceptBooking implements Serializable {
         this.conceptBookingPickupClientName = conceptBookingPickupClientName;
     }
 
-    private String conceptBookingPickupClientName;
-
     public String getDeliveryImages() {
         return deliveryImages;
     }
@@ -59,9 +68,6 @@ public class ConceptBooking implements Serializable {
     public void setDeliveryImages(String deliveryImages) {
         this.deliveryImages = deliveryImages;
     }
-
-    private String deliveryImages;
-    private String pickupImages;
 
     public String getPickupImages() {
         return pickupImages;

@@ -50,6 +50,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView bookingTime = (TextView) rowView.findViewById(R.id.list_item_booking_time);
         TextView pallets = (TextView) rowView.findViewById(R.id.list_item_pallets);
         TextView parcels = (TextView) rowView.findViewById(R.id.list_item_parcels);
+        TextView type = (TextView) rowView.findViewById(R.id.list_item_type);
 
         if(isConcept){
             suburb.setText(job.getConceptBookingDeliverySuburb());
@@ -58,6 +59,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         else{
             customerName.setVisibility(View.VISIBLE);
             customerNameLbl.setVisibility(View.VISIBLE);
+            type.setVisibility(View.VISIBLE);
             customerName.setText(job.getConceptClientsName());
             if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2){
                 suburb.setText(job.getConceptBookingPickupSuburb());
@@ -69,6 +71,33 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
                 clientName.setText(job.getClient());
                 clientNameLbl.setText("Delivery Client Name:");
             }
+
+            String jobType = "";
+            String customerType = "";
+            switch (job.getCustomerType()){
+                case 1:
+                    customerType = "VIP";
+                    break;
+                case 2:
+                    customerType = "Standard";
+                    break;
+                case 3:
+                    customerType = "Next Day";
+                    break;
+            }
+
+            if(job.getPallets() == 1){
+                jobType = "Pallets";
+            }
+            else if(job.getParcels() == 2){
+                jobType = "Parcels";
+            }
+            else if(job.getPallets() == 0 && job.getParcels() == 0){
+                jobType = "Tonage";
+            }
+
+            String typeString = customerType + "/" + jobType;
+            type.setText(typeString);
         }
 
         orderNo.setText(job.getOrderno());
