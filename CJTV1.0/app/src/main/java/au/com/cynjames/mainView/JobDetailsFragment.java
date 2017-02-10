@@ -176,6 +176,12 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
         TextView etaLbl = (TextView) viewRef.findViewById(R.id.list_item_eta_label);
         TextView btnProcess = (TextView) viewRef.findViewById(R.id.list_item_process_button);
+        TextView deliveryClientName = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name);
+        TextView deliveryClientNameLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name_label);
+        TextView deliveryAdd = (TextView) viewRef.findViewById(R.id.list_item_delivery_address);
+        TextView deliveryAddLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_address_label);
+        TextView deliverySuburb = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb);
+        TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -202,6 +208,21 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 addressStr = job.getConceptBookingPickupAddress() + "," + job.getConceptBookingPickupSuburb();
                 clientName.setText(job.getConceptBookingPickupClientName());
                 clientNameLbl.setText("Pickup \nClient Name:");
+
+                // Showing delivery details in Pending Jobs
+                deliveryClientName.setVisibility(View.VISIBLE);
+                deliveryClientNameLbl.setVisibility(View.VISIBLE);
+                deliverySuburb.setVisibility(View.VISIBLE);
+                deliverySuburbLbl.setVisibility(View.VISIBLE);
+                deliveryAdd.setVisibility(View.VISIBLE);
+                deliveryAddLbl.setVisibility(View.VISIBLE);
+
+                deliveryClientName.setText(job.getClient());
+                deliveryClientNameLbl.setText("Delivery \nClient Name:");
+                deliverySuburb.setText(job.getConceptBookingDeliverySuburb());
+                deliverySuburbLbl.setText("Delivery \nSuburb:");
+                deliveryAdd.setText(job.getAddress());
+                deliveryAddLbl.setText("Delivery \nAddress:");
             }
             else{
                 suburb.setText(job.getConceptBookingDeliverySuburb());

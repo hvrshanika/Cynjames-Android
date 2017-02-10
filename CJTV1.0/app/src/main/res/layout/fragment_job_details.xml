@@ -357,10 +357,88 @@
                 android:visibility="gone"/>
 
             <TextView
+                android:id="@+id/list_item_delivery_client_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_eta"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_client_name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_delivery_client_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_eta"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/list_item_client_name_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_delivery_suburb_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_delivery_client_name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="25dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_address"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_delivery_suburb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_delivery_client_name"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_toRightOf="@+id/list_item_address_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_delivery_address_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_delivery_suburb"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="25dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_address"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_delivery_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_delivery_suburb"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_toRightOf="@+id/list_item_address_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
                 android:id="@+id/list_item_process_button"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/list_item_eta"
+                android:layout_below="@+id/list_item_delivery_address"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"

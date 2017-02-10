@@ -57,8 +57,9 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             clientName.setText(job.getClient());
         }
         else{
-            customerName.setVisibility(View.VISIBLE);
-            customerNameLbl.setVisibility(View.VISIBLE);
+            // Asked to remove
+            customerName.setVisibility(View.GONE);
+            customerNameLbl.setVisibility(View.GONE);
             type.setVisibility(View.VISIBLE);
             customerName.setText(job.getConceptClientsName());
             if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2){
@@ -96,7 +97,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
                 jobType = "Tonage";
             }
 
-            String typeString = customerType + "/" + jobType;
+            String typeString = customerType + "|" + jobType;
             type.setText(typeString);
         }
 
