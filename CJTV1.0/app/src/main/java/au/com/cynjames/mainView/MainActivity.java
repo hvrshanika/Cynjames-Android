@@ -64,6 +64,7 @@ import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
+import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.DriverStatus;
@@ -1068,16 +1069,26 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 JSONArray objs = jSONObject.getJSONArray("joblist");
+                JSONArray dimens = null;
                 if(isConcept){
                     db.clearTable("conceptBooking");
                 }
                 else{
                     db.clearTable("adhocBooking");
+                    db.clearTable("adhocDimensions");
+                    dimens = jSONObject.getJSONArray("dimenslist");
                 }
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
                     db.addJob(job, isConcept);
+                }
+                if(dimens != null){
+                    for (int i = 0; i < dimens.length(); i++) {
+                        JSONObject obj = dimens.getJSONObject(i);
+                        AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
+                        db.addDimension(dimen);
+                    }
                 }
                 updateLabels();
                 if(isConcept){

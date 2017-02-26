@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -48,6 +50,7 @@ import au.com.cynjames.CJT;
 import au.com.cynjames.cjtv10.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
+import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.User;
 import au.com.cynjames.utils.GenericMethods;
@@ -72,6 +75,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     TextView eta;
     Location loc;
     String addressStr;
+    List<AdhocDimensions> adhocDimensions;
 
     public JobDetailsFragment() {
 
@@ -96,6 +100,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         int id = gson.fromJson(jsonUser, Integer.TYPE);
         user = db.getUser(id);
         loadImages();
+        adhocDimensions = db.getDimenForJob(job.getId());
     }
 
     @Override
@@ -182,6 +187,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView deliveryAddLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_address_label);
         TextView deliverySuburb = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb);
         TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
+        TextView vehicleLbl = (TextView) viewRef.findViewById(R.id.list_item_vehicle_label);
+        TextView vehicle = (TextView) viewRef.findViewById(R.id.list_item_vehicle);
+        TextView rateLbl = (TextView) viewRef.findViewById(R.id.list_item_rate_label);
+        TextView rate = (TextView) viewRef.findViewById(R.id.list_item_rate);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,6 +200,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
         eta.setVisibility(View.VISIBLE);
         etaLbl.setVisibility(View.VISIBLE);
+
+        TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
 
         if(isConcept){
             suburb.setText(job.getConceptBookingDeliverySuburb());
@@ -223,6 +234,49 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 deliverySuburbLbl.setText("Delivery \nSuburb:");
                 deliveryAdd.setText(job.getAddress());
                 deliveryAddLbl.setText("Delivery \nAddress:");
+
+                String vehicleVal = "";
+                float rateVal = 0;
+                for(int i = 0; i <adhocDimensions.size(); i++){
+                    AdhocDimensions dimen = adhocDimensions.get(i);
+                    vehicleVal = dimen.getVehicle();
+                    rateVal =  dimen.getRate();
+                    if(dimen.getQty() != 0){
+                        dimensTable.setVisibility(View.VISIBLE);
+
+                        if(i == 0){
+                            TableRow header= new TableRow(context);
+                            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                            header.setLayoutParams(lp);
+
+                            header.addView(createTextViewForTable("Qty"));
+                            header.addView(createTextViewForTable("Height\ncm"));
+                            header.addView(createTextViewForTable("Width\ncm"));
+                            header.addView(createTextViewForTable("Length\ncm"));
+                            header.addView(createTextViewForTable("Weight\nkg"));
+                            header.addView(createTextViewForTable("Total\nWeight"));
+                            dimensTable.addView(header,i);
+                        }
+
+                        TableRow row= new TableRow(context);
+                        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                        row.setLayoutParams(lp);
+
+                        row.addView(createTextViewForTable(""+dimen.getQty()));
+                        row.addView(createTextViewForTable(""+dimen.getHeight()));
+                        row.addView(createTextViewForTable(""+dimen.getWidth()));
+                        row.addView(createTextViewForTable(""+dimen.getLength()));
+                        row.addView(createTextViewForTable(""+dimen.getWeight()));
+                        row.addView(createTextViewForTable(""+(dimen.getQty() * dimen.getWeight())));
+                        dimensTable.addView(row,i+1);
+                    }
+                }
+                vehicleLbl.setVisibility(View.VISIBLE);
+                vehicle.setVisibility(View.VISIBLE);
+                vehicle.setText(vehicleVal);
+                rateLbl.setVisibility(View.VISIBLE);
+                rate.setVisibility(View.VISIBLE);
+                rate.setText("$ "+rateVal);
             }
             else{
                 suburb.setText(job.getConceptBookingDeliverySuburb());
@@ -280,6 +334,17 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnViewImages.setVisibility(View.GONE);
             }
         }
+    }
+
+    private TextView createTextViewForTable(String text){
+        TextView tv = new TextView(context);
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tv.setGravity(Gravity.CENTER);
+        tv.setTextAppearance(context,android.R.style.TextAppearance_Medium);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
+        tv.setLayoutParams(params);
+        tv.setText(text);
+        return tv;
     }
 
     private void btnBackClicked() {

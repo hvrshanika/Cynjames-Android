@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.LinkedList;
 import java.util.List;
 
+import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.DriverStatus;
@@ -20,7 +21,7 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
@@ -37,12 +38,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT, conceptClientsName TEXT, conceptBookingPickupClientName TEXT, customerType INTEGER)";
         String createAdhocBookingLogTable = "CREATE TABLE adhocBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
+        String createAdhocDimensionsTable = "CREATE TABLE adhocDimensions (id INTEGER PRIMARY KEY AUTOINCREMENT, qty INTEGER, height REAL, width REAL, length REAL, weight REAL, clientId INTEGER, bookingId INTEGER, vehicle TEXT, rate REAL)";
         db.execSQL(createUserTable);
         db.execSQL(createJobsTable);
         db.execSQL(createDriverStatusTable);
         db.execSQL(createconceptBookingLogTable);
         db.execSQL(createAdhocJobsTable);
         db.execSQL(createAdhocBookingLogTable);
+        db.execSQL(createAdhocDimensionsTable);
 
     }
 
@@ -54,6 +57,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS conceptBookingLog");
         db.execSQL("DROP TABLE IF EXISTS adhocBooking");
         db.execSQL("DROP TABLE IF EXISTS adhocBookingLog");
+        db.execSQL("DROP TABLE IF EXISTS adhocDimensions");
         this.onCreate(db);
     }
 
@@ -568,6 +572,55 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         for(ConceptBookingLog jobb: jobs) {
             Log.d("getAllStatus()", String.valueOf(jobb.getConceptBookingLogDate()));
+        }
+        db.close();
+        return jobs;
+    }
+
+    public void addDimension(AdhocDimensions dimen){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("id", dimen.getId());
+        values.put("qty", dimen.getQty());
+        values.put("height", dimen.getHeight());
+        values.put("width", dimen.getWidth());
+        values.put("length", dimen.getLength());
+        values.put("weight", dimen.getWeight());
+        values.put("rate", dimen.getRate());
+        values.put("clientId", dimen.getClientId());
+        values.put("bookingId", dimen.getBookingId());
+        values.put("vehicle", dimen.getVehicle());
+
+        String table = "adhocDimensions";
+        db.insert(table, null, values);
+
+        db.close();
+    }
+
+    public List<AdhocDimensions> getDimenForJob(int id){
+        List<AdhocDimensions> jobs = new LinkedList<AdhocDimensions>();
+
+        String query = "SELECT * FROM adhocDimensions WHERE bookingId = " + id;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        AdhocDimensions job = null;
+        if (cursor.moveToFirst()) {
+            do {
+                job = new AdhocDimensions();
+                job.setQty(Integer.parseInt(cursor.getString(1)));
+                job.setHeight(Float.parseFloat(cursor.getString(2)));
+                job.setWidth(Float.parseFloat(cursor.getString(3)));
+                job.setLength(Float.parseFloat(cursor.getString(4)));
+                job.setWeight(Float.parseFloat(cursor.getString(5)));
+                job.setClientId(Integer.parseInt(cursor.getString(6)));
+                job.setBookingId(Integer.parseInt(cursor.getString(7)));
+                job.setVehicle(cursor.getString(8));
+                job.setRate(Float.parseFloat(cursor.getString(9)));
+
+                jobs.add(job);
+            } while (cursor.moveToNext());
         }
         db.close();
         return jobs;
