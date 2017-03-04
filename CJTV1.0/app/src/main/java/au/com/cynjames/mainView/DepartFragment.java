@@ -69,7 +69,12 @@ public class DepartFragment extends DialogFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((JobsListActivity) getActivity()).resetDisconnectTimer();
+        if(getActivity().getClass() == JobsListActivity.class){
+            ((JobsListActivity) getActivity()).resetDisconnectTimer();
+        }
+        else{
+            ((MainActivity) getActivity()).resetDisconnectTimer();
+        }
     }
 
     @Override
@@ -90,7 +95,12 @@ public class DepartFragment extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        ((JobsListActivity) getActivity()).stopDisconnectTimer();
+        if(getActivity().getClass() == JobsListActivity.class){
+            ((JobsListActivity) getActivity()).stopDisconnectTimer();
+        }
+        else{
+            ((MainActivity) getActivity()).stopDisconnectTimer();
+        }
         ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
     }
 
@@ -205,6 +215,9 @@ public class DepartFragment extends DialogFragment {
             }
             db.updateUser(user);
             listener.handleDialogCloseDepart();
+            if(!isConcept){
+                dismiss();
+            }
         }
 
     }

@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,15 +28,17 @@ public class CustomPagerAdapter extends PagerAdapter {
     public static final int ADHOC_VIEW = 5;
     public static final int ADHOC_DELIVERY_COUNT = 6;
     public static final int ADHOC_DELIVERY_VIEW = 7;
+    public static final int ADHOC_LISTVIEW = 8;
 
     private TextView conceptCount = null;
     private TextView conceptView = null;
     private TextView conceptDeliverCount = null;
     private TextView conceptDeliveryView = null;
-    private TextView adhocCount = null;
-    private TextView adhocView = null;
-    private TextView adhocDeliverCount = null;
-    private TextView adhocDeliveryView = null;
+//    private TextView adhocCount = null;
+//    private TextView adhocView = null;
+//    private TextView adhocDeliverCount = null;
+//    private TextView adhocDeliveryView = null;
+    private ListView adhocListView = null;
     private RelativeLayout conceptRView = null;
     private RelativeLayout adhocRView = null;
     private RelativeLayout messagesRView  = null;
@@ -50,17 +53,18 @@ public class CustomPagerAdapter extends PagerAdapter {
         conceptDeliverCount = (TextView) conceptRView.findViewById(R.id.main_concept_ready_count);
         conceptDeliveryView = (TextView) conceptRView.findViewById(R.id.main_concept_ready_view);
 
-        adhocRView = (RelativeLayout) inflater.inflate(R.layout.activity_main_adhoc,null);
-        adhocCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_count);
-        adhocView = (TextView) adhocRView.findViewById(R.id.main_adhoc_view);
-        adhocDeliverCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_ready_count);
-        adhocDeliveryView = (TextView) adhocRView.findViewById(R.id.main_adhoc_ready_view);
+        adhocRView = (RelativeLayout) inflater.inflate(R.layout.activity_main_adhoc_new,null);
+        adhocListView = (ListView) adhocRView.findViewById(R.id.main_adhoc_new_list);
+//        adhocCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_count);
+//        adhocView = (TextView) adhocRView.findViewById(R.id.main_adhoc_view);
+//        adhocDeliverCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_ready_count);
+//        adhocDeliveryView = (TextView) adhocRView.findViewById(R.id.main_adhoc_ready_view);
 
         messagesRView = (RelativeLayout) inflater.inflate(R.layout.activity_main_messages,null);
     }
 
-    public TextView getViewAtPosition(int position) {
-        TextView view = null;
+    public View getViewAtPosition(int position) {
+        View view = null;
         switch (position){
             case CONCEPT_COUNT:
                 view = conceptCount;
@@ -74,18 +78,21 @@ public class CustomPagerAdapter extends PagerAdapter {
             case CONCEPT_DELIVERY_VIEW:
                 view = conceptDeliveryView;
                 break;
-            case ADHOC_COUNT:
-                view = adhocCount;
+            case ADHOC_LISTVIEW:
+                view = adhocListView;
                 break;
-            case ADHOC_VIEW:
-                view = adhocView;
-                break;
-            case ADHOC_DELIVERY_COUNT:
-                view = adhocDeliverCount;
-                break;
-            case ADHOC_DELIVERY_VIEW:
-                view = adhocDeliveryView;
-                break;
+//            case ADHOC_COUNT:
+//                view = adhocCount;
+//                break;
+//            case ADHOC_VIEW:
+//                view = adhocView;
+//                break;
+//            case ADHOC_DELIVERY_COUNT:
+//                view = adhocDeliverCount;
+//                break;
+//            case ADHOC_DELIVERY_VIEW:
+//                view = adhocDeliveryView;
+//                break;
             default:
                 break;
         }

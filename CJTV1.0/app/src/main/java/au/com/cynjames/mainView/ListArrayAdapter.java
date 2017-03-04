@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import au.com.cynjames.cjtv10.R;
@@ -34,9 +36,10 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.jobs_list_item, parent, false);
         ConceptBooking job = jobsList.get(position);
-        if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8 ){
+
+        if (job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8) {
             rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
-        }else if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9 ) {
+        } else if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
             rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
         }
 
@@ -51,23 +54,22 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView pallets = (TextView) rowView.findViewById(R.id.list_item_pallets);
         TextView parcels = (TextView) rowView.findViewById(R.id.list_item_parcels);
         TextView type = (TextView) rowView.findViewById(R.id.list_item_type);
+        TextView jobTypeMain = (TextView) rowView.findViewById(R.id.list_item_job_type_label);
 
-        if(isConcept){
+        if (isConcept) {
             suburb.setText(job.getConceptBookingDeliverySuburb());
             clientName.setText(job.getClient());
-        }
-        else{
+        } else {
             // Asked to remove
             customerName.setVisibility(View.GONE);
             customerNameLbl.setVisibility(View.GONE);
             type.setVisibility(View.VISIBLE);
             customerName.setText(job.getConceptClientsName());
-            if(job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2){
+            if (job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 2) {
                 suburb.setText(job.getConceptBookingPickupSuburb());
                 clientName.setText(job.getConceptBookingPickupClientName());
                 clientNameLbl.setText("Pickup Client Name:");
-            }
-            else if(job.getConceptBookingStatus() == 8 || job.getConceptBookingStatus() == 9){
+            } else if (job.getConceptBookingStatus() == 8 || job.getConceptBookingStatus() == 9) {
                 suburb.setText(job.getConceptBookingDeliverySuburb());
                 clientName.setText(job.getClient());
                 clientNameLbl.setText("Delivery Client Name:");
@@ -75,7 +77,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
 
             String jobType = "";
             String customerType = "";
-            switch (job.getCustomerType()){
+            switch (job.getCustomerType()) {
                 case 1:
                     customerType = "VIP";
                     break;
@@ -87,14 +89,19 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
                     break;
             }
 
-            if(job.getPallets() == 1){
+            if (job.getPallets() == 1) {
                 jobType = "Pallets";
-            }
-            else if(job.getParcels() == 2){
+            } else if (job.getParcels() == 2) {
                 jobType = "Parcels";
-            }
-            else if(job.getPallets() == 0 && job.getParcels() == 0){
+            } else if (job.getPallets() == 0 && job.getParcels() == 0) {
                 jobType = "Tonage";
+            }
+
+            if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 7){
+                jobTypeMain.setText("Pending");
+            }
+            else{
+                jobTypeMain.setText("Picked Up");
             }
 
             String typeString = customerType + "|" + jobType;
@@ -102,20 +109,19 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         }
 
         orderNo.setText(job.getOrderno());
-        if(job.getConceptBookingTailLift() == 1){
+        if (job.getConceptBookingTailLift() == 1) {
             orderNoType.setText("[TL]");
-        }else if(job.getConceptBookingHandUnload() == 1){
+        } else if (job.getConceptBookingHandUnload() == 1) {
             orderNoType.setText("[HU]");
-        }else if(job.getConceptBookingUrgent() == 1){
+        } else if (job.getConceptBookingUrgent() == 1) {
             orderNoType.setText("[U]");
         }
 
-        if(job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")){
+        if (job.getConceptBookingTimeFor() == null || job.getConceptBookingTimeFor().equals("")) {
             bookingTime.setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_booking_time_label).setVisibility(View.GONE);
             rowView.findViewById(R.id.list_item_timefor_line).setVisibility(View.GONE);
-        }
-        else{
+        } else {
             bookingTime.setText(job.getConceptBookingTimeFor());
         }
         pallets.setText(String.valueOf(job.getPallets()));

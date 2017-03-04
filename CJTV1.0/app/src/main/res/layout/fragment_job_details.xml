@@ -56,6 +56,22 @@
         android:textColor="@color/white"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/fragment_jobs_details_header_depart_button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_images_view_button"
+        android:layout_below="@+id/fragment_job_details_header"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/fragment_jobs_list_depart"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:background="@drawable/main_viewnow_orange_bg"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <ImageView
         android:id="@+id/fragment_job_details_header_directions_button"
         android:layout_width="35dp"
@@ -63,7 +79,7 @@
         android:layout_alignTop="@+id/fragment_job_details_header_back_button"
         android:layout_marginRight="10dp"
         android:layout_marginTop="2.5dp"
-        android:layout_toLeftOf="@+id/fragment_job_details_header_images_view_button"
+        android:layout_toLeftOf="@+id/fragment_jobs_details_header_depart_button"
         android:src="@mipmap/imgpsh_fullsize" />
 
     <View

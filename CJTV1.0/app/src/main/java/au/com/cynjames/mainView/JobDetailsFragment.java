@@ -106,14 +106,25 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onResume() {
         super.onResume();
-        ((JobsListActivity) getActivity()).stopDisconnectTimer();
+        if(getActivity().getClass() == JobsListActivity.class){
+            ((JobsListActivity) getActivity()).stopDisconnectTimer();
+        }
+        else{
+            ((MainActivity) getActivity()).stopDisconnectTimer();
+        }
+
         ((CJT) getActivity().getApplication()).stopActivityTransitionTimer();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((JobsListActivity) getActivity()).resetDisconnectTimer();
+        if(getActivity().getClass() == JobsListActivity.class){
+            ((JobsListActivity) getActivity()).resetDisconnectTimer();
+        }
+        else{
+            ((MainActivity) getActivity()).resetDisconnectTimer();
+        }
     }
 
     @Override
@@ -197,6 +208,13 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 BtnProcessClicked();
             }
         });
+        TextView btnDepart = (TextView) viewRef.findViewById(R.id.fragment_jobs_details_header_depart_button);
+        btnDepart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnDepartClicked();
+            }
+        });
 
         eta.setVisibility(View.VISIBLE);
         etaLbl.setVisibility(View.VISIBLE);
@@ -248,8 +266,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                             TableRow header= new TableRow(context);
                             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
                             header.setLayoutParams(lp);
+                            header.setBackground(getActivity().getResources().getDrawable(R.drawable.details_table_bg));
 
-                            header.addView(createTextViewForTable("Qty"));
+                            header.addView(createTextViewForTable("Qty\n    "));
                             header.addView(createTextViewForTable("Height\ncm"));
                             header.addView(createTextViewForTable("Width\ncm"));
                             header.addView(createTextViewForTable("Length\ncm"));
@@ -322,6 +341,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
+                if(!isConcept){
+                    btnDepart.setVisibility(View.VISIBLE);
+                }
             }
         }
         if (type.equals("DeliveryJobs") && user.getUserArriveClient() != null) {
@@ -332,6 +354,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
+                if(!isConcept){
+                    btnDepart.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -344,10 +369,24 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
         tv.setLayoutParams(params);
         tv.setText(text);
+        tv.setBackground(getActivity().getResources().getDrawable(R.drawable.details_table_bg));
         return tv;
     }
 
+    private void btnDepartClicked() {
+        listener.handleDialogCloseImage("");
+        dismiss();
+    }
+
     private void btnBackClicked() {
+        if (type.equals("JobsPending") && !isConcept && job.getConceptBookingStatus() == 7) {
+            user.setUserArriveConcept(null);
+            db.updateUser(user);
+        }
+        else if (type.equals("DeliveryJobs") && !isConcept && job.getConceptBookingStatus() == 8) {
+            user.setUserArriveClient(null);
+            db.updateUser(user);
+        }
         listener.handleDialogClose();
         dismiss();
     }
@@ -366,6 +405,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 job.setPickupImages(createImageString());
             } else if (job.getConceptBookingStatus() == 2) {
                 job.setConceptBookingStatus(7);
+                if(!isConcept){
+                    user.setUserArriveConcept(null);
+                    db.updateUser(user);
+                }
             }
             db.updateJob(job, isConcept);
             listener.handleDialogClose();
@@ -375,6 +418,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             if (job.getConceptBookingStatus() == 9) {
                 job.setConceptBookingStatus(8);
                 db.updateJob(job, isConcept);
+                if(!isConcept){
+                    user.setUserArriveClient(null);
+                    db.updateUser(user);
+                }
                 listener.handleDialogClose();
                 dismiss();
             } else if (job.getConceptBookingStatus() == 8) {

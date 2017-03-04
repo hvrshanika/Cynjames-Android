@@ -1,6 +1,8 @@
 package au.com.cynjames.mainView;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,11 +32,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v7.app.ActionBar;
 
@@ -76,7 +82,7 @@ import au.com.cynjames.utils.NewJobsUpdateService;
 import au.com.cynjames.utils.SQLiteHelper;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener, JobsDetailsFragmentListener {
     public static final long INTERACTION_TIMEOUT = 8000;
     Context context;
     Menu menu;
@@ -92,12 +98,15 @@ public class MainActivity extends AppCompatActivity {
     TextView tab_count_concept;
     TextView tab_count_adhoc;
     TextView tab_count_msgs;
+    ListView adhocJobsListView;
+    ListArrayAdapter adhocAdapter;
     int unreadMessages;
     SQLiteHelper db;
     List<ConceptBooking> pendingJobs;
     List<ConceptBooking> deliverReadyJobs;
     List<ConceptBooking> adhocPendingJobs;
     List<ConceptBooking> adhocDeliverReadyJobs;
+    List<ConceptBooking> sortedAllAdhocJobsList;
     Location mLastLocation;
     ImageView pendingIcon;
     Vehicle vehicle;
@@ -121,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     boolean notificationSent = false;
     boolean isUploading = false;
     boolean isRefreshing = false;
+    String type = "";
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -179,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
         deliverReadyJobs = new ArrayList<>();
         adhocPendingJobs = new ArrayList<>();
         adhocDeliverReadyJobs = new ArrayList<>();
+        sortedAllAdhocJobsList = new ArrayList<>();
         gson = new Gson();
         db = new SQLiteHelper(this);
         firstStatus = true;
@@ -430,20 +441,26 @@ public class MainActivity extends AppCompatActivity {
         TextView welcome = (TextView) findViewById(R.id.main_welcome_user_text);
         welcome.setText("Welcome " + user.getUserFirstName());
 
-        pendingCount = adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_COUNT);
-        deliverReadyCount = adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_DELIVERY_COUNT);
-        adhocPendingCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_COUNT);
-        adhocDeliverReadyCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_COUNT);
+        pendingCount = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_COUNT);
+        deliverReadyCount = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_DELIVERY_COUNT);
+//        adhocPendingCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_COUNT);
+//        adhocDeliverReadyCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_COUNT);
+        adhocJobsListView = (ListView) adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_LISTVIEW);
 
         pendingIcon = (ImageView) findViewById(R.id.main_truck_icon);
         messagesCount = (TextView) findViewById(R.id.main_messages_count);
 
         pendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
         deliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
-        adhocPendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
-        adhocDeliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
+//        adhocPendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
+//        adhocDeliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
 
-        TextView pendingJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_VIEW);
+        adhocAdapter = new ListArrayAdapter(this, sortedAllAdhocJobsList, false);
+        adhocJobsListView.setAdapter(adhocAdapter);
+        adhocJobsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        adhocJobsListView.setOnItemClickListener(this);
+
+        TextView pendingJobsViewBtn = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_VIEW);
         pendingJobsViewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -451,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
                 pendingJobsViewBtnClicked();
             }
         });
-        TextView deliveryJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_DELIVERY_VIEW);
+        TextView deliveryJobsViewBtn = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_DELIVERY_VIEW);
         deliveryJobsViewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -460,22 +477,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TextView adhocPendingJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_VIEW);
-        adhocPendingJobsViewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isConcept = false;
-                pendingJobsViewBtnClicked();
-            }
-        });
-        TextView adhocDeliveryJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_VIEW);
-        adhocDeliveryJobsViewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isConcept = false;
-                deliveryJobsViewBtnClicked();
-            }
-        });
+//        TextView adhocPendingJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_VIEW);
+//        adhocPendingJobsViewBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                isConcept = false;
+//                pendingJobsViewBtnClicked();
+//            }
+//        });
+//        TextView adhocDeliveryJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_VIEW);
+//        adhocDeliveryJobsViewBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                isConcept = false;
+//                deliveryJobsViewBtnClicked();
+//            }
+//        });
 
     }
 
@@ -508,6 +525,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logoutUser() {
+        getUser();
         if (user.getUserArriveConcept() != null) {
             GenericMethods.showToast(context, "You need to depart Concept before logging out");
         }
@@ -562,8 +580,8 @@ public class MainActivity extends AppCompatActivity {
         adhocDeliverReadyJobs = db.getReadyJobs(false);
         pendingCount.setText(String.valueOf(pendingJobs.size()));
         deliverReadyCount.setText(String.valueOf(deliverReadyJobs.size()));
-        adhocPendingCount.setText(String.valueOf(adhocPendingJobs.size()));
-        adhocDeliverReadyCount.setText(String.valueOf(adhocDeliverReadyJobs.size()));
+//        adhocPendingCount.setText(String.valueOf(adhocPendingJobs.size()));
+//        adhocDeliverReadyCount.setText(String.valueOf(adhocDeliverReadyJobs.size()));
 
         int conceptTotal = pendingJobs.size() + deliverReadyJobs.size();
         int adhocTotal = adhocPendingJobs.size() + adhocDeliverReadyJobs.size();
@@ -582,6 +600,15 @@ public class MainActivity extends AppCompatActivity {
             tab_count_adhoc.setVisibility(View.GONE);
         }
         tab_count_msgs.setVisibility(View.GONE);
+
+        sortedAllAdhocJobsList.clear();
+        for(ConceptBooking job : adhocPendingJobs){
+            sortedAllAdhocJobsList.add(job);
+        }
+        for(ConceptBooking job : adhocDeliverReadyJobs){
+            sortedAllAdhocJobsList.add(job);
+        }
+        adhocAdapter.notifyDataSetChanged();
     }
 
     private void initVariables() {
@@ -1061,6 +1088,130 @@ public class MainActivity extends AppCompatActivity {
             isConcept = false;
             HTTPHandler.post("cjt-adhoc-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        ConceptBooking job = sortedAllAdhocJobsList.get(i);
+
+        if (job.getBarcode().equals("PendingHeader") || job.getBarcode().equals("DeliveryHeader")) {
+            return;
+        }
+
+        if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 7) {
+            type = "JobsPending";
+        }
+        else{
+            type = "DeliveryJobs";
+        }
+        if (type.equals("JobsPending")) {
+            checkUserArrivePickup(job);
+        } else if (type.equals("DeliveryJobs")) {
+            checkUserArriveDrop(job);
+        }
+    }
+
+    private void openJobDetailsFrag(ConceptBooking job){
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        params.gravity = Gravity.CENTER;
+        FragmentManager fm = getFragmentManager();
+        JobDetailsFragment jobFragment = new JobDetailsFragment(this, job, params, type, false);
+        jobFragment.setListener(this);
+        jobFragment.setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar);
+        jobFragment.show(fm, "job_fragment");
+    }
+
+    private void openDepartFrag() {
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        params.gravity = Gravity.CENTER;
+        FragmentManager fm = getFragmentManager();
+        DepartFragment departFragment = new DepartFragment(this, params, type, false);
+        departFragment.setListener(this);
+        departFragment.setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar);
+        departFragment.show(fm, "depart_fragment");
+    }
+
+    private void checkUserArrivePickup(final ConceptBooking job) {
+        getUser();
+        if (user.getUserArriveConcept() == null && user.getUserArriveClient() == null) {
+            AlertDialog.Builder build = new AlertDialog.Builder(this);
+            build.setMessage("Arrived at Pickup Location?");
+            build.setCancelable(false);
+            build.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    user.setUserArriveConcept(GenericMethods.getDisplayDate(new Date()));
+                    db.updateUser(user);
+                    dialog.dismiss();
+                    openJobDetailsFrag(job);
+                }
+            });
+            build.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                    openJobDetailsFrag(job);
+                }
+            });
+            build.create().show();
+        }
+        else if(job.getConceptBookingStatus() == 2){
+            openJobDetailsFrag(job);
+        }
+    }
+
+    private void checkUserArriveDrop(final ConceptBooking job) {
+        getUser();
+        if (user.getUserArriveClient() == null && user.getUserArriveConcept() == null) {
+            AlertDialog.Builder build = new AlertDialog.Builder(this);
+            build.setMessage("Arrived at Drop off Location?");
+            build.setCancelable(false);
+            build.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    user.setUserArriveClient(GenericMethods.getDisplayDate(new Date()));
+                    db.updateUser(user);
+                    dialog.dismiss();
+                    openJobDetailsFrag(job);
+                }
+            });
+            build.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                    openJobDetailsFrag(job);
+                }
+            });
+            build.create().show();
+        }
+        else if(job.getConceptBookingStatus() == 9){
+            openJobDetailsFrag(job);
+        }
+    }
+
+    @Override
+    public void handleDialogClose() {
+        resetDisconnectTimer();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateLabels();
+            }
+        });
+    }
+
+    @Override
+    public void handleDialogCloseDepart() {
+        resetDisconnectTimer();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateLabels();
+            }
+        });
+    }
+
+    @Override
+    public void handleDialogCloseImage(String image) {
+        openDepartFrag();
     }
 
     public class PendingListLoader implements ResponseListener {
