@@ -29,6 +29,7 @@ public class CustomPagerAdapter extends PagerAdapter {
     public static final int ADHOC_DELIVERY_COUNT = 6;
     public static final int ADHOC_DELIVERY_VIEW = 7;
     public static final int ADHOC_LISTVIEW = 8;
+    public static final int ADHOC_NOJOBSVIEW = 9;
 
     private TextView conceptCount = null;
     private TextView conceptView = null;
@@ -39,6 +40,7 @@ public class CustomPagerAdapter extends PagerAdapter {
 //    private TextView adhocDeliverCount = null;
 //    private TextView adhocDeliveryView = null;
     private ListView adhocListView = null;
+    private View adhocNoJobsView = null;
     private RelativeLayout conceptRView = null;
     private RelativeLayout adhocRView = null;
     private RelativeLayout messagesRView  = null;
@@ -55,6 +57,7 @@ public class CustomPagerAdapter extends PagerAdapter {
 
         adhocRView = (RelativeLayout) inflater.inflate(R.layout.activity_main_adhoc_new,null);
         adhocListView = (ListView) adhocRView.findViewById(R.id.main_adhoc_new_list);
+        adhocNoJobsView = adhocRView.findViewById(R.id.fragment_jobs_list_no_jobs_view);
 //        adhocCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_count);
 //        adhocView = (TextView) adhocRView.findViewById(R.id.main_adhoc_view);
 //        adhocDeliverCount = (TextView) adhocRView.findViewById(R.id.main_adhoc_ready_count);
@@ -80,6 +83,9 @@ public class CustomPagerAdapter extends PagerAdapter {
                 break;
             case ADHOC_LISTVIEW:
                 view = adhocListView;
+                break;
+            case ADHOC_NOJOBSVIEW:
+                view = adhocNoJobsView;
                 break;
 //            case ADHOC_COUNT:
 //                view = adhocCount;

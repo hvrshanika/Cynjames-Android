@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     TextView tab_count_adhoc;
     TextView tab_count_msgs;
     ListView adhocJobsListView;
+    View adhocNoJobsVIew;
     ListArrayAdapter adhocAdapter;
     int unreadMessages;
     SQLiteHelper db;
@@ -446,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 //        adhocPendingCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_COUNT);
 //        adhocDeliverReadyCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_COUNT);
         adhocJobsListView = (ListView) adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_LISTVIEW);
+        adhocNoJobsVIew = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_NOJOBSVIEW);
 
         pendingIcon = (ImageView) findViewById(R.id.main_truck_icon);
         messagesCount = (TextView) findViewById(R.id.main_messages_count);
@@ -609,6 +611,12 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
             sortedAllAdhocJobsList.add(job);
         }
         adhocAdapter.notifyDataSetChanged();
+        if(sortedAllAdhocJobsList.size() == 0){
+            adhocNoJobsVIew.setVisibility(View.VISIBLE);
+        }
+        else{
+            adhocNoJobsVIew.setVisibility(View.GONE);
+        }
     }
 
     private void initVariables() {

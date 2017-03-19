@@ -187,6 +187,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView bookingTime = (TextView) viewRef.findViewById(R.id.list_item_booking_time);
         pallets = (TextView) viewRef.findViewById(R.id.list_item_pallets);
         parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
+        TextView parcelsLbl = (TextView) viewRef.findViewById(R.id.list_item_parcels_label);
         TextView address = (TextView) viewRef.findViewById(R.id.list_item_address);
         TextView notes = (TextView) viewRef.findViewById(R.id.list_item_notes);
         eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
@@ -200,8 +201,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
         TextView vehicleLbl = (TextView) viewRef.findViewById(R.id.list_item_vehicle_label);
         TextView vehicle = (TextView) viewRef.findViewById(R.id.list_item_vehicle);
-        TextView rateLbl = (TextView) viewRef.findViewById(R.id.list_item_rate_label);
-        TextView rate = (TextView) viewRef.findViewById(R.id.list_item_rate);
+//        TextView rateLbl = (TextView) viewRef.findViewById(R.id.list_item_rate_label);
+//        TextView rate = (TextView) viewRef.findViewById(R.id.list_item_rate);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,11 +227,52 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             address.setText(job.getAddress());
             addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
             clientName.setText(job.getClient());
+            pallets.setText(String.valueOf(job.getPallets()));
+            parcels.setText(String.valueOf(job.getParcels()));
         }
         else{
             customerName.setVisibility(View.VISIBLE);
             customerNameLbl.setVisibility(View.VISIBLE);
             customerName.setText(job.getConceptClientsName());
+
+            int totQty = 0;
+            String vehicleVal = "";
+            float rateVal = 0;
+            for(int i = 0; i <adhocDimensions.size(); i++){
+                AdhocDimensions dimen = adhocDimensions.get(i);
+                vehicleVal = dimen.getVehicle();
+                rateVal =  dimen.getRate();
+                totQty += dimen.getQty();
+                if(dimen.getQty() != 0){
+
+                    if(i == 0){
+                        TableRow header= new TableRow(context);
+                        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                        header.setLayoutParams(lp);
+                        header.setBackground(getActivity().getResources().getDrawable(R.drawable.details_table_bg));
+
+                        header.addView(createTextViewForTable("Qty\n    "));
+                        header.addView(createTextViewForTable("Height\ncm"));
+                        header.addView(createTextViewForTable("Width\ncm"));
+                        header.addView(createTextViewForTable("Length\ncm"));
+                        header.addView(createTextViewForTable("Weight\nkg"));
+                        header.addView(createTextViewForTable("Total\nWeight"));
+                        dimensTable.addView(header,i);
+                    }
+
+                    TableRow row= new TableRow(context);
+                    TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+                    row.setLayoutParams(lp);
+
+                    row.addView(createTextViewForTable(""+dimen.getQty()));
+                    row.addView(createTextViewForTable(""+dimen.getHeight()));
+                    row.addView(createTextViewForTable(""+dimen.getWidth()));
+                    row.addView(createTextViewForTable(""+dimen.getLength()));
+                    row.addView(createTextViewForTable(""+dimen.getWeight()));
+                    row.addView(createTextViewForTable(""+(dimen.getQty() * dimen.getWeight())));
+                    dimensTable.addView(row,i+1);
+                }
+            }
             if (type.equals("JobsPending")){
                 suburb.setText(job.getConceptBookingPickupSuburb());
                 address.setText(job.getConceptBookingPickupAddress());
@@ -253,49 +295,16 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 deliveryAdd.setText(job.getAddress());
                 deliveryAddLbl.setText("Delivery \nAddress:");
 
-                String vehicleVal = "";
-                float rateVal = 0;
-                for(int i = 0; i <adhocDimensions.size(); i++){
-                    AdhocDimensions dimen = adhocDimensions.get(i);
-                    vehicleVal = dimen.getVehicle();
-                    rateVal =  dimen.getRate();
-                    if(dimen.getQty() != 0){
-                        dimensTable.setVisibility(View.VISIBLE);
-
-                        if(i == 0){
-                            TableRow header= new TableRow(context);
-                            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
-                            header.setLayoutParams(lp);
-                            header.setBackground(getActivity().getResources().getDrawable(R.drawable.details_table_bg));
-
-                            header.addView(createTextViewForTable("Qty\n    "));
-                            header.addView(createTextViewForTable("Height\ncm"));
-                            header.addView(createTextViewForTable("Width\ncm"));
-                            header.addView(createTextViewForTable("Length\ncm"));
-                            header.addView(createTextViewForTable("Weight\nkg"));
-                            header.addView(createTextViewForTable("Total\nWeight"));
-                            dimensTable.addView(header,i);
-                        }
-
-                        TableRow row= new TableRow(context);
-                        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
-                        row.setLayoutParams(lp);
-
-                        row.addView(createTextViewForTable(""+dimen.getQty()));
-                        row.addView(createTextViewForTable(""+dimen.getHeight()));
-                        row.addView(createTextViewForTable(""+dimen.getWidth()));
-                        row.addView(createTextViewForTable(""+dimen.getLength()));
-                        row.addView(createTextViewForTable(""+dimen.getWeight()));
-                        row.addView(createTextViewForTable(""+(dimen.getQty() * dimen.getWeight())));
-                        dimensTable.addView(row,i+1);
-                    }
+                if(totQty > 0){
+                    dimensTable.setVisibility(View.VISIBLE);
                 }
+
                 vehicleLbl.setVisibility(View.VISIBLE);
                 vehicle.setVisibility(View.VISIBLE);
                 vehicle.setText(vehicleVal);
-                rateLbl.setVisibility(View.VISIBLE);
-                rate.setVisibility(View.VISIBLE);
-                rate.setText("$ "+rateVal);
+//                rateLbl.setVisibility(View.VISIBLE);
+//                rate.setVisibility(View.VISIBLE);
+//                rate.setText("$ "+rateVal);
             }
             else{
                 suburb.setText(job.getConceptBookingDeliverySuburb());
@@ -303,6 +312,15 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
                 clientName.setText(job.getClient());
                 clientNameLbl.setText("Delivery \nClient Name:");
+            }
+            if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
+                parcelsLbl.setVisibility(View.GONE);
+                parcels.setVisibility(View.GONE);
+                pallets.setText(""+totQty);
+            }
+            else{
+                pallets.setText(String.valueOf(job.getPallets()));
+                parcels.setText(String.valueOf(job.getParcels()));
             }
         }
 
@@ -323,8 +341,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         } else {
             bookingTime.setText(job.getConceptBookingTimeFor());
         }
-        pallets.setText(String.valueOf(job.getPallets()));
-        parcels.setText(String.valueOf(job.getParcels()));
 
         if (job.getSpecialNotes() == null || job.getSpecialNotes().equals("")) {
             notes.setVisibility(View.GONE);
