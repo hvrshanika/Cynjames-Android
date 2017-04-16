@@ -111,27 +111,27 @@ public class HTTPHandler {
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
             Log.d("Handler Fail String", responseString);
-            if(GenericMethods.getBuilderObj() != null){
-                if(!GenericMethods.getBuilderObj().isShowing()){
-                    GenericMethods.getBuilderObj().dismiss();
-                    GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
-                }
-            }
-            else {
-                GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
-            }
+//            if(GenericMethods.getBuilderObj() != null){
+//                if(!GenericMethods.getBuilderObj().isShowing()){
+//                    GenericMethods.getBuilderObj().dismiss();
+//                    GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
+//                }
+//            }
+//            else {
+//                GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
+//            }
         }
 
         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
             super.onFailure(statusCode,headers,throwable,errorResponse);
             Log.d("Handler Fail JSONArray", String.valueOf(errorResponse));
-            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
+//            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
         }
 
         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
             super.onFailure(statusCode,headers,throwable,errorResponse);
             Log.d("Handler Fail JSONObject", String.valueOf(errorResponse));
-            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
+//            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
         }
 
         public void onFinish() {

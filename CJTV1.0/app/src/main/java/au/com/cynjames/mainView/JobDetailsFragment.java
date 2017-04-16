@@ -3,6 +3,7 @@ package au.com.cynjames.mainView;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +78,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     Location loc;
     String addressStr;
     List<AdhocDimensions> adhocDimensions;
+    boolean isTonnage;
 
     public JobDetailsFragment() {
 
@@ -144,6 +147,20 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 //        addressStr = "307,Galle Road, Colombo 3";
         HTTPHandler.directionsRequest(loc,addressStr, new RequestParams(), new HTTPHandler.ResponseManager(new ETADownload(), context, "Updating..."));
 
+        if(!isConcept){
+            rootView.setFocusableInTouchMode(true);
+            rootView.setOnKeyListener( new View.OnKeyListener(){
+                @Override
+                public boolean onKey( View v, int keyCode, KeyEvent event ){
+                    if( keyCode == KeyEvent.KEYCODE_BACK ){
+                        btnBackClicked();
+                        return true;
+                    }
+                    return false;
+                }
+            } );
+        }
+
         return rootView;
     }
 
@@ -186,6 +203,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView customerNameLbl = (TextView) viewRef.findViewById(R.id.list_item_customer_name_label);
         TextView bookingTime = (TextView) viewRef.findViewById(R.id.list_item_booking_time);
         pallets = (TextView) viewRef.findViewById(R.id.list_item_pallets);
+        TextView palletsLbl = (TextView) viewRef.findViewById(R.id.list_item_pallets_label);
         parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
         TextView parcelsLbl = (TextView) viewRef.findViewById(R.id.list_item_parcels_label);
         TextView address = (TextView) viewRef.findViewById(R.id.list_item_address);
@@ -313,14 +331,23 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 clientName.setText(job.getClient());
                 clientNameLbl.setText("Delivery \nClient Name:");
             }
+            pallets.setText(String.valueOf(job.getPallets()));
+            parcels.setText(String.valueOf(job.getParcels()));
             if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
+                isTonnage = true;
                 parcelsLbl.setVisibility(View.GONE);
                 parcels.setVisibility(View.GONE);
                 pallets.setText(""+totQty);
             }
-            else{
+            else if(job.getPallets() == 1){
                 pallets.setText(String.valueOf(job.getPallets()));
+                parcelsLbl.setVisibility(View.GONE);
+                parcels.setVisibility(View.GONE);
+            }
+            else if (job.getParcels() == 2) {
                 parcels.setText(String.valueOf(job.getParcels()));
+                palletsLbl.setVisibility(View.GONE);
+                pallets.setVisibility(View.GONE);
             }
         }
 
@@ -415,8 +442,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         if (type.equals("JobsPending")) {
             if (job.getConceptBookingStatus() == 7) {
                 job.setConceptBookingStatus(2);
-                job.setPallets(Integer.parseInt(pallets.getText().toString()));
-                job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                if(!isTonnage){
+                    job.setPallets(Integer.parseInt(pallets.getText().toString()));
+                    job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                }
                 job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
                 job.setPickupImages(createImageString());
             } else if (job.getConceptBookingStatus() == 2) {
@@ -461,8 +490,10 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                     sendEmail();
                 }
                 job.setConceptBookingStatus(9);
-                job.setPallets(Integer.parseInt(pallets.getText().toString()));
-                job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                if(!isTonnage) {
+                    job.setPallets(Integer.parseInt(pallets.getText().toString()));
+                    job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                }
                 job.setConceptDeliveryDate(GenericMethods.getDisplayDate(new Date()));
                 job.setDeliveryImages(createImageString());
                 db.updateJob(job, isConcept);

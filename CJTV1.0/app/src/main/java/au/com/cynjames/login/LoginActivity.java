@@ -53,6 +53,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
+
+        //Check user avail and Move to Main
+        SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        String jsonUser = mPrefs.getString("User", "");
+        String jsonVehicle = mPrefs.getString("Vehicle", "");
+        if(!(jsonUser.equals("") || jsonUser == null || jsonVehicle.equals("") || jsonVehicle == null)){
+            Intent intent = new Intent(context, MainActivity.class);
+            startActivity(intent);
+        }
+
         if (!isTaskRoot()
                 && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
                 && getIntent().getAction() != null
@@ -63,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_login);
         init();
-        context = this;
         gson = new Gson();
         if(GenericMethods.isConnectedToInternet(this)) {
             loadVehicleList();
@@ -71,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
         else{
             GenericMethods.showNoInternetDialog(context);
         }
-        SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
         prefsEditor = mPrefs.edit();
         db = new SQLiteHelper(this);
         //FirebaseCrash.report(new Exception("My first Android non-fatal error"));

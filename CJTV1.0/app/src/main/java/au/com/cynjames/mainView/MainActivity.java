@@ -2,6 +2,7 @@ package au.com.cynjames.mainView;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -33,6 +34,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -82,7 +84,7 @@ import au.com.cynjames.utils.NewJobsUpdateService;
 import au.com.cynjames.utils.SQLiteHelper;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener, JobsDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, JobsDetailsFragmentListener {
     public static final long INTERACTION_TIMEOUT = 8000;
     Context context;
     Menu menu;
@@ -215,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         FirebaseCrash.log("MainActivity - onCreate");
     }
 
-    public void setActionBar(){
+    public void setActionBar() {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         adapter = new CustomPagerAdapter(this, getLayoutInflater());
         viewPager.setAdapter(adapter);
@@ -284,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         tab_count_msgs = (TextView) msgsTab.getCustomView().findViewById(R.id.tab_view_count);
         tab_count_msgs.setTypeface(tab_count_msgs.getTypeface(), Typeface.BOLD);
 
-        actionBar.addTab(conceptTab,true);
+        actionBar.addTab(conceptTab, true);
         actionBar.addTab(adhocTab);
         actionBar.addTab(msgsTab);
     }
@@ -338,14 +340,12 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 //        MenuItem timeDifference = menu.findItem(R.id.action_difference);
         if (user.getUserArriveConcept() != null) {
             arriveConcept.setTitle("Concept: " + user.getUserArriveConcept());
-        }
-        else{
+        } else {
             arriveConcept.setVisible(false);
         }
         if (user.getUserArriveClient() != null) {
             arriveClient.setTitle("Client: " + user.getUserArriveClient());
-        }
-        else{
+        } else {
             arriveClient.setVisible(false);
         }
     }
@@ -356,8 +356,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         mapIntent.setPackage("com.google.android.apps.maps");
         if (mapIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(mapIntent);
-        }
-        else{
+        } else {
             GenericMethods.showToast(context, "No supported application found");
         }
     }
@@ -387,13 +386,12 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         myApp.stopActivityTransitionTimer();
         resetDisconnectTimer();
 
-        if(logoutTimer){
-            if(notificationSent) {
+        if (logoutTimer) {
+            if (notificationSent) {
                 stopLogOutTimer();
                 NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 notificationManager.cancel(0);
-            }
-            else
+            } else
                 resetLogOutTimer();
         }
         FirebaseCrash.log("MainActivity - onResume - end");
@@ -421,9 +419,8 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                         uploadDatatoServer();
                     }
                     //startNotificationService();
-                }
-                else{
-                    if(logoutTimer)
+                } else {
+                    if (logoutTimer)
                         stopLogOutTimer();
                 }
             }
@@ -529,10 +526,10 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     public void logoutUser() {
         getUser();
         if (user.getUserArriveConcept() != null) {
-            GenericMethods.showToast(context, "You need to depart Concept before logging out");
+            GenericMethods.showToast(context, "You need to depart before logging out");
         }
         if (user.getUserArriveClient() != null) {
-            GenericMethods.showToast(context, "You need to depart Client before logging out");
+            GenericMethods.showToast(context, "You need to depart before logging out");
         }
         if (user.getUserArriveConcept() == null && user.getUserArriveClient() == null) {
             AlertDialog.Builder build = new AlertDialog.Builder(context);
@@ -542,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                 public void onClick(DialogInterface dialog, int id) {
                     initVariables();
                     logoutClicked = true;
-                    if(logoutTimer){
+                    if (logoutTimer) {
                         timer.cancel();
                         stopLogOutTimer();
                     }
@@ -561,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                     dialog.dismiss();
                 }
             });
-            if(!((MainActivity) context).isFinishing()){
+            if (!((MainActivity) context).isFinishing()) {
                 build.create().show();
             }
         }
@@ -587,34 +584,31 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 
         int conceptTotal = pendingJobs.size() + deliverReadyJobs.size();
         int adhocTotal = adhocPendingJobs.size() + adhocDeliverReadyJobs.size();
-        if(conceptTotal > 0){
+        if (conceptTotal > 0) {
             tab_count_concept.setVisibility(View.VISIBLE);
             tab_count_concept.setText(String.valueOf(pendingJobs.size() + deliverReadyJobs.size()));
-        }
-        else{
+        } else {
             tab_count_concept.setVisibility(View.GONE);
         }
-        if(adhocTotal > 0){
+        if (adhocTotal > 0) {
             tab_count_adhoc.setVisibility(View.VISIBLE);
             tab_count_adhoc.setText(String.valueOf(adhocPendingJobs.size() + adhocDeliverReadyJobs.size()));
-        }
-        else{
+        } else {
             tab_count_adhoc.setVisibility(View.GONE);
         }
         tab_count_msgs.setVisibility(View.GONE);
 
         sortedAllAdhocJobsList.clear();
-        for(ConceptBooking job : adhocPendingJobs){
+        for (ConceptBooking job : adhocPendingJobs) {
             sortedAllAdhocJobsList.add(job);
         }
-        for(ConceptBooking job : adhocDeliverReadyJobs){
+        for (ConceptBooking job : adhocDeliverReadyJobs) {
             sortedAllAdhocJobsList.add(job);
         }
         adhocAdapter.notifyDataSetChanged();
-        if(sortedAllAdhocJobsList.size() == 0){
+        if (sortedAllAdhocJobsList.size() == 0) {
             adhocNoJobsVIew.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             adhocNoJobsVIew.setVisibility(View.GONE);
         }
     }
@@ -677,10 +671,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     private void pendingJobsViewBtnClicked() {
         Intent intent = new Intent(context, JobsListActivity.class);
         intent.putExtra("type", "JobsPending");
-        if(isConcept){
+        if (isConcept) {
             intent.putExtra("view", "Concept");
-        }
-        else{
+        } else {
             intent.putExtra("view", "Adhoc");
         }
         startActivity(intent);
@@ -689,10 +682,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     private void deliveryJobsViewBtnClicked() {
         Intent intent = new Intent(context, JobsListActivity.class);
         intent.putExtra("type", "DeliveryJobs");
-        if(isConcept){
+        if (isConcept) {
             intent.putExtra("view", "Concept");
-        }
-        else{
+        } else {
             intent.putExtra("view", "Adhoc");
         }
         startActivity(intent);
@@ -724,7 +716,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     @Override
     public void onUserInteraction() {
         resetDisconnectTimer();
-        if(logoutTimer && !notificationSent) {
+        if (logoutTimer && !notificationSent) {
             resetLogOutTimer();
         }
     }
@@ -746,11 +738,11 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         timer.schedule(task, date.getTime());//, 1000 * 60 * 60 * 24);
     }
 
-    private void sendNotification(){
+    private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification noti = new Notification.Builder(this)
                 .setContentTitle("Cynjames Notification")
                 .setContentText("You have been idle for 30 minutes.")
@@ -764,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     }
 
     private void uploadDatatoServer() {
-        if(!isUploading) {
+        if (!isUploading) {
             isUploading = true;
             List<ConceptBookingLog> conceptLogs = db.getAllLogs(true);
             List<ConceptBookingLog> adhocLogs = db.getAllLogs(false);
@@ -1014,6 +1006,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             isUploading = false;
             prefsEditor.clear();
+            prefsEditor.commit();
             finish();
         } else if (prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             initVariables();
@@ -1024,7 +1017,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
     }
 
     private void loadNewJobs() {
-        if(!isRefreshing) {
+        if (!isRefreshing) {
             isRefreshing = true;
             String userId = String.valueOf(user.getUserid());
             RequestParams params = new RequestParams();
@@ -1106,10 +1099,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
             return;
         }
 
-        if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 7) {
+        if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 7) {
             type = "JobsPending";
-        }
-        else{
+        } else {
             type = "DeliveryJobs";
         }
         if (type.equals("JobsPending")) {
@@ -1119,7 +1111,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
         }
     }
 
-    private void openJobDetailsFrag(ConceptBooking job){
+    private void openJobDetailsFrag(ConceptBooking job) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -1164,8 +1156,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                 }
             });
             build.create().show();
-        }
-        else if(job.getConceptBookingStatus() == 2){
+        } else if (job.getConceptBookingStatus() == 2) {
             openJobDetailsFrag(job);
         }
     }
@@ -1191,8 +1182,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                 }
             });
             build.create().show();
-        }
-        else if(job.getConceptBookingStatus() == 9){
+        } else if (job.getConceptBookingStatus() == 9) {
             openJobDetailsFrag(job);
         }
     }
@@ -1229,10 +1219,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
             if (jSONObject.getInt("success") == 1) {
                 JSONArray objs = jSONObject.getJSONArray("joblist");
                 JSONArray dimens = null;
-                if(isConcept){
+                if (isConcept) {
                     db.clearTable("conceptBooking");
-                }
-                else{
+                } else {
                     db.clearTable("adhocBooking");
                     db.clearTable("adhocDimensions");
                     dimens = jSONObject.getJSONArray("dimenslist");
@@ -1242,7 +1231,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
                     db.addJob(job, isConcept);
                 }
-                if(dimens != null){
+                if (dimens != null) {
                     for (int i = 0; i < dimens.length(); i++) {
                         JSONObject obj = dimens.getJSONObject(i);
                         AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
@@ -1250,10 +1239,9 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                     }
                 }
                 updateLabels();
-                if(isConcept){
+                if (isConcept) {
                     loadAdhocData();
-                }
-                else{
+                } else {
                     if (pendingJobs.size() > 0 || adhocPendingJobs.size() > 0) {
                         pendingIcon.setVisibility(View.VISIBLE);
                         playSound();
@@ -1277,10 +1265,11 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                 if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
                     db.clearConcept(id, isConcept);
                 }
-                postJobsAssignedCheck ++;
-                if(isConcept && preJobsAssignedCheck == postJobsAssignedCheck){
+                postJobsAssignedCheck++;
+                if (isConcept && preJobsAssignedCheck == postJobsAssignedCheck) {
                     checkAdhocJobsAssigned();
                 }
+                updateLabels();
             }
         }
     }
@@ -1380,11 +1369,19 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
 
                 }
                 updateLabels();
-                if(isConcept){
+                if (isConcept) {
                     conceptNewJobsCount = newJobs.size();
                     loadNewAdhocJobs();
-                }
-                else{
+                } else {
+                    JSONArray dimens = jSONObject.getJSONArray("dimenslist");
+                    if (dimens != null) {
+                        for (int i = 0; i < dimens.length(); i++) {
+                            JSONObject obj = dimens.getJSONObject(i);
+                            AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
+                            db.addDimension(dimen);
+                        }
+                    }
+
                     if (conceptNewJobsCount > 0 || newJobs.size() > 0) {
                         pendingIcon.setVisibility(View.VISIBLE);
                         playSound();
@@ -1396,7 +1393,7 @@ public class MainActivity extends AppCompatActivity implements  AdapterView.OnIt
                     }
 
                     SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
-                    String d=formatter.format(new Date());
+                    String d = formatter.format(new Date());
                     GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
                     isUploading = false;
                     isRefreshing = false;

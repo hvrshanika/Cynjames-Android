@@ -182,7 +182,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/white"
-                android:layout_below="@id/list_item_order_no_label" />
+                android:layout_below="@id/list_item_order_no" />
 
             <TextView
                 android:id="@+id/list_item_order_no_type_tl"
@@ -191,7 +191,8 @@
                 android:layout_below="@+id/list_item_suburb"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/list_item_order_no"
+                android:layout_toLeftOf="@+id/list_item_order_no_type_hu"
+                android:layout_marginRight="5dp"
                 android:gravity="left|center"
                 android:text="[TL]"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -202,9 +203,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/list_item_suburb"
-                android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/list_item_order_no_type_tl"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
                 android:gravity="left|center"
                 android:text="[HU]"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -214,7 +215,7 @@
                 android:id="@+id/list_item_parcels_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/list_item_pallets_label"
+                android:layout_marginLeft="10dp"
                 android:layout_below="@+id/list_item_pallets"
                 android:layout_marginTop="20dp"
                 android:gravity="left|center"
@@ -265,7 +266,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/white"
-                android:layout_below="@id/list_item_customer_name_label" />
+                android:layout_below="@id/list_item_customer_name" />
 
             <TextView
                 android:id="@+id/list_item_client_name_label"
@@ -345,6 +346,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_toLeftOf="@+id/list_item_order_no_type_tl"
                 android:layout_below="@+id/list_item_suburb"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
@@ -356,7 +358,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/white"
-                android:layout_below="@id/list_item_notes_label" />
+                android:layout_below="@id/list_item_notes" />
 
             <TextView
                 android:id="@+id/list_item_booking_time_label"

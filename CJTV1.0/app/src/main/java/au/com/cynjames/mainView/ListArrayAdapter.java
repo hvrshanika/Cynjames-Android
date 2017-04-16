@@ -68,6 +68,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView customerNameLbl = (TextView) rowView.findViewById(R.id.list_item_customer_label);
         TextView bookingTime = (TextView) rowView.findViewById(R.id.list_item_booking_time);
         TextView pallets = (TextView) rowView.findViewById(R.id.list_item_pallets);
+        TextView palletsLbl = (TextView) rowView.findViewById(R.id.list_item_pallets_label);
         TextView parcels = (TextView) rowView.findViewById(R.id.list_item_parcels);
         TextView parcelsLbl = (TextView) rowView.findViewById(R.id.list_item_parcels_label);
         TextView type = (TextView) rowView.findViewById(R.id.list_item_type);
@@ -114,22 +115,21 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             for(AdhocDimensions dimen : adhocDimensions){
                 totQty += dimen.getQty();
             }
-            if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
-                parcelsLbl.setVisibility(View.GONE);
-                parcels.setVisibility(View.GONE);
-                pallets.setText(""+totQty);
-            }
-            else{
-                pallets.setText(String.valueOf(job.getPallets()));
-                parcels.setText(String.valueOf(job.getParcels()));
-            }
+
+            pallets.setText(String.valueOf(job.getPallets()));
+            parcels.setText(String.valueOf(job.getParcels()));
 
             if (job.getPallets() == 1) {
                 jobType = "Pallets";
+                parcels.setVisibility(View.GONE);
+                parcelsLbl.setVisibility(View.GONE);
             } else if (job.getParcels() == 2) {
                 jobType = "Parcels";
+                pallets.setVisibility(View.INVISIBLE);
+                palletsLbl.setVisibility(View.INVISIBLE);
             } else if (job.getPallets() == 0 && job.getParcels() == 0) {
-                jobType = "Tonage";
+                jobType = "Tonnage";
+                pallets.setText(""+totQty);
                 parcels.setVisibility(View.GONE);
                 parcelsLbl.setVisibility(View.GONE);
             }
