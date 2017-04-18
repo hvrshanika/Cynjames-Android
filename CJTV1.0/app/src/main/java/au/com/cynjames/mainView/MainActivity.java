@@ -1159,6 +1159,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else if (job.getConceptBookingStatus() == 2) {
             openJobDetailsFrag(job);
         }
+        else{
+            GenericMethods.showToast(context, "You need to depart to access this Job");
+        }
     }
 
     private void checkUserArriveDrop(final ConceptBooking job) {
@@ -1184,6 +1187,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             build.create().show();
         } else if (job.getConceptBookingStatus() == 9) {
             openJobDetailsFrag(job);
+        }
+        else{
+            GenericMethods.showToast(context, "You need to depart to access this Job");
         }
     }
 

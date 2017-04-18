@@ -291,7 +291,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                     dimensTable.addView(row,i+1);
                 }
             }
-            if (type.equals("JobsPending")){
+//            if (type.equals("JobsPending")){
                 suburb.setText(job.getConceptBookingPickupSuburb());
                 address.setText(job.getConceptBookingPickupAddress());
                 addressStr = job.getConceptBookingPickupAddress() + "," + job.getConceptBookingPickupSuburb();
@@ -323,14 +323,18 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 //                rateLbl.setVisibility(View.VISIBLE);
 //                rate.setVisibility(View.VISIBLE);
 //                rate.setText("$ "+rateVal);
-            }
-            else{
-                suburb.setText(job.getConceptBookingDeliverySuburb());
-                address.setText(job.getAddress());
-                addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
-                clientName.setText(job.getClient());
-                clientNameLbl.setText("Delivery \nClient Name:");
-            }
+//            }
+//            else{
+//                suburb.setText(job.getConceptBookingDeliverySuburb());
+//                address.setText(job.getAddress());
+//                addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+//                clientName.setText(job.getClient());
+//                clientNameLbl.setText("Delivery \nClient Name:");
+//
+//                if(totQty > 0){
+//                    dimensTable.setVisibility(View.VISIBLE);
+//                }
+//            }
             pallets.setText(String.valueOf(job.getPallets()));
             parcels.setText(String.valueOf(job.getParcels()));
             if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
