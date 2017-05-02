@@ -74,7 +74,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     String imageFileName;
     boolean rejected = false;
     boolean isConcept;
-    TextView eta;
+    TextView eta, distance;
     Location loc;
     String addressStr;
     List<AdhocDimensions> adhocDimensions;
@@ -210,6 +210,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView notes = (TextView) viewRef.findViewById(R.id.list_item_notes);
         eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
         TextView etaLbl = (TextView) viewRef.findViewById(R.id.list_item_eta_label);
+        distance = (TextView) viewRef.findViewById(R.id.list_item_distance);
+        TextView distanceLbl = (TextView) viewRef.findViewById(R.id.list_item_distance_label);
         TextView btnProcess = (TextView) viewRef.findViewById(R.id.list_item_process_button);
         TextView deliveryClientName = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name);
         TextView deliveryClientNameLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name_label);
@@ -236,7 +238,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         });
 
         eta.setVisibility(View.VISIBLE);
+        distance.setVisibility(View.VISIBLE);
         etaLbl.setVisibility(View.VISIBLE);
+        distanceLbl.setVisibility(View.VISIBLE);
 
         TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
 
@@ -249,6 +253,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             parcels.setText(String.valueOf(job.getParcels()));
         }
         else{
+            pallets.setText(String.valueOf(job.getNo_pallets()));
+            parcels.setText(String.valueOf(job.getNo_parcels()));
+
             customerName.setVisibility(View.VISIBLE);
             customerNameLbl.setVisibility(View.VISIBLE);
             customerName.setText(job.getConceptClientsName());
@@ -335,8 +342,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 //                    dimensTable.setVisibility(View.VISIBLE);
 //                }
 //            }
-            pallets.setText(String.valueOf(job.getPallets()));
-            parcels.setText(String.valueOf(job.getParcels()));
+
             if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
                 isTonnage = true;
                 parcelsLbl.setVisibility(View.GONE);
@@ -344,12 +350,12 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 pallets.setText(""+totQty);
             }
             else if(job.getPallets() == 1){
-                pallets.setText(String.valueOf(job.getPallets()));
+                pallets.setText(String.valueOf(job.getNo_pallets()));
                 parcelsLbl.setVisibility(View.GONE);
                 parcels.setVisibility(View.GONE);
             }
             else if (job.getParcels() == 2) {
-                parcels.setText(String.valueOf(job.getParcels()));
+                parcels.setText(String.valueOf(job.getNo_parcels()));
                 palletsLbl.setVisibility(View.GONE);
                 pallets.setVisibility(View.GONE);
             }
@@ -601,8 +607,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 JSONArray eleArr = elements.getJSONArray("elements");
                 JSONObject row = eleArr.getJSONObject(0);
                 JSONObject duration = row.getJSONObject("duration");
+                JSONObject dist = row.getJSONObject("distance");
                 String time = duration.getString("text");
+                String miles = dist.getString("text");
                 eta.setText(time);
+                distance.setText(miles);
             }
         }
     }

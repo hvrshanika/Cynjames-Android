@@ -116,8 +116,8 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
                 totQty += dimen.getQty();
             }
 
-            pallets.setText(String.valueOf(job.getPallets()));
-            parcels.setText(String.valueOf(job.getParcels()));
+            pallets.setText(String.valueOf(job.getNo_pallets()));
+            parcels.setText(String.valueOf(job.getNo_parcels()));
 
             if (job.getPallets() == 1) {
                 jobType = "Pallets";

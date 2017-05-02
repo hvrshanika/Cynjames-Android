@@ -36,6 +36,8 @@ public class ConceptBooking implements Serializable {
     private String conceptClientsName;
     private String conceptBookingPickupClientName;
     private int customerType;
+    private int no_pallets;
+    private int no_parcels;
 
     public int getCustomerType() {
         return customerType;
@@ -275,6 +277,22 @@ public class ConceptBooking implements Serializable {
 
     public void setConceptBookingPickupAddress(String conceptBookingPickupAddress) {
         this.conceptBookingPickupAddress = conceptBookingPickupAddress;
+    }
+
+    public int getNo_pallets() {
+        return no_pallets;
+    }
+
+    public void setNo_pallets(int no_pallets) {
+        this.no_pallets = no_pallets;
+    }
+
+    public int getNo_parcels() {
+        return no_parcels;
+    }
+
+    public void setNo_parcels(int no_parcels) {
+        this.no_parcels = no_parcels;
     }
 
 
