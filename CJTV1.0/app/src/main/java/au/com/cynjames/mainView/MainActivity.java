@@ -790,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             preStatusCount = statuses.size();
             for (DriverStatus status : statuses) {
                 RequestParams params = new RequestParams();
-                params.add("date", GenericMethods.getDBDate(GenericMethods.getDatefromString(status.getDriverStatusDate())));
+                params.add("date", status.getDriverStatusDate());
                 params.add("time", status.getDriverStatusTime());
                 params.add("description", status.getDriverStatusDescription());
                 params.add("longitude", String.valueOf(status.getDriverStatusLongitude()));
@@ -1384,7 +1384,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         for (int i = 0; i < dimens.length(); i++) {
                             JSONObject obj = dimens.getJSONObject(i);
                             AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
-                            db.addDimension(dimen);
+                            if(!db.dimenExist(dimen.getId()))
+                                db.addDimension(dimen);
                         }
                     }
 

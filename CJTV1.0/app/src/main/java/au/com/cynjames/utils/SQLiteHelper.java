@@ -635,4 +635,21 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
         return jobs;
     }
+
+    public boolean dimenExist(int id){
+        boolean exist;
+
+        String query = "SELECT COUNT(id) FROM adhocDimensions WHERE id =" + id +"";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                count = cursor.getInt(0);
+            } while (cursor.moveToNext());
+        }
+        exist = count != 0;
+        db.close();
+        return exist;
+    }
 }
