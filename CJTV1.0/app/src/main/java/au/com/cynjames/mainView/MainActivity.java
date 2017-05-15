@@ -706,7 +706,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void resetLogOutTimer() {
         logOutHandler.removeCallbacks(logOutCallback);
-        logOutHandler.postDelayed(logOutCallback, 60000);
+        logOutHandler.postDelayed(logOutCallback, 30*60000);
     }
 
     public void stopLogOutTimer() {

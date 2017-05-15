@@ -48,7 +48,7 @@ public class HTTPHandler {
     public static void directionsRequest(Location origin, String destinations, RequestParams params, JsonHttpResponseHandler responseHandler) {
         String destinationsF = (destinations.replace(" ", "+")).replaceAll("[\u0000-\u001f]", "");
         if(origin != null){
-            String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
+            String url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+origin.getLatitude()+","+origin.getLongitude()+"&destinations="+destinationsF+"&key=AIzaSyBJRifeKCWQiYpEW1lG9M24zCGQJkHGnT0";
             getAsyncClient().post(url, params, responseHandler);
         }
     }
@@ -68,12 +68,10 @@ public class HTTPHandler {
     public static class ResponseManager extends JsonHttpResponseHandler {
         final ResponseListener responseListener;
         final Context context;
-//        ProgressDialog progressDialog;
 
         public ResponseManager(ResponseListener responseListener, Context context, String msg) {
             this.responseListener = responseListener;
             this.context = context;
-//            progressDialog = GenericMethods.getProgressDialog(context, msg);
         }
 
         public void onStart() {
@@ -111,38 +109,20 @@ public class HTTPHandler {
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
             Log.d("Handler Fail String", responseString);
-//            if(GenericMethods.getBuilderObj() != null){
-//                if(!GenericMethods.getBuilderObj().isShowing()){
-//                    GenericMethods.getBuilderObj().dismiss();
-//                    GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
-//                }
-//            }
-//            else {
-//                GenericMethods.showServerError(context,"Error","Server Error. Please try again later");
-//            }
         }
 
         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
             super.onFailure(statusCode,headers,throwable,errorResponse);
             Log.d("Handler Fail JSONArray", String.valueOf(errorResponse));
-//            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
         }
 
         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
             super.onFailure(statusCode,headers,throwable,errorResponse);
             Log.d("Handler Fail JSONObject", String.valueOf(errorResponse));
-//            GenericMethods.showMessage(context,"Error","Server Error. Please try again later");
         }
 
         public void onFinish() {
             super.onFinish();
-//            try {
-//                progressDialog.dismiss();
-//            } catch (WindowManager.BadTokenException e) {
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
         }
     }
 }

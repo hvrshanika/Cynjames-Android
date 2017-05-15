@@ -109,10 +109,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onResume() {
         super.onResume();
-        if(getActivity().getClass() == JobsListActivity.class){
+        if (getActivity().getClass() == JobsListActivity.class) {
             ((JobsListActivity) getActivity()).stopDisconnectTimer();
-        }
-        else{
+        } else {
             ((MainActivity) getActivity()).stopDisconnectTimer();
         }
 
@@ -122,10 +121,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(getActivity().getClass() == JobsListActivity.class){
+        if (getActivity().getClass() == JobsListActivity.class) {
             ((JobsListActivity) getActivity()).resetDisconnectTimer();
-        }
-        else{
+        } else {
             ((MainActivity) getActivity()).resetDisconnectTimer();
         }
     }
@@ -145,20 +143,23 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
         loc = ((CJT) getActivity().getApplication()).lastLocation;
 //        addressStr = "307,Galle Road, Colombo 3";
-        HTTPHandler.directionsRequest(loc,addressStr, new RequestParams(), new HTTPHandler.ResponseManager(new ETADownload(), context, "Updating..."));
+//        loc = new Location("");
+//        loc.setLatitude(-33.6656653);
+//        loc.setLongitude(115.256259);
+        HTTPHandler.directionsRequest(loc, addressStr, new RequestParams(), new HTTPHandler.ResponseManager(new ETADownload(), context, "Updating..."));
 
-        if(!isConcept){
+        if (!isConcept) {
             rootView.setFocusableInTouchMode(true);
-            rootView.setOnKeyListener( new View.OnKeyListener(){
+            rootView.setOnKeyListener(new View.OnKeyListener() {
                 @Override
-                public boolean onKey( View v, int keyCode, KeyEvent event ){
-                    if( keyCode == KeyEvent.KEYCODE_BACK ){
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
                         btnBackClicked();
                         return true;
                     }
                     return false;
                 }
-            } );
+            });
         }
 
         return rootView;
@@ -221,8 +222,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
         TextView vehicleLbl = (TextView) viewRef.findViewById(R.id.list_item_vehicle_label);
         TextView vehicle = (TextView) viewRef.findViewById(R.id.list_item_vehicle);
-//        TextView rateLbl = (TextView) viewRef.findViewById(R.id.list_item_rate_label);
-//        TextView rate = (TextView) viewRef.findViewById(R.id.list_item_rate);
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,15 +243,14 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
         TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
 
-        if(isConcept){
+        if (isConcept) {
             suburb.setText(job.getConceptBookingDeliverySuburb());
             address.setText(job.getAddress());
             addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
             clientName.setText(job.getClient());
             pallets.setText(String.valueOf(job.getPallets()));
             parcels.setText(String.valueOf(job.getParcels()));
-        }
-        else{
+        } else {
             pallets.setText(String.valueOf(job.getNo_pallets()));
             parcels.setText(String.valueOf(job.getNo_parcels()));
 
@@ -262,16 +260,14 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
             int totQty = 0;
             String vehicleVal = "";
-            float rateVal = 0;
-            for(int i = 0; i <adhocDimensions.size(); i++){
+            for (int i = 0; i < adhocDimensions.size(); i++) {
                 AdhocDimensions dimen = adhocDimensions.get(i);
                 vehicleVal = dimen.getVehicle();
-                rateVal =  dimen.getRate();
                 totQty += dimen.getQty();
-                if(dimen.getQty() != 0){
+                if (dimen.getQty() != 0) {
 
-                    if(i == 0){
-                        TableRow header= new TableRow(context);
+                    if (i == 0) {
+                        TableRow header = new TableRow(context);
                         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
                         header.setLayoutParams(lp);
                         header.setBackground(getActivity().getResources().getDrawable(R.drawable.details_table_bg));
@@ -282,79 +278,66 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                         header.addView(createTextViewForTable("Length\ncm"));
                         header.addView(createTextViewForTable("Weight\nkg"));
                         header.addView(createTextViewForTable("Total\nWeight"));
-                        dimensTable.addView(header,i);
+                        dimensTable.addView(header, i);
                     }
 
-                    TableRow row= new TableRow(context);
+                    TableRow row = new TableRow(context);
                     TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
                     row.setLayoutParams(lp);
 
-                    row.addView(createTextViewForTable(""+dimen.getQty()));
-                    row.addView(createTextViewForTable(""+dimen.getHeight()));
-                    row.addView(createTextViewForTable(""+dimen.getWidth()));
-                    row.addView(createTextViewForTable(""+dimen.getLength()));
-                    row.addView(createTextViewForTable(""+dimen.getWeight()));
-                    row.addView(createTextViewForTable(""+(dimen.getQty() * dimen.getWeight())));
-                    dimensTable.addView(row,i+1);
+                    row.addView(createTextViewForTable("" + dimen.getQty()));
+                    row.addView(createTextViewForTable("" + dimen.getHeight()));
+                    row.addView(createTextViewForTable("" + dimen.getWidth()));
+                    row.addView(createTextViewForTable("" + dimen.getLength()));
+                    row.addView(createTextViewForTable("" + dimen.getWeight()));
+                    row.addView(createTextViewForTable("" + (dimen.getQty() * dimen.getWeight())));
+                    dimensTable.addView(row, i + 1);
                 }
             }
-//            if (type.equals("JobsPending")){
-                suburb.setText(job.getConceptBookingPickupSuburb());
-                address.setText(job.getConceptBookingPickupAddress());
+            if (type.equals("JobsPending")) {
                 addressStr = job.getConceptBookingPickupAddress() + "," + job.getConceptBookingPickupSuburb();
-                clientName.setText(job.getConceptBookingPickupClientName());
-                clientNameLbl.setText("Pickup \nClient Name:");
 
-                // Showing delivery details in Pending Jobs
-                deliveryClientName.setVisibility(View.VISIBLE);
-                deliveryClientNameLbl.setVisibility(View.VISIBLE);
-                deliverySuburb.setVisibility(View.VISIBLE);
-                deliverySuburbLbl.setVisibility(View.VISIBLE);
-                deliveryAdd.setVisibility(View.VISIBLE);
-                deliveryAddLbl.setVisibility(View.VISIBLE);
+            } else {
+                addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
+            }
 
-                deliveryClientName.setText(job.getClient());
-                deliveryClientNameLbl.setText("Delivery \nClient Name:");
-                deliverySuburb.setText(job.getConceptBookingDeliverySuburb());
-                deliverySuburbLbl.setText("Delivery \nSuburb:");
-                deliveryAdd.setText(job.getAddress());
-                deliveryAddLbl.setText("Delivery \nAddress:");
+            clientName.setText(job.getConceptBookingPickupClientName());
+            clientNameLbl.setText("Pickup \nClient Name:");
+            suburb.setText(job.getConceptBookingPickupSuburb());
+            address.setText(job.getConceptBookingPickupAddress());
 
-                if(totQty > 0){
-                    dimensTable.setVisibility(View.VISIBLE);
-                }
+            deliveryClientName.setVisibility(View.VISIBLE);
+            deliveryClientNameLbl.setVisibility(View.VISIBLE);
+            deliverySuburb.setVisibility(View.VISIBLE);
+            deliverySuburbLbl.setVisibility(View.VISIBLE);
+            deliveryAdd.setVisibility(View.VISIBLE);
+            deliveryAddLbl.setVisibility(View.VISIBLE);
 
-                vehicleLbl.setVisibility(View.VISIBLE);
-                vehicle.setVisibility(View.VISIBLE);
-                vehicle.setText(vehicleVal);
-//                rateLbl.setVisibility(View.VISIBLE);
-//                rate.setVisibility(View.VISIBLE);
-//                rate.setText("$ "+rateVal);
-//            }
-//            else{
-//                suburb.setText(job.getConceptBookingDeliverySuburb());
-//                address.setText(job.getAddress());
-//                addressStr = job.getAddress() + "," + job.getConceptBookingDeliverySuburb();
-//                clientName.setText(job.getClient());
-//                clientNameLbl.setText("Delivery \nClient Name:");
-//
-//                if(totQty > 0){
-//                    dimensTable.setVisibility(View.VISIBLE);
-//                }
-//            }
+            deliveryClientName.setText(job.getClient());
+            deliveryClientNameLbl.setText("Delivery \nClient Name:");
+            deliverySuburb.setText(job.getConceptBookingDeliverySuburb());
+            deliverySuburbLbl.setText("Delivery \nSuburb:");
+            deliveryAdd.setText(job.getAddress());
+            deliveryAddLbl.setText("Delivery \nAddress:");
 
-            if(totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0){
+            if (totQty > 0) {
+                dimensTable.setVisibility(View.VISIBLE);
+            }
+
+            vehicleLbl.setVisibility(View.VISIBLE);
+            vehicle.setVisibility(View.VISIBLE);
+            vehicle.setText(vehicleVal);
+
+            if (totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0) {
                 isTonnage = true;
                 parcelsLbl.setVisibility(View.GONE);
                 parcels.setVisibility(View.GONE);
-                pallets.setText(""+totQty);
-            }
-            else if(job.getPallets() == 1){
+                pallets.setText("" + totQty);
+            } else if (job.getPallets() == 1) {
                 pallets.setText(String.valueOf(job.getNo_pallets()));
                 parcelsLbl.setVisibility(View.GONE);
                 parcels.setVisibility(View.GONE);
-            }
-            else if (job.getParcels() == 2) {
+            } else if (job.getParcels() == 2) {
                 parcels.setText(String.valueOf(job.getNo_parcels()));
                 palletsLbl.setVisibility(View.GONE);
                 pallets.setVisibility(View.GONE);
@@ -394,7 +377,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
-                if(!isConcept){
+                if (!isConcept) {
                     btnDepart.setVisibility(View.VISIBLE);
                 }
             }
@@ -407,18 +390,18 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
-                if(!isConcept){
+                if (!isConcept) {
                     btnDepart.setVisibility(View.VISIBLE);
                 }
             }
         }
     }
 
-    private TextView createTextViewForTable(String text){
+    private TextView createTextViewForTable(String text) {
         TextView tv = new TextView(context);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         tv.setGravity(Gravity.CENTER);
-        tv.setTextAppearance(context,android.R.style.TextAppearance_Medium);
+        tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
         tv.setLayoutParams(params);
         tv.setText(text);
@@ -435,8 +418,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         if (type.equals("JobsPending") && !isConcept && job.getConceptBookingStatus() == 7) {
             user.setUserArriveConcept(null);
             db.updateUser(user);
-        }
-        else if (type.equals("DeliveryJobs") && !isConcept && job.getConceptBookingStatus() == 8) {
+        } else if (type.equals("DeliveryJobs") && !isConcept && job.getConceptBookingStatus() == 8) {
             user.setUserArriveClient(null);
             db.updateUser(user);
         }
@@ -452,7 +434,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         if (type.equals("JobsPending")) {
             if (job.getConceptBookingStatus() == 7) {
                 job.setConceptBookingStatus(2);
-                if(!isTonnage){
+                if (!isTonnage) {
                     job.setPallets(Integer.parseInt(pallets.getText().toString()));
                     job.setParcels(Integer.parseInt(parcels.getText().toString()));
                 }
@@ -460,7 +442,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 job.setPickupImages(createImageString());
             } else if (job.getConceptBookingStatus() == 2) {
                 job.setConceptBookingStatus(7);
-                if(!isConcept){
+                if (!isConcept) {
                     user.setUserArriveConcept(null);
                     db.updateUser(user);
                 }
@@ -473,7 +455,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             if (job.getConceptBookingStatus() == 9) {
                 job.setConceptBookingStatus(8);
                 db.updateJob(job, isConcept);
-                if(!isConcept){
+                if (!isConcept) {
                     user.setUserArriveClient(null);
                     db.updateUser(user);
                 }
@@ -496,11 +478,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                if(rejected){
+                if (rejected) {
                     sendEmail();
                 }
                 job.setConceptBookingStatus(9);
-                if(!isTonnage) {
+                if (!isTonnage) {
                     job.setPallets(Integer.parseInt(pallets.getText().toString()));
                     job.setParcels(Integer.parseInt(parcels.getText().toString()));
                 }
@@ -531,8 +513,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                             rejected = true;
                             break;
                     }
-                }
-                else{
+                } else {
                     switch (which) {
                         case 0:
                             break;
@@ -549,7 +530,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         return builder.create();
     }
 
-    private void sendEmail(){
+    private void sendEmail() {
         String subject = "Booking " + job.getId() + " has been rejected";
         String content = job.getId() + " has been rejected by client " + job.getClient() + ".";
         RequestParams params = new RequestParams();
@@ -638,13 +619,12 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
     private void openGMapsWithPosition() {
         String destinationsF = addressStr.replace(" ", "+");
-        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ destinationsF +"&mode=d");
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + destinationsF + "&mode=d");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setPackage("com.google.android.apps.maps");
         if (mapIntent.resolveActivity(context.getPackageManager()) != null) {
             startActivity(mapIntent);
-        }
-        else{
+        } else {
             GenericMethods.showToast(context, "No supported application found");
         }
     }
