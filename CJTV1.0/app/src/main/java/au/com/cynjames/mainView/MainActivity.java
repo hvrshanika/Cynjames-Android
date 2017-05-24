@@ -134,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     boolean isUploading = false;
     boolean isRefreshing = false;
     String type = "";
+    ViewPager viewPager = null;
+    boolean isDepart = false;
+    int currentSelected = 0;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void setActionBar() {
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
         adapter = new CustomPagerAdapter(this, getLayoutInflater());
         viewPager.setAdapter(adapter);
         viewPager.setOnPageChangeListener(
@@ -245,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 viewPager.setCurrentItem(tab.getPosition());
+                currentSelected = tab.getPosition();
+                checkDepartBtn();
                 TextView title = (TextView) tab.getCustomView().findViewById(R.id.tab_view_id);
                 title.setTypeface(Typeface.DEFAULT_BOLD);
             }
@@ -313,9 +318,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case R.id.action_logout:
                 logoutUser();
                 break;
-//            case R.id.action_log:
-//                logsBtnClicked();
-//                break;
+            case R.id.action_depart:
+                openDepartFrag();
+                break;
             default:
                 break;
         }
@@ -335,18 +340,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void updateMenuTitles() {
+        if(menu == null)
+            return;
+
         MenuItem arriveConcept = menu.findItem(R.id.action_ariive_concept);
         MenuItem arriveClient = menu.findItem(R.id.action_arrive_client);
 //        MenuItem timeDifference = menu.findItem(R.id.action_difference);
         if (user.getUserArriveConcept() != null) {
+            arriveConcept.setVisible(true);
             arriveConcept.setTitle("Concept: " + user.getUserArriveConcept());
         } else {
             arriveConcept.setVisible(false);
         }
         if (user.getUserArriveClient() != null) {
+            arriveClient.setVisible(true);
             arriveClient.setTitle("Client: " + user.getUserArriveClient());
         } else {
             arriveClient.setVisible(false);
+        }
+
+        MenuItem depart = menu.findItem(R.id.action_depart);
+        if(viewPager == null)
+            depart.setVisible(false);
+        else{
+            if (isDepart && currentSelected == 1) {
+                depart.setVisible(true);
+                isDepart = false;
+            } else {
+                depart.setVisible(false);
+            }
         }
     }
 
@@ -495,6 +517,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    private void checkDepartBtn() {
+        for (ConceptBooking job : sortedAllAdhocJobsList) {
+            if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
+                isDepart = true;
+            }
+        }
+        updateMenuTitles();
+    }
+
     private void uploadFirebaseToken() {
         String token = FirebaseInstanceId.getInstance().getToken();
         if (token != null && GenericMethods.isConnectedToInternet(context)) {
@@ -611,6 +642,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             adhocNoJobsVIew.setVisibility(View.GONE);
         }
+
+        checkDepartBtn();
     }
 
     private void initVariables() {
@@ -1160,7 +1193,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             openJobDetailsFrag(job);
         }
         else{
-            GenericMethods.showToast(context, "You need to depart to access this Job");
+            if (user.getUserArriveConcept() != null && user.getUserArriveClient() == null) {
+                openJobDetailsFrag(job);
+            }
+            else {
+                GenericMethods.showToast(context, "You need to depart Drop off location to access this Job");
+            }
         }
     }
 
@@ -1189,7 +1227,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             openJobDetailsFrag(job);
         }
         else{
-            GenericMethods.showToast(context, "You need to depart to access this Job");
+            if (user.getUserArriveConcept() == null && user.getUserArriveClient() != null) {
+                openJobDetailsFrag(job);
+            }
+            else{
+                GenericMethods.showToast(context, "You need to depart Pick up location to access this Job");
+            }
         }
     }
 

@@ -712,7 +712,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-//                GenericMethods.showToast(JobsListActivity.this, "Log data upload successful.");
                 db.clearTable("conceptBookingLog");
             }
         }
@@ -723,7 +722,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-//                GenericMethods.showToast(JobsListActivity.this, "Driver data upload successful.");
                 db.clearTable("driverStatus");
             }
         }
@@ -742,7 +740,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-//                GenericMethods.showToast(JobsListActivity.this, "Concept data upload successful.");
                 if (jSONObject.getInt("status") == 10) {
                     db.clearConcept(id, concept);
                 }
@@ -761,7 +758,6 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-//                GenericMethods.showToast(JobsListActivity.this, "Image upload successful.");
                 File file = new File(FILE_PATH, name);
                 file.delete();
             }

@@ -76,13 +76,6 @@ public class HTTPHandler {
 
         public void onStart() {
             super.onStart();
-//            try {
-//                progressDialog.show();
-//            } catch (WindowManager.BadTokenException e) {
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
         }
 
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

@@ -8,6 +8,10 @@
         app:showAsAction="ifRoom"
         android:title="Logout"/>
     <item
+        android:id="@+id/action_depart"
+        app:showAsAction="always"
+        android:title="Depart"/>
+    <item
         android:id="@+id/action_refresh"
         android:icon="@mipmap/refresh_resize"
         app:showAsAction="never"

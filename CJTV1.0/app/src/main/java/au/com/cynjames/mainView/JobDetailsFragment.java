@@ -235,6 +235,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnDepartClicked();
             }
         });
+        btnDepart.setVisibility(View.GONE);
 
         eta.setVisibility(View.VISIBLE);
         distance.setVisibility(View.VISIBLE);
@@ -378,7 +379,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
                 if (!isConcept) {
-                    btnDepart.setVisibility(View.VISIBLE);
+//                    btnDepart.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -391,7 +392,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
                 if (!isConcept) {
-                    btnDepart.setVisibility(View.VISIBLE);
+//                    btnDepart.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -443,8 +444,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             } else if (job.getConceptBookingStatus() == 2) {
                 job.setConceptBookingStatus(7);
                 if (!isConcept) {
-                    user.setUserArriveConcept(null);
-                    db.updateUser(user);
+                    List<ConceptBooking> jobs = db.getPendingJobsWithStatus("2", isConcept);
+                    if(jobs.size() == 1) {
+                        user.setUserArriveConcept(null);
+                        db.updateUser(user);
+                    }
                 }
             }
             db.updateJob(job, isConcept);
@@ -456,8 +460,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 job.setConceptBookingStatus(8);
                 db.updateJob(job, isConcept);
                 if (!isConcept) {
-                    user.setUserArriveClient(null);
-                    db.updateUser(user);
+                    List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9", isConcept);
+                    if(jobs.size() == 0) {
+                        user.setUserArriveClient(null);
+                        db.updateUser(user);
+                    }
                 }
                 listener.handleDialogClose();
                 dismiss();
@@ -537,45 +544,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         params.add("subject", subject);
         params.add("content", content);
         HTTPHandler.post("cjt-send-email.php", params, new HTTPHandler.ResponseManager(new EmailSender(), context, "Sending Email..."));
-    }
-
-    public void getEmailIntent() {
-        String subject = "Booking " + job.getId() + " has been rejected";
-        String content = job.getId() + " has been rejected by client [Client Name]";
-
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("*/*");
-        i.putExtra(Intent.EXTRA_EMAIL, new String[]{
-                "jlenette@gmail.com"
-        });
-        i.putExtra(Intent.EXTRA_SUBJECT, subject);
-        i.putExtra(Intent.EXTRA_TEXT, content);
-
-        startActivity(createEmailOnlyChooserIntent(i, "Send via email"));
-    }
-
-    public Intent createEmailOnlyChooserIntent(Intent source,
-                                               CharSequence chooserTitle) {
-        Stack<Intent> intents = new Stack<Intent>();
-        Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "info@domain.com", null));
-        List<ResolveInfo> activities = context.getPackageManager().queryIntentActivities(i, 0);
-
-        for (ResolveInfo ri : activities) {
-            Intent target = new Intent(source);
-            target.setPackage(ri.activityInfo.packageName);
-            intents.add(target);
-        }
-
-        if (!intents.isEmpty()) {
-            Intent chooserIntent = Intent.createChooser(intents.remove(0),
-                    chooserTitle);
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
-                    intents.toArray(new Parcelable[intents.size()]));
-
-            return chooserIntent;
-        } else {
-            return Intent.createChooser(source, chooserTitle);
-        }
     }
 
     public class ETADownload implements ResponseListener {

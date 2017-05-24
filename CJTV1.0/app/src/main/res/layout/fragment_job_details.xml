@@ -196,7 +196,7 @@
                 android:gravity="left|center"
                 android:text="[TL]"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="gone" />
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/list_item_order_no_type_hu"
@@ -209,7 +209,7 @@
                 android:gravity="left|center"
                 android:text="[HU]"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="gone" />
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/list_item_parcels_label"

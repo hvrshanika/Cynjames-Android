@@ -40,25 +40,6 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         View rowView = inflater.inflate(R.layout.jobs_list_item, parent, false);
         ConceptBooking job = jobsList.get(position);
 
-        if(isConcept){
-            if (job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8) {
-                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
-            } else if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
-                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
-            }
-        }
-        else{
-            if (job.getConceptBookingStatus() == 7) {
-                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
-            }
-            else if (job.getConceptBookingStatus() == 8){
-                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
-            }
-            else if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
-                rowView.setBackgroundColor(context.getResources().getColor(R.color.orange));
-            }
-        }
-
         TextView suburb = (TextView) rowView.findViewById(R.id.list_item_suburb);
         TextView orderNo = (TextView) rowView.findViewById(R.id.list_item_order_no);
         TextView orderNoType = (TextView) rowView.findViewById(R.id.list_item_order_no_type);
@@ -75,12 +56,35 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView jobTypeMain = (TextView) rowView.findViewById(R.id.list_item_job_type_label);
 
         if (isConcept) {
+            if (job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8) {
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
+            } else if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
+            }
+
             jobTypeMain.setVisibility(View.GONE);
             suburb.setText(job.getConceptBookingDeliverySuburb());
             clientName.setText(job.getClient());
             pallets.setText(String.valueOf(job.getPallets()));
             parcels.setText(String.valueOf(job.getParcels()));
         } else {
+            if (job.getConceptBookingStatus() == 7) {
+                jobTypeMain.setText("Pick up Job");
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
+            }
+            else if (job.getConceptBookingStatus() == 8){
+                jobTypeMain.setText("Ready for Delivery");
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.list_green));
+            }
+            else if (job.getConceptBookingStatus() == 2) {
+                jobTypeMain.setText("Pick up in Progress");
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.orange));
+            }
+            else if (job.getConceptBookingStatus() == 9) {
+                jobTypeMain.setText("Delivery in Progress");
+                rowView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            }
+
             // Asked to remove
             customerName.setVisibility(View.GONE);
             customerNameLbl.setVisibility(View.GONE);
@@ -132,13 +136,6 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
                 pallets.setText(""+totQty);
                 parcels.setVisibility(View.GONE);
                 parcelsLbl.setVisibility(View.GONE);
-            }
-
-            if(job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 7){
-                jobTypeMain.setText("Pending");
-            }
-            else{
-                jobTypeMain.setText("Picked Up");
             }
 
             String typeString = customerType + "|" + jobType;
