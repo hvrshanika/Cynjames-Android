@@ -340,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void updateMenuTitles() {
+        getUser();
         if(menu == null)
             return;
 
@@ -1038,6 +1039,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void isUpdatefinished() {
         if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             isUploading = false;
+            db.clearTable("conceptBooking");
+            db.clearTable("adhocBooking");
+            db.clearTable("adhocDimensions");
             prefsEditor.clear();
             prefsEditor.commit();
             finish();
@@ -1269,22 +1273,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 JSONArray objs = jSONObject.getJSONArray("joblist");
                 JSONArray dimens = null;
                 if (isConcept) {
-                    db.clearTable("conceptBooking");
+//                    db.clearTable("conceptBooking");
                 } else {
-                    db.clearTable("adhocBooking");
-                    db.clearTable("adhocDimensions");
+//                    db.clearTable("adhocBooking");
+//                    db.clearTable("adhocDimensions");
                     dimens = jSONObject.getJSONArray("dimenslist");
                 }
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
-                    db.addJob(job, isConcept);
+                    if (!db.jobExist(job.getId(), isConcept)) {
+                        db.addJob(job, isConcept);
+                    }
                 }
                 if (dimens != null) {
                     for (int i = 0; i < dimens.length(); i++) {
                         JSONObject obj = dimens.getJSONObject(i);
                         AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
-                        db.addDimension(dimen);
+                        if(!db.dimenExist(dimen.getId())) {
+                            db.addDimension(dimen);
+                        }
                     }
                 }
                 updateLabels();
@@ -1329,9 +1337,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d("Response", jSONObject.toString());
             postlogCount++;
             if (jSONObject.getInt("success") == 1) {
-                if (!logoutClicked) {
-//                    GenericMethods.showToast(MainActivity.this, "Log data upload successful.");
-                }
                 db.clearTable("conceptBookingLog");
                 db.clearTable("adhocBookingLog");
             }
@@ -1345,9 +1350,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             postStatusCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (!logoutClicked) {
-//                    GenericMethods.showToast(MainActivity.this, "Driver data upload successful.");
-                }
                 db.clearTable("driverStatus");
             }
             isUpdatefinished();
@@ -1368,9 +1370,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             postjobsCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (!logoutClicked) {
-//                    GenericMethods.showToast(MainActivity.this, "Concept data upload successful.");
-                }
                 if (jSONObject.getInt("status") == 10) {
                     db.clearConcept(id, concept);
                 }
@@ -1391,9 +1390,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             postImagesCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (!logoutClicked) {
-//                    GenericMethods.showToast(MainActivity.this, "Image upload successful.");
-                }
                 File file = new File(FILE_PATH, name);
                 file.delete();
             }

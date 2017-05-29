@@ -417,11 +417,17 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
     private void btnBackClicked() {
         if (type.equals("JobsPending") && !isConcept && job.getConceptBookingStatus() == 7) {
-            user.setUserArriveConcept(null);
-            db.updateUser(user);
+            List<ConceptBooking> jobs = db.getPendingJobsWithStatus("2", isConcept);
+            if(jobs.size() == 0) {
+                user.setUserArriveConcept(null);
+                db.updateUser(user);
+            }
         } else if (type.equals("DeliveryJobs") && !isConcept && job.getConceptBookingStatus() == 8) {
-            user.setUserArriveClient(null);
-            db.updateUser(user);
+            List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9", isConcept);
+            if(jobs.size() == 0) {
+                user.setUserArriveClient(null);
+                db.updateUser(user);
+            }
         }
         listener.handleDialogClose();
         dismiss();
