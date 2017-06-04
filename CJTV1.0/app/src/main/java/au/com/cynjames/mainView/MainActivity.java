@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Vehicle vehicle;
     CJT myApp;
     boolean logoutClicked;
-    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator;
+    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator;
     int prelogCount = 0;
     int postlogCount = 0;
     int preStatusCount = 0;

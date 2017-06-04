@@ -237,7 +237,7 @@ public class DepartFragment extends DialogFragment {
         try {
             Bitmap bm = Bitmap.createBitmap(sign.getDrawingCache());
             signtureId = "signature"+time+".png";
-            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator);
+            File dir = new File(Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator);
             dir.mkdir();
             File f = new File(dir, signtureId);
             f.createNewFile();

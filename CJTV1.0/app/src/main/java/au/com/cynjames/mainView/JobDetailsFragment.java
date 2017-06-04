@@ -421,12 +421,22 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             if(jobs.size() == 0) {
                 user.setUserArriveConcept(null);
                 db.updateUser(user);
+
+                if(images.size() > 0){
+                    job.setPickupImages(createImageString());
+                    db.updateJob(job,isConcept);
+                }
             }
         } else if (type.equals("DeliveryJobs") && !isConcept && job.getConceptBookingStatus() == 8) {
             List<ConceptBooking> jobs = db.getPendingJobsWithStatus("9", isConcept);
             if(jobs.size() == 0) {
                 user.setUserArriveClient(null);
                 db.updateUser(user);
+            }
+
+            if(images.size() > 0){
+                job.setDeliveryImages(createImageString());
+                db.updateJob(job,isConcept);
             }
         }
         listener.handleDialogClose();
@@ -607,7 +617,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         long time = System.currentTimeMillis();
         imageFileName = job.getId() + "_" + time + ".jpg";
 
-        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator);
+        File dir = new File(Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator);
         dir.mkdir();
         File image = new File(dir, imageFileName);
         image.createNewFile();

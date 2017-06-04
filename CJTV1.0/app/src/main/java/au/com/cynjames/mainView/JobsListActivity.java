@@ -72,7 +72,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     boolean statusTwoJobs = false;
     boolean statusNineJobs = false;
     CJT myApp;
-    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator;
+    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator;
     Context context;
     boolean isConcept;
 

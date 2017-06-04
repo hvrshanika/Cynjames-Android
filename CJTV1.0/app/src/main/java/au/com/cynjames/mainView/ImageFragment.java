@@ -35,7 +35,7 @@ public class ImageFragment extends DialogFragment {
     ImageView imageView;
     ImageView btnBack;
     ImageView btnNext;
-    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + "CJT-AppData" + File.separator;
+    String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator;
     String cuurentImage;
     boolean firstImage = false;
     boolean secondImage = false;
@@ -104,20 +104,13 @@ public class ImageFragment extends DialogFragment {
     }
 
     private void setImage(String imageName) {
-//        Bitmap bitmap = null;
         cuurentImage = imageName;
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 8;
         String strPath = FILE_PATH + "" + imageName + "";
         Bitmap bitmap = BitmapFactory.decodeFile(strPath,options);
-//        try {
-//            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse("file:///" + FILE_PATH + "" + imageName + ""));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
-            //bitmap.recycle();
         } else {
             GenericMethods.showToast(context, "No Image");
         }
