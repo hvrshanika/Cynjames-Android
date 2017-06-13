@@ -133,13 +133,11 @@ public class DepartFragment extends DialogFragment {
         });
         TextView arriveConceptLabel = (TextView) viewRef.findViewById(R.id.list_item_arrive_concept_label);
         TextView departConceptLabel = (TextView) viewRef.findViewById(R.id.list_item_depart_concept_label);
+        arriveConceptLabel.setText("Arrival");
+        departConceptLabel.setText("Departure");
         if(type.equals("JobsPending")){
-            arriveConceptLabel.setText("Arrive Concept");
-            departConceptLabel.setText("Depart Concept");
             arriveConcept.setText(user.getUserArriveConcept());
         }else if(type.equals("DeliveryJobs")){
-            arriveConceptLabel.setText("Arrive Client");
-            departConceptLabel.setText("Depart Client");
             arriveConcept.setText(user.getUserArriveClient());
         }
         departConcept.setText(GenericMethods.getDisplayDate(new Date()));

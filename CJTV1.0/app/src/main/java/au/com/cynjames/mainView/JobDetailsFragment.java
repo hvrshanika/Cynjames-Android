@@ -329,30 +329,44 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             vehicle.setVisibility(View.VISIBLE);
             vehicle.setText(vehicleVal);
 
+            if (job.getPallets() == 1 || job.getParcels() == 0) {
+                pallets.setText(String.valueOf(job.getNo_pallets()));
+                parcelsLbl.setVisibility(View.GONE);
+                parcels.setVisibility(View.GONE);
+            }
+            if (job.getParcels() == 2 || job.getPallets() == 0) {
+                parcels.setText(String.valueOf(job.getNo_parcels()));
+                palletsLbl.setVisibility(View.GONE);
+                pallets.setVisibility(View.GONE);
+            }
             if (totQty > 0 && job.getPallets() == 0 && job.getParcels() == 0) {
                 isTonnage = true;
                 parcelsLbl.setVisibility(View.GONE);
                 parcels.setVisibility(View.GONE);
+                palletsLbl.setVisibility(View.VISIBLE);
+                pallets.setVisibility(View.VISIBLE);
                 pallets.setText("" + totQty);
-            } else if (job.getPallets() == 1) {
-                pallets.setText(String.valueOf(job.getNo_pallets()));
-                parcelsLbl.setVisibility(View.GONE);
-                parcels.setVisibility(View.GONE);
-            } else if (job.getParcels() == 2) {
-                parcels.setText(String.valueOf(job.getNo_parcels()));
-                palletsLbl.setVisibility(View.GONE);
-                pallets.setVisibility(View.GONE);
             }
         }
 
         orderNo.setText(job.getOrderno());
         if (job.getConceptBookingTailLift() == 1) {
             orderNoTypeTL.setVisibility(View.VISIBLE);
-        }
-        if (job.getConceptBookingHandUnload() == 1) {
+            if (job.getConceptBookingHandUnload() == 1) {
+                orderNoTypeHU.setVisibility(View.VISIBLE);
+                if (job.getConceptBookingUrgent() == 1) {
+
+                }
+            }
+            else if (job.getConceptBookingUrgent() == 1) {
+
+            }
+        }else if (job.getConceptBookingHandUnload() == 1) {
             orderNoTypeHU.setVisibility(View.VISIBLE);
-        }
-        if (job.getConceptBookingUrgent() == 1) {
+            if (job.getConceptBookingUrgent() == 1) {
+
+            }
+        }else if (job.getConceptBookingUrgent() == 1) {
 
         }
 

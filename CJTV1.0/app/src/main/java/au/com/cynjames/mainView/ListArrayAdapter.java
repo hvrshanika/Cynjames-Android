@@ -123,16 +123,20 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             pallets.setText(String.valueOf(job.getNo_pallets()));
             parcels.setText(String.valueOf(job.getNo_parcels()));
 
-            if (job.getPallets() == 1) {
+            if (job.getPallets() == 1 || job.getParcels() == 0) {
                 jobType = "Pallets";
                 parcels.setVisibility(View.GONE);
                 parcelsLbl.setVisibility(View.GONE);
-            } else if (job.getParcels() == 2) {
+            }
+            if (job.getParcels() == 2 || job.getPallets() == 0) {
                 jobType = "Parcels";
                 pallets.setVisibility(View.INVISIBLE);
                 palletsLbl.setVisibility(View.INVISIBLE);
-            } else if (job.getPallets() == 0 && job.getParcels() == 0) {
+            }
+            if (job.getPallets() == 0 && job.getParcels() == 0) {
                 jobType = "Tonnage";
+                pallets.setVisibility(View.VISIBLE);
+                palletsLbl.setVisibility(View.VISIBLE);
                 pallets.setText(""+totQty);
                 parcels.setVisibility(View.GONE);
                 parcelsLbl.setVisibility(View.GONE);
@@ -145,9 +149,21 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         orderNo.setText(job.getOrderno());
         if (job.getConceptBookingTailLift() == 1) {
             orderNoType.setText("[TL]");
-        } else if (job.getConceptBookingHandUnload() == 1) {
+            if (job.getConceptBookingHandUnload() == 1) {
+                orderNoType.setText("[TL][HU]");
+                if (job.getConceptBookingUrgent() == 1) {
+                    orderNoType.setText("[TL][HU][U]");
+                }
+            }
+            else if (job.getConceptBookingUrgent() == 1) {
+                orderNoType.setText("[TL][U]");
+            }
+        }else if (job.getConceptBookingHandUnload() == 1) {
             orderNoType.setText("[HU]");
-        } else if (job.getConceptBookingUrgent() == 1) {
+            if (job.getConceptBookingUrgent() == 1) {
+                orderNoType.setText("[HU][U]");
+            }
+        }else if (job.getConceptBookingUrgent() == 1) {
             orderNoType.setText("[U]");
         }
 
