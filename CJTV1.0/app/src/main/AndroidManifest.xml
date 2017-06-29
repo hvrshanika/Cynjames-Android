@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -63,6 +64,19 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name="au.com.cynjames.utils.LogoutService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name="au.com.cynjames.utils.LogoutAlarm"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name="au.com.cynjames.utils.LogoutTaskAlarm"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

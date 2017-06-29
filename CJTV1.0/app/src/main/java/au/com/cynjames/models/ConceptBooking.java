@@ -38,6 +38,7 @@ public class ConceptBooking implements Serializable {
     private int customerType;
     private int no_pallets;
     private int no_parcels;
+    private String jobno;
 
     public int getCustomerType() {
         return customerType;
@@ -293,6 +294,14 @@ public class ConceptBooking implements Serializable {
 
     public void setNo_parcels(int no_parcels) {
         this.no_parcels = no_parcels;
+    }
+
+    public String getJobno() {
+        return jobno;
+    }
+
+    public void setJobno(String jobno) {
+        this.jobno = jobno;
     }
 
 

@@ -54,6 +54,8 @@ import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.SQLiteHelper;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
+
 public class JobsListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, JobsDetailsFragmentListener {
     public static final long INTERACTION_TIMEOUT = 8000;
     List<ConceptBooking> jobsList;
@@ -97,7 +99,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-        mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        mPrefs = getApplicationContext().getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         gson = new Gson();
         getData();
         getUser();

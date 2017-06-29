@@ -102,7 +102,6 @@ public class GenericMethods {
     public static String getDisplayDate(Date date) {
         if (date == null) {
             date = new Date();
-
         }
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
@@ -121,6 +120,17 @@ public class GenericMethods {
         String d=formatter.format(date);
         return d;
 
+    }
+
+    public static Date getDBDateForSave(String dateStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d= null;
+        try {
+            d = formatter.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return d;
     }
 
     public static String getDBTime(Date date) {

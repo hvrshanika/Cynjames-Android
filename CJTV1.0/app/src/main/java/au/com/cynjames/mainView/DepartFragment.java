@@ -31,6 +31,8 @@ import au.com.cynjames.models.User;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.SQLiteHelper;
 
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
+
 public class DepartFragment extends DialogFragment {
     Context context;
     WindowManager.LayoutParams params;
@@ -59,7 +61,7 @@ public class DepartFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new SQLiteHelper(context);
-        SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
+        SharedPreferences mPrefs = context.getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         Gson gson = new Gson();
         String jsonUser = mPrefs.getString("User", "");
         int id = gson.fromJson(jsonUser, Integer.TYPE);

@@ -37,7 +37,7 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class HTTPHandler {
 
-    private static final String BASE_URL = "http://cynjames-stage.trotic.com/webservice-one/";
+    private static final String BASE_URL = "http://cynjamestransport.com/webservice-one/";
 
     private static AsyncHttpClient httpClient;
 
@@ -60,7 +60,8 @@ public class HTTPHandler {
     public static AsyncHttpClient getAsyncClient() {
         if (httpClient == null) {
             httpClient = new AsyncHttpClient();
-            httpClient.setMaxRetriesAndTimeout(1, 20000);
+            httpClient.setMaxRetriesAndTimeout(1, 60000);
+            httpClient.setResponseTimeout(60000);
         }
         return httpClient;
     }

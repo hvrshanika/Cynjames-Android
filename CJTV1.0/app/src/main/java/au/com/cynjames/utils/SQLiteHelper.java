@@ -7,9 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import au.com.cynjames.CJT;
 import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
@@ -21,13 +23,15 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 18;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
+    private Context mContext;
 
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
-        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT, conceptClientsName TEXT, conceptBookingPickupClientName TEXT, customerType INTEGER, no_pallets INTEGER, no_parcels INTEGER)";
+        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT, conceptClientsName TEXT, conceptBookingPickupClientName TEXT, customerType INTEGER, no_pallets INTEGER, no_parcels INTEGER, concept_job_number TEXT)";
         String createAdhocBookingLogTable = "CREATE TABLE adhocBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         String createAdhocDimensionsTable = "CREATE TABLE adhocDimensions (id INTEGER PRIMARY KEY AUTOINCREMENT, qty INTEGER, height REAL, width REAL, length REAL, weight REAL, clientId INTEGER, bookingId INTEGER, vehicle TEXT, rate REAL)";
         db.execSQL(createUserTable);
@@ -145,11 +149,26 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put("conceptBookingPickupDate", job.getConceptBookingPickupDate());
         values.put("conceptPickupSignature", job.getConceptPickupSignature());
         values.put("conceptPickupName", job.getConceptPickupName());
-        values.put("arrivedConcept", job.getArrivedConcept());
         values.put("conceptDeliveryDate", job.getConceptDeliveryDate());
-        values.put("arrivedClient", job.getArrivedClient());
         values.put("conceptDeliverySignature", job.getConceptDeliverySignature());
         values.put("conceptDeliveryName", job.getConceptDeliveryName());
+
+        String arrivedConceptStr = job.getArrivedConcept();
+        String arrivedClientStr = job.getArrivedClient();
+        if(arrivedConceptStr != null){
+            Date arrivedConcept = GenericMethods.getDBDateForSave(job.getArrivedConcept());
+            if(arrivedConcept != null){
+                arrivedConceptStr = GenericMethods.getDisplayDate(arrivedConcept);
+            }
+        }
+        if(arrivedClientStr != null){
+            Date arrivedClient = GenericMethods.getDBDateForSave(job.getArrivedClient());
+            if(arrivedClient != null){
+                arrivedClientStr = GenericMethods.getDisplayDate(arrivedClient);
+            }
+        }
+        values.put("arrivedConcept", arrivedConceptStr);
+        values.put("arrivedClient", arrivedClientStr);
 
         String table = "";
         if(isConcept){
@@ -164,6 +183,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put("customerType", job.getCustomerType());
             values.put("no_pallets", job.getNo_pallets());
             values.put("no_parcels", job.getNo_parcels());
+            values.put("concept_job_number", job.getJobno());
         }
         db.insert(table, null, values);
 
@@ -212,6 +232,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put("customerType", job.getCustomerType());
             values.put("no_pallets", job.getNo_pallets());
             values.put("no_parcels", job.getNo_parcels());
+            values.put("concept_job_number", job.getJobno());
         }
         db.update(table, values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
 
@@ -323,6 +344,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setCustomerType(cursor.getInt(29));
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
+                    job.setJobno(cursor.getString(32));
                 }
 
                 jobs.add(job);
@@ -388,6 +410,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setCustomerType(cursor.getInt(29));
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
+                    job.setJobno(cursor.getString(32));
                 }
 
                 jobs.add(job);
@@ -452,6 +475,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setCustomerType(cursor.getInt(29));
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
+                    job.setJobno(cursor.getString(32));
                 }
 
                 jobs.add(job);

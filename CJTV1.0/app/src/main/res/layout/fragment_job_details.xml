@@ -103,33 +103,123 @@
             android:focusableInTouchMode="true">
 
             <TextView
-                android:id="@+id/list_item_suburb_label"
+                android:id="@+id/list_item_order_no_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_address"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:gravity="left|center"
-                android:text="@string/job_details_suburb"
+                android:text="@string/jobs_list_item_order_no"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/list_item_suburb"
-                android:layout_width="200dp"
+                android:id="@+id/list_item_order_no"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_below="@+id/list_item_address"
                 android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/list_item_suburb_label"
+                android:layout_toRightOf="@+id/list_item_order_no_label"
                 android:gravity="left|center"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
-                android:layout_below="@id/list_item_suburb_label" />
+                android:background="@color/gray"
+                android:layout_below="@id/list_item_order_no" />
+
+            <TextView
+                android:id="@+id/list_item_job_no_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_customer_name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/jobs_list_item_job_no"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_job_no"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_customer_name"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/list_item_client_name_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="gone"/>
+
+            <View
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_below="@id/list_item_job_no_label" />
+
+            <TextView
+                android:id="@+id/list_item_client_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_job_no"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_client_name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/list_item_client_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_job_no"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/list_item_client_name_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <View
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_below="@id/list_item_client_name_label" />
+
+            <TextView
+                android:id="@+id/list_item_order_no_type_tl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_suburb_label"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toLeftOf="@+id/list_item_order_no_type_hu"
+                android:layout_marginRight="5dp"
+                android:gravity="left|center"
+                android:text="[TL]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/list_item_order_no_type_hu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/list_item_suburb_label"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:gravity="left|center"
+                android:text="[HU]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/list_item_pallets_label"
@@ -156,60 +246,6 @@
                 android:inputType="number"
                 android:paddingLeft="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/list_item_order_no_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:gravity="left|center"
-                android:text="@string/jobs_list_item_order_no"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/list_item_order_no"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/list_item_order_no_label"
-                android:gravity="left|center"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/white"
-                android:layout_below="@id/list_item_order_no" />
-
-            <TextView
-                android:id="@+id/list_item_order_no_type_tl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/list_item_suburb"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp"
-                android:layout_toLeftOf="@+id/list_item_order_no_type_hu"
-                android:layout_marginRight="5dp"
-                android:gravity="left|center"
-                android:text="[TL]"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="invisible" />
-
-            <TextView
-                android:id="@+id/list_item_order_no_type_hu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/list_item_suburb"
-                android:layout_marginTop="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="10dp"
-                android:gravity="left|center"
-                android:text="[HU]"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/list_item_parcels_label"
@@ -263,40 +299,11 @@
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_customer_name" />
-
-            <TextView
-                android:id="@+id/list_item_client_name_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_customer_name"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:gravity="left|center"
-                android:text="@string/job_details_client_name"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <TextView
-                android:id="@+id/list_item_client_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/list_item_customer_name"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_toRightOf="@+id/list_item_client_name_label"
-                android:gravity="left|center"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/white"
-                android:layout_below="@id/list_item_client_name_label" />
 
             <TextView
                 android:id="@+id/list_item_address_label"
@@ -323,17 +330,48 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_address_label" />
+
+            <TextView
+                android:id="@+id/list_item_suburb_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/list_item_address_label"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="left|center"
+                android:text="@string/job_details_suburb"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/list_item_suburb"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/list_item_client_name"
+                android:layout_below="@+id/list_item_address_label"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@+id/list_item_suburb_label"
+                android:gravity="left|center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <View
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"
+                android:layout_below="@id/list_item_suburb_label" />
 
             <TextView
                 android:id="@+id/list_item_notes_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_suburb"
+                android:layout_below="@+id/list_item_suburb_label"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
@@ -347,7 +385,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
                 android:layout_toLeftOf="@+id/list_item_order_no_type_tl"
-                android:layout_below="@+id/list_item_suburb"
+                android:layout_below="@+id/list_item_suburb_label"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/list_item_notes_label"
@@ -355,9 +393,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_notes" />
 
             <TextView
@@ -369,7 +408,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:gravity="left|center"
-                android:text="@string/jobs_list_item_booking_time"
+                android:text="Booking \nTime:"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
@@ -377,17 +416,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/list_item_notes"
+                android:layout_alignLeft="@+id/list_item_client_name"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/list_item_booking_time_label"
                 android:gravity="left|center"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_booking_time_label" />
 
             <TextView
@@ -395,7 +435,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_booking_time"
+                android:layout_below="@+id/list_item_booking_time_label"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:gravity="left|center"
@@ -408,7 +448,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_below="@+id/list_item_booking_time"
+                android:layout_below="@+id/list_item_booking_time_label"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/list_item_notes_label"
@@ -417,9 +457,10 @@
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_eta_label" />
 
             <TextView
@@ -449,9 +490,10 @@
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_distance_label" />
 
             <TextView
@@ -481,9 +523,10 @@
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_delivery_client_name_label" />
 
             <TextView
@@ -491,9 +534,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_delivery_client_name"
+                android:layout_below="@+id/list_item_delivery_client_name_label"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="10dp"
                 android:gravity="left|center"
                 android:text="@string/job_details_address"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -504,18 +547,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_below="@+id/list_item_delivery_client_name"
+                android:layout_below="@+id/list_item_delivery_client_name_label"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/list_item_address_label"
                 android:gravity="left|center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_delivery_suburb_label" />
 
             <TextView
@@ -523,9 +567,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_delivery_suburb"
+                android:layout_below="@+id/list_item_delivery_suburb_label"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="10dp"
                 android:gravity="left|center"
                 android:text="@string/job_details_address"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -536,18 +580,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_below="@+id/list_item_delivery_suburb"
+                android:layout_below="@+id/list_item_delivery_suburb_label"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/list_item_address_label"
                 android:gravity="left|center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_delivery_address_label" />
 
             <TextView
@@ -555,9 +600,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/list_item_delivery_address"
+                android:layout_below="@+id/list_item_delivery_address_label"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:gravity="left|center"
                 android:text="@string/job_details_vehicle"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -568,18 +613,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/list_item_client_name"
-                android:layout_below="@+id/list_item_delivery_address"
+                android:layout_below="@+id/list_item_delivery_address_label"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:layout_toRightOf="@+id/list_item_address_label"
                 android:gravity="left|center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="gone"/>
 
             <View
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/white"
+                android:background="@color/gray"
                 android:layout_below="@id/list_item_vehicle_label" />
 
             <!--<TextView-->

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App Ver: 13/06/17 TEST</string>
+    <string name="app_name">App Ver: 19/06/17 TEST</string>
     <string name="app_header">CJT</string>
     <string name="login_username">Username</string>
     <string name="login_password">Password</string>
@@ -17,6 +17,7 @@
     <string name="jobs_list_item_suburb">Suburb:</string>
     <string name="jobs_list_item_client_name">Client Name:</string>
     <string name="jobs_list_item_order_no">Order No:</string>
+    <string name="jobs_list_item_job_no">Job No:</string>
     <string name="jobs_list_item_booking_time">Booking Time:</string>
     <string name="jobs_list_item_eta">ETA:</string>
     <string name="jobs_list_item_distance">Distance:</string>

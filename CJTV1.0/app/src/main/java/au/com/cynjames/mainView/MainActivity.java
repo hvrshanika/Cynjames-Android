@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -80,9 +81,12 @@ import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
+import au.com.cynjames.utils.LogoutService;
 import au.com.cynjames.utils.NewJobsUpdateService;
 import au.com.cynjames.utils.SQLiteHelper;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, JobsDetailsFragmentListener {
     public static final long INTERACTION_TIMEOUT = 8000;
@@ -125,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int preImagesCount = 0;
     int postImagesCount = 0;
     boolean firstStatus;
-    boolean logoutTimer = false;
+    //    boolean logoutTimer = false;
     boolean isConcept;
     CustomPagerAdapter adapter;
     int conceptNewJobsCount = 0;
-    Timer timer;
+    //    Timer timer;
     boolean notificationSent = false;
     boolean isUploading = false;
     boolean isRefreshing = false;
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ViewPager viewPager = null;
     boolean isDepart = false;
     int currentSelected = 0;
+    ProgressDialog logoutProgress;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -151,6 +156,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     updateDriverStauts("Locating Driver");
                 }
             }
+        }
+    };
+    private BroadcastReceiver mLogoutCallBack = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            sendNotification();
+            notificationSent = true;
+            logoutUser();
         }
     };
     private Handler interactionHandler = new Handler() {
@@ -188,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         myApp = (CJT) this.getApplication();
-        mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        mPrefs = getApplicationContext().getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         prefsEditor = mPrefs.edit();
         context = MainActivity.this;
         pendingJobs = new ArrayList<>();
@@ -203,7 +216,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setActionBar();
         init();
         if (user == null) {
-            //finish();
             GenericMethods.showMessage(context, "Error", "Please Login again!");
         }
         if (GenericMethods.isConnectedToInternet(context)) {
@@ -211,10 +223,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             GenericMethods.showNoInternetDialog(context);
             GenericMethods.showMessage(context, "Error", "Please Login again!");
-            //logoutUser();
         }
         startLocationService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mLogoutCallBack, new IntentFilter("LogoutCall"));
         setTimer();
         uploadFirebaseToken();
         FirebaseCrash.log("MainActivity - onCreate");
@@ -341,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void updateMenuTitles() {
         getUser();
-        if(menu == null)
+        if (menu == null)
             return;
 
         MenuItem arriveConcept = menu.findItem(R.id.action_ariive_concept);
@@ -361,9 +373,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         MenuItem depart = menu.findItem(R.id.action_depart);
-        if(viewPager == null)
+        if (viewPager == null)
             depart.setVisible(false);
-        else{
+        else {
             if (isDepart && currentSelected == 1) {
                 depart.setVisible(true);
                 isDepart = false;
@@ -409,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         myApp.stopActivityTransitionTimer();
         resetDisconnectTimer();
 
-        if (logoutTimer) {
+        if (myApp.logoutTimer) {
             if (notificationSent) {
                 stopLogOutTimer();
                 NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -443,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     //startNotificationService();
                 } else {
-                    if (logoutTimer)
+                    if (myApp.logoutTimer)
                         stopLogOutTimer();
                 }
             }
@@ -571,17 +583,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 public void onClick(DialogInterface dialog, int id) {
                     initVariables();
                     logoutClicked = true;
-                    if (logoutTimer) {
-                        timer.cancel();
+                    if (myApp.logoutTimer) {
+//                        timer.cancel();
                         stopLogOutTimer();
                     }
                     if (mLastLocation != null) {
                         updateDriverStauts("Driver has logged out");
                     }
                     if (GenericMethods.isConnectedToInternet(context)) {
+                        logoutProgress = GenericMethods.getProgressDialog(context, "Please wait");
+                        logoutProgress.show();
                         uploadDatatoServer();
-                    } else {
-                        GenericMethods.showNoInternetDialog(context);
                     }
                 }
             });
@@ -739,37 +751,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void resetLogOutTimer() {
-        logOutHandler.removeCallbacks(logOutCallback);
-        logOutHandler.postDelayed(logOutCallback, 30*60000);
+//        logOutHandler.removeCallbacks(logOutCallback);
+//        logOutHandler.postDelayed(logOutCallback, 30*60000);
+        stopService(new Intent(MainActivity.this, LogoutService.class));
+        startService(new Intent(MainActivity.this, LogoutService.class));
     }
 
     public void stopLogOutTimer() {
-        logOutHandler.removeCallbacks(logOutCallback);
+//        logOutHandler.removeCallbacks(logOutCallback);
+
+        stopService(new Intent(MainActivity.this, LogoutService.class));
     }
 
     @Override
     public void onUserInteraction() {
         resetDisconnectTimer();
-        if (logoutTimer && !notificationSent) {
+        if (myApp.logoutTimer && !notificationSent) {
             resetLogOutTimer();
         }
     }
 
     private void setTimer() {
-        timer = new Timer();
-        TimerTask task = new TimerTask() {
-            public void run() {
-                logoutTimer = true;
-                resetLogOutTimer();
-            }
-        };
-        Calendar date = Calendar.getInstance();
-        date.set(Calendar.HOUR, 7);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        date.set(Calendar.AM_PM, Calendar.PM);
-        timer.schedule(task, date.getTime());//, 1000 * 60 * 60 * 24);
+//        timer = new Timer();
+//        TimerTask task = new TimerTask() {
+//            public void run() {
+//                logoutTimer = true;
+//                resetLogOutTimer();
+//            }
+//        };
+//        Calendar date = Calendar.getInstance();
+//        date.set(Calendar.HOUR, 9);
+//        date.set(Calendar.MINUTE, 30);
+//        date.set(Calendar.SECOND, 0);
+//        date.set(Calendar.MILLISECOND, 0);
+//        date.set(Calendar.AM_PM, Calendar.AM);
+//        timer.schedule(task, date.getTime());//, 1000 * 60 * 60 * 24);
+        startService(new Intent(MainActivity.this, LogoutService.class));
     }
 
     private void sendNotification() {
@@ -1044,6 +1061,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             db.clearTable("adhocDimensions");
             prefsEditor.clear();
             prefsEditor.commit();
+
+            if (logoutProgress != null)
+                logoutProgress.dismiss();
+
             finish();
         } else if (prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             initVariables();
@@ -1195,12 +1216,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             build.create().show();
         } else if (job.getConceptBookingStatus() == 2) {
             openJobDetailsFrag(job);
-        }
-        else{
+        } else {
             if (user.getUserArriveConcept() != null && user.getUserArriveClient() == null) {
                 openJobDetailsFrag(job);
-            }
-            else {
+            } else {
                 GenericMethods.showToast(context, "You need to depart Drop off location to access this Job");
             }
         }
@@ -1229,12 +1248,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             build.create().show();
         } else if (job.getConceptBookingStatus() == 9) {
             openJobDetailsFrag(job);
-        }
-        else{
+        } else {
             if (user.getUserArriveConcept() == null && user.getUserArriveClient() != null) {
                 openJobDetailsFrag(job);
-            }
-            else{
+            } else {
                 GenericMethods.showToast(context, "You need to depart Pick up location to access this Job");
             }
         }
@@ -1277,7 +1294,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 } else {
 //                    db.clearTable("adhocBooking");
 //                    db.clearTable("adhocDimensions");
-                    dimens = jSONObject.getJSONArray("dimenslist");
+                    if (jSONObject.has("dimenslist")) {
+                        dimens = jSONObject.getJSONArray("dimenslist");
+                    }
                 }
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
@@ -1290,7 +1309,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     for (int i = 0; i < dimens.length(); i++) {
                         JSONObject obj = dimens.getJSONObject(i);
                         AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
-                        if(!db.dimenExist(dimen.getId())) {
+                        if (!db.dimenExist(dimen.getId())) {
                             db.addDimension(dimen);
                         }
                     }
@@ -1418,13 +1437,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     conceptNewJobsCount = newJobs.size();
                     loadNewAdhocJobs();
                 } else {
-                    JSONArray dimens = jSONObject.getJSONArray("dimenslist");
-                    if (dimens != null) {
-                        for (int i = 0; i < dimens.length(); i++) {
-                            JSONObject obj = dimens.getJSONObject(i);
-                            AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
-                            if(!db.dimenExist(dimen.getId()))
-                                db.addDimension(dimen);
+                    if (jSONObject.has("dimenslist")) {
+                        JSONArray dimens = jSONObject.getJSONArray("dimenslist");
+                        if (dimens != null) {
+                            for (int i = 0; i < dimens.length(); i++) {
+                                JSONObject obj = dimens.getJSONObject(i);
+                                AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
+                                if (!db.dimenExist(dimen.getId()))
+                                    db.addDimension(dimen);
+                            }
                         }
                     }
 

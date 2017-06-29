@@ -40,6 +40,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         View rowView = inflater.inflate(R.layout.jobs_list_item, parent, false);
         ConceptBooking job = jobsList.get(position);
 
+        TextView orderNoLbl = (TextView) rowView.findViewById(R.id.list_item_order_no_label);
         TextView suburb = (TextView) rowView.findViewById(R.id.list_item_suburb);
         TextView orderNo = (TextView) rowView.findViewById(R.id.list_item_order_no);
         TextView orderNoType = (TextView) rowView.findViewById(R.id.list_item_order_no_type);
@@ -56,6 +57,7 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
         TextView jobTypeMain = (TextView) rowView.findViewById(R.id.list_item_job_type_label);
 
         if (isConcept) {
+            orderNo.setText(job.getOrderno());
             if (job.getConceptBookingStatus() == 7 || job.getConceptBookingStatus() == 8) {
                 rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
             } else if (job.getConceptBookingStatus() == 2 || job.getConceptBookingStatus() == 9) {
@@ -68,6 +70,9 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             pallets.setText(String.valueOf(job.getPallets()));
             parcels.setText(String.valueOf(job.getParcels()));
         } else {
+            orderNoLbl.setText("Job No:");
+            orderNo.setText(job.getJobno());
+
             if (job.getConceptBookingStatus() == 7) {
                 jobTypeMain.setText("Pick up Job");
                 rowView.setBackgroundColor(context.getResources().getColor(R.color.list_red));
@@ -146,7 +151,6 @@ public class ListArrayAdapter extends ArrayAdapter<ConceptBooking> {
             type.setText(typeString);
         }
 
-        orderNo.setText(job.getOrderno());
         if (job.getConceptBookingTailLift() == 1) {
             orderNoType.setText("[TL]");
             if (job.getConceptBookingHandUnload() == 1) {

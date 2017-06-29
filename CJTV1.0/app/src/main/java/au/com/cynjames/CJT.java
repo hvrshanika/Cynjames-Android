@@ -19,6 +19,7 @@ public class CJT extends Application {
     public boolean wasInBackground;
     private final long MAX_ACTIVITY_TRANSITION_TIME_MS = 3000;
     public Location lastLocation;
+    public boolean logoutTimer;
 
     @Override
     public void onCreate() {

@@ -6,7 +6,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,6 +40,8 @@ import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.SQLiteHelper;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
+
 public class LoginActivity extends AppCompatActivity {
     Gson gson;
     Spinner vehicleList;
@@ -55,8 +61,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         context = this;
 
+//        Intent pmIntent = new Intent();
+//        String packageName = getPackageName();
+//        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+//                pmIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+//                pmIntent.setData(Uri.parse("package:" + packageName));
+//                startActivity(pmIntent);
+//            }
+//        }
+
         //Check user avail and Move to Main
-        SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        SharedPreferences mPrefs = getApplicationContext().getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         String jsonUser = mPrefs.getString("User", "");
         String jsonVehicle = mPrefs.getString("Vehicle", "");
         if(!(jsonUser.equals("") || jsonUser == null || jsonVehicle.equals("") || jsonVehicle == null)){

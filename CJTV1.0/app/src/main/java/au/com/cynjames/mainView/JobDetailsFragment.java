@@ -59,6 +59,8 @@ import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
 
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
+
 public class JobDetailsFragment extends DialogFragment implements JobsDetailsFragmentListener {
     static final int REQUEST_TAKE_PHOTO = 1;
     ConceptBooking job;
@@ -97,7 +99,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         super.onCreate(savedInstanceState);
         db = new SQLiteHelper(context);
         images = new ArrayList<>();
-        SharedPreferences mPrefs = context.getSharedPreferences("AppData", 0);
+        SharedPreferences mPrefs = context.getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         Gson gson = new Gson();
         String jsonUser = mPrefs.getString("User", "");
         int id = gson.fromJson(jsonUser, Integer.TYPE);
@@ -166,35 +168,14 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     }
 
     private void setLabels(View viewRef) {
+        TextView jobNo = (TextView) viewRef.findViewById(R.id.list_item_job_no);
+        TextView jobNoLbl = (TextView) viewRef.findViewById(R.id.list_item_job_no_label);
         TextView btnBack = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_back_button);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnBackClicked();
-            }
-        });
         ImageView btnCamera = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_camera_button);
-        btnCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraBtnClicked();
-            }
-        });
         ImageView btnDirections = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_directions_button);
-        btnDirections.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openGMapsWithPosition();
-            }
-        });
         TextView btnViewImages = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_images_view_button);
-        btnViewImages.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewImagesBtnClicked();
-            }
-        });
         TextView suburb = (TextView) viewRef.findViewById(R.id.list_item_suburb);
+        TextView suburbLbl = (TextView) viewRef.findViewById(R.id.list_item_suburb_label);
         TextView orderNo = (TextView) viewRef.findViewById(R.id.list_item_order_no);
         TextView orderNoTypeTL = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_tl);
         TextView orderNoTypeHU = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_hu);
@@ -208,6 +189,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
         TextView parcelsLbl = (TextView) viewRef.findViewById(R.id.list_item_parcels_label);
         TextView address = (TextView) viewRef.findViewById(R.id.list_item_address);
+        TextView addressLbl = (TextView) viewRef.findViewById(R.id.list_item_address_label);
         TextView notes = (TextView) viewRef.findViewById(R.id.list_item_notes);
         eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
         TextView etaLbl = (TextView) viewRef.findViewById(R.id.list_item_eta_label);
@@ -222,27 +204,51 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
         TextView vehicleLbl = (TextView) viewRef.findViewById(R.id.list_item_vehicle_label);
         TextView vehicle = (TextView) viewRef.findViewById(R.id.list_item_vehicle);
+        TextView btnDepart = (TextView) viewRef.findViewById(R.id.fragment_jobs_details_header_depart_button);
+        TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnBackClicked();
+            }
+        });
+        btnCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraBtnClicked();
+            }
+        });
+        btnDirections.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGMapsWithPosition();
+            }
+        });
+        btnViewImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewImagesBtnClicked();
+            }
+        });
         btnProcess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BtnProcessClicked();
             }
         });
-        TextView btnDepart = (TextView) viewRef.findViewById(R.id.fragment_jobs_details_header_depart_button);
         btnDepart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnDepartClicked();
             }
         });
-        btnDepart.setVisibility(View.GONE);
 
+        btnDepart.setVisibility(View.GONE);
         eta.setVisibility(View.VISIBLE);
         distance.setVisibility(View.VISIBLE);
         etaLbl.setVisibility(View.VISIBLE);
         distanceLbl.setVisibility(View.VISIBLE);
-
-        TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
 
         if (isConcept) {
             suburb.setText(job.getConceptBookingDeliverySuburb());
@@ -255,9 +261,13 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             pallets.setText(String.valueOf(job.getNo_pallets()));
             parcels.setText(String.valueOf(job.getNo_parcels()));
 
-            customerName.setVisibility(View.VISIBLE);
-            customerNameLbl.setVisibility(View.VISIBLE);
+            customerName.setVisibility(View.GONE);
+            customerNameLbl.setVisibility(View.GONE);
             customerName.setText(job.getConceptClientsName());
+
+            jobNoLbl.setVisibility(View.VISIBLE);
+            jobNo.setVisibility(View.VISIBLE);
+            jobNo.setText(job.getJobno());
 
             int totQty = 0;
             String vehicleVal = "";
@@ -306,6 +316,9 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             clientNameLbl.setText("Pickup \nClient Name:");
             suburb.setText(job.getConceptBookingPickupSuburb());
             address.setText(job.getConceptBookingPickupAddress());
+
+            suburbLbl.setText("Pickup \nSuburb:");
+            addressLbl.setText("Pickup \nAddress:");
 
             deliveryClientName.setVisibility(View.VISIBLE);
             deliveryClientNameLbl.setVisibility(View.VISIBLE);

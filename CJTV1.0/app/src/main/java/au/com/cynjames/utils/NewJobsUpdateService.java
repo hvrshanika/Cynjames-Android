@@ -32,6 +32,8 @@ import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles;
 
+import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
+
 public class NewJobsUpdateService extends Service {
 
     private int mInterval = 300000;
@@ -52,7 +54,7 @@ public class NewJobsUpdateService extends Service {
         gson = new Gson();
         db = new SQLiteHelper(this);
         mHandler = new Handler();
-        mPrefs = getApplicationContext().getSharedPreferences("AppData", 0);
+        mPrefs = getApplicationContext().getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         getUser();
         startRepeatingTask();
         icon = BitmapFactory.decodeResource(getResources(), R.mipmap.truck_icon_resized);
