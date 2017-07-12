@@ -1123,11 +1123,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int postJobsAssignedCheck = 0;
 
     private void checkJobsAssigned() {
-        List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7", true);
-        preJobsAssignedCheck = statusSevenJobs.size();
+        List<ConceptBooking> alljobs = db.getPendingJobs(true);
+        alljobs.addAll(db.getReadyJobs(true));
+        preJobsAssignedCheck = alljobs.size();
         postJobsAssignedCheck = 0;
 
-        for (ConceptBooking statusSevenJob : statusSevenJobs) {
+        for (ConceptBooking statusSevenJob : alljobs) {
 
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
@@ -1136,15 +1137,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
 
-        if(statusSevenJobs.size() == 0){
+        if(alljobs.size() == 0){
             checkAdhocJobsAssigned();
         }
     }
 
     private void checkAdhocJobsAssigned() {
-        List<ConceptBooking> statusSevenJobs = db.getPendingJobsWithStatus("7", false);
+        List<ConceptBooking> alljobs = db.getPendingJobs(false);
+        alljobs.addAll(db.getReadyJobs(false));
 
-        for (ConceptBooking statusSevenJob : statusSevenJobs) {
+        for (ConceptBooking statusSevenJob : alljobs) {
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
@@ -1342,7 +1344,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
+                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6 || jSONObject.getInt("concept_status") == 10) {
                     db.clearConcept(id, isConcept);
                 }
                 postJobsAssignedCheck++;
