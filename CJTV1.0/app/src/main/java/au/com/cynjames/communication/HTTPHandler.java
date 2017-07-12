@@ -37,7 +37,7 @@ import cz.msebera.android.httpclient.util.EntityUtils;
 
 public class HTTPHandler {
 
-    private static final String BASE_URL = "http://cynjamestransport.com/webservice-one/";
+    private static final String BASE_URL = "http://cynjames-stage.trotic.com/webservice-one/";
 
     private static AsyncHttpClient httpClient;
 

@@ -1135,6 +1135,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             isConcept = true;
             HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
+
+        if(statusSevenJobs.size() == 0){
+            checkAdhocJobsAssigned();
+        }
     }
 
     private void checkAdhocJobsAssigned() {
