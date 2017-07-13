@@ -240,8 +240,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
                         getSupportActionBar().setSelectedNavigationItem(position);
                     }
                 });
@@ -256,7 +254,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         actionBar.setTitle("   Hi " + user.getUserFirstName() + "!");
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 viewPager.setCurrentItem(tab.getPosition());
@@ -476,8 +473,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         pendingCount = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_COUNT);
         deliverReadyCount = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_DELIVERY_COUNT);
-//        adhocPendingCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_COUNT);
-//        adhocDeliverReadyCount = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_COUNT);
         adhocJobsListView = (ListView) adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_LISTVIEW);
         adhocNoJobsVIew = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_NOJOBSVIEW);
 
@@ -486,8 +481,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         pendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
         deliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
-//        adhocPendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
-//        adhocDeliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
 
         adhocAdapter = new ListArrayAdapter(this, sortedAllAdhocJobsList, false);
         adhocJobsListView.setAdapter(adhocAdapter);
@@ -510,24 +503,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 deliveryJobsViewBtnClicked();
             }
         });
-
-//        TextView adhocPendingJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_VIEW);
-//        adhocPendingJobsViewBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                isConcept = false;
-//                pendingJobsViewBtnClicked();
-//            }
-//        });
-//        TextView adhocDeliveryJobsViewBtn = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_DELIVERY_VIEW);
-//        adhocDeliveryJobsViewBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                isConcept = false;
-//                deliveryJobsViewBtnClicked();
-//            }
-//        });
-
     }
 
     private void checkDepartBtn() {
@@ -584,7 +559,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     initVariables();
                     logoutClicked = true;
                     if (myApp.logoutTimer) {
-//                        timer.cancel();
                         stopLogOutTimer();
                     }
                     if (mLastLocation != null) {
@@ -623,8 +597,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adhocDeliverReadyJobs = db.getReadyJobs(false);
         pendingCount.setText(String.valueOf(pendingJobs.size()));
         deliverReadyCount.setText(String.valueOf(deliverReadyJobs.size()));
-//        adhocPendingCount.setText(String.valueOf(adhocPendingJobs.size()));
-//        adhocDeliverReadyCount.setText(String.valueOf(adhocDeliverReadyJobs.size()));
 
         int conceptTotal = pendingJobs.size() + deliverReadyJobs.size();
         int adhocTotal = adhocPendingJobs.size() + adhocDeliverReadyJobs.size();
@@ -759,7 +731,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void stopLogOutTimer() {
 //        logOutHandler.removeCallbacks(logOutCallback);
-
         stopService(new Intent(MainActivity.this, LogoutService.class));
     }
 
@@ -1037,22 +1008,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private String getStringImage(Bitmap bmp) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
-    }
-
-    private String getStringPhoto(Bitmap bmp) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
-    }
-
     private void isUpdatefinished() {
         if (logoutClicked && prelogCount == postlogCount && preStatusCount == postStatusCount && prejobsCount == postjobsCount && preImagesCount == postImagesCount) {
             isUploading = false;
@@ -1275,6 +1230,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    private String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private String getStringPhoto(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
     @Override
     public void handleDialogClose() {
         resetDisconnectTimer();
@@ -1307,11 +1278,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (jSONObject.getInt("success") == 1) {
                 JSONArray objs = jSONObject.getJSONArray("joblist");
                 JSONArray dimens = null;
-                if (isConcept) {
-//                    db.clearTable("conceptBooking");
-                } else {
-//                    db.clearTable("adhocBooking");
-//                    db.clearTable("adhocDimensions");
+                if (!isConcept) {
                     if (jSONObject.has("dimenslist")) {
                         dimens = jSONObject.getJSONArray("dimenslist");
                     }
