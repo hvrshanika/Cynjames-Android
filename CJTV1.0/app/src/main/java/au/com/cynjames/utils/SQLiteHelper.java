@@ -193,7 +193,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void updateJob(ConceptBooking job, boolean isConcept){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-//        values.put("conceptBookingId", job.getId());
         values.put("conceptBookingOrderNo", job.getOrderno());
         values.put("conceptBookingBarcode", job.getBarcode());
         values.put("conceptBookingDeliverySuburb", job.getConceptBookingDeliverySuburb());
@@ -290,6 +289,65 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return exist;
     }
 
+    public ConceptBooking getJobForId(int id, boolean isConcept){
+        ConceptBooking job = null;
+
+        String table = "";
+        if(isConcept){
+            table = "conceptBooking";
+        }
+        else{
+            table = "adhocBooking";
+        }
+
+        String query = "SELECT * FROM " + table + " WHERE conceptBookingId =" + id +"";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                job = new ConceptBooking();
+                job.setId(Integer.parseInt(cursor.getString(0)));
+                job.setOrderno(cursor.getString(1));
+                job.setBarcode(cursor.getString(2));
+                job.setConceptBookingDeliverySuburb(cursor.getString(3));
+                job.setClient(cursor.getString(4));
+                job.setAddress(cursor.getString(5));
+                job.setSpecialNotes(cursor.getString(6));
+                job.setDate(cursor.getString(7));
+                job.setConceptBookingTimeFor(cursor.getString(8));
+                job.setPallets(Integer.parseInt(cursor.getString(9)));
+                job.setParcels(Integer.parseInt(cursor.getString(10)));
+                job.setConceptBookingStatus(Integer.parseInt(cursor.getString(11)));
+                job.setConceptBookingTailLift(Integer.parseInt(cursor.getString(12)));
+                job.setConceptBookingHandUnload(Integer.parseInt(cursor.getString(13)));
+                job.setConceptBookingUrgent(Integer.parseInt(cursor.getString(14)));
+                job.setConceptBookingPickupDate(cursor.getString(15));
+                job.setConceptPickupSignature(cursor.getString(16));
+                job.setConceptPickupName(cursor.getString(17));
+                job.setArrivedConcept(cursor.getString(18));
+                job.setConceptDeliveryDate(cursor.getString(19));
+                job.setArrivedClient((cursor.getString(20)));
+                job.setConceptDeliverySignature(cursor.getString(21));
+                job.setConceptDeliveryName(cursor.getString(22));
+                job.setDeliveryImages(cursor.getString(23));
+                job.setPickupImages(cursor.getString(24));
+
+                if(!isConcept){
+                    job.setConceptBookingPickupAddress(cursor.getString(25));
+                    job.setConceptBookingPickupSuburb(cursor.getString(26));
+                    job.setConceptClientsName(cursor.getString(27));
+                    job.setConceptBookingPickupClientName(cursor.getString(28));
+                    job.setCustomerType(cursor.getInt(29));
+                    job.setNo_pallets(cursor.getInt(30));
+                    job.setNo_parcels(cursor.getInt(31));
+                    job.setJobno(cursor.getString(32));
+                }
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return job;
+    }
+
     public List<ConceptBooking> getPendingJobs(boolean isConcept){
         List<ConceptBooking> jobs = new LinkedList<ConceptBooking>();
 
@@ -349,9 +407,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
                 jobs.add(job);
             } while (cursor.moveToNext());
-        }
-        for(ConceptBooking jobb: jobs) {
-            Log.d("getPendingJobs()", String.valueOf(jobb.getConceptBookingStatus()));
         }
         db.close();
         return jobs;
@@ -416,9 +471,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 jobs.add(job);
             } while (cursor.moveToNext());
         }
-        for(ConceptBooking jobb: jobs) {
-            Log.d("getPendingJobs()", String.valueOf(jobb.getConceptBookingStatus()));
-        }
         db.close();
         return jobs;
     }
@@ -480,9 +532,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
                 jobs.add(job);
             } while (cursor.moveToNext());
-        }
-        for(ConceptBooking jobb: jobs) {
-            Log.d("getReadyJobs()", String.valueOf(jobb.getConceptBookingStatus()));
         }
         db.close();
         return jobs;

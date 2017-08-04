@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     boolean notificationSent = false;
     boolean isUploading = false;
     boolean isRefreshing = false;
+    boolean isNewJobsLoading = false;
     String type = "";
     ViewPager viewPager = null;
     boolean isDepart = false;
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public void run() {
             if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
-                uploadDatatoServer();
+                checkJobsAssigned();
             }
         }
     };
@@ -319,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 if (GenericMethods.isConnectedToInternet(this)) {
-                    loadNewJobs();
+                    isNewJobsLoading = true;
+                    checkJobsAssigned();
                 } else {
                     GenericMethods.showNoInternetDialog(context);
                 }
@@ -412,7 +414,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             FirebaseCrash.log("MainActivity inBackground onResume");
             //stopNotificationService();
             if (GenericMethods.isConnectedToInternet(context)) {
-                loadNewJobs();
+                isNewJobsLoading = true;
+                checkJobsAssigned();
             }
         }
         myApp.stopActivityTransitionTimer();
@@ -448,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (myApp.wasInBackground) {
                     FirebaseCrash.log("MainActivity inBackground ONSTOP");
                     if (GenericMethods.isConnectedToInternet(context)) {
-                        uploadDatatoServer();
+                        checkJobsAssigned();
                     }
                     //startNotificationService();
                 } else {
@@ -567,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (GenericMethods.isConnectedToInternet(context)) {
                         logoutProgress = GenericMethods.getProgressDialog(context, "Please wait");
                         logoutProgress.show();
-                        uploadDatatoServer();
+                        checkJobsAssigned();
                     }
                 }
             });
@@ -1094,7 +1097,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
 
-        if(alljobs.size() == 0){
+        if (alljobs.size() == 0) {
             checkAdhocJobsAssigned();
         }
     }
@@ -1109,16 +1112,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
-            isConcept  = false;
+            isConcept = false;
             HTTPHandler.post("cjt-adhoc-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
         }
 
-        if(alljobs.size() == 0){
-            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
-            String d = formatter.format(new Date());
-            GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
-            isUploading = false;
-            isRefreshing = false;
+        if (alljobs.size() == 0) {
+            if(isNewJobsLoading)
+                loadNewJobs();
+            else
+                uploadDatatoServer();
         }
     }
 
@@ -1323,25 +1325,48 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6 || jSONObject.getInt("concept_status") == 10) {
+                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
                     db.clearConcept(id, isConcept);
                 }
-                if(isConcept)
+                else if(jSONObject.getInt("concept_status") == 10){
+                    db.clearConcept(id, isConcept);
+                }
+                else if(jSONObject.getInt("concept_status") == 8){
+                    ConceptBooking job = db.getJobForId(id,isConcept);
+                    if(job != null){
+                        if(job.getConceptBookingStatus() == 2){
+                            job.setConceptBookingStatus(8);
+                            db.updateJob(job,isConcept);
+                        }
+                    }
+                }
+                if (isConcept)
                     postJobsAssignedCheck++;
                 else
                     postAdhocJobsAssignedCheck++;
 
+                List<ConceptBooking> statusNineJobs = db.getPendingJobsWithStatus("9", isConcept);
+                if(statusNineJobs.size() == 0) {
+                    user.setUserArriveClient(null);
+                    db.updateUser(user);
+                }
+
+                List<ConceptBooking> statusTwoJobs = db.getPendingJobsWithStatus("2", isConcept);
+                if(statusTwoJobs.size() == 0) {
+                    user.setUserArriveConcept(null);
+                    db.updateUser(user);
+                }
+
+                updateLabels();
                 if (isConcept && preJobsAssignedCheck == postJobsAssignedCheck) {
                     checkAdhocJobsAssigned();
+                } else if (!isConcept && preAdhocJobsAssignedCheck == postAdhocJobsAssignedCheck) {
+                    if(isNewJobsLoading)
+                        loadNewJobs();
+                    else
+                        uploadDatatoServer();
                 }
-                else if (!isConcept && preAdhocJobsAssignedCheck == postAdhocJobsAssignedCheck) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
-                    String d = formatter.format(new Date());
-                    GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
-                    isUploading = false;
-                    isRefreshing = false;
-                }
-                updateLabels();
+
             }
         }
     }
@@ -1451,16 +1476,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     conceptNewJobsCount = 0;
 
-                    if (GenericMethods.isConnectedToInternet(context)) {
-                        checkJobsAssigned();
-                    }
-                    else {
-                        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
-                        String d = formatter.format(new Date());
-                        GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
-                        isUploading = false;
-                        isRefreshing = false;
-                    }
+                    SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
+                    String d = formatter.format(new Date());
+                    GenericMethods.showToast(MainActivity.this, "Last Updated at " + d);
+                    isUploading = false;
+                    isRefreshing = false;
+                    isNewJobsLoading = false;
                 }
             }
         }
