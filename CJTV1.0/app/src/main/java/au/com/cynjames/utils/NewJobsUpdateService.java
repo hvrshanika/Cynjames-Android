@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.mainView.MainActivity;

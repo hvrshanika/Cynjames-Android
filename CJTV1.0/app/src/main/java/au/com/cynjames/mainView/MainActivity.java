@@ -70,13 +70,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import au.com.cynjames.CJT;
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.DriverStatus;
+import au.com.cynjames.models.ParcelPalletLabel;
 import au.com.cynjames.models.User;
 import au.com.cynjames.models.Vehicles.Vehicle;
 import au.com.cynjames.utils.GenericMethods;
@@ -144,6 +145,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int currentSelected = 0;
     ProgressDialog logoutProgress;
 
+    private BroadcastReceiver mRefreshReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateLabels();
+        }
+    };
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -159,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
     };
+
     private BroadcastReceiver mLogoutCallBack = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -167,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             logoutUser();
         }
     };
+
     private Handler interactionHandler = new Handler() {
         public void handleMessage(Message msg) {
         }
@@ -177,18 +187,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (GenericMethods.isConnectedToInternet(MainActivity.this)) {
                 checkJobsAssigned();
             }
-        }
-    };
-    private Handler logOutHandler = new Handler() {
-        public void handleMessage(Message msg) {
-        }
-    };
-    private Runnable logOutCallback = new Runnable() {
-        @Override
-        public void run() {
-            sendNotification();
-            notificationSent = true;
-            logoutUser();
         }
     };
 
@@ -227,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         startLocationService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRefreshReceiver, new IntentFilter("RefreshUI"));
         LocalBroadcastManager.getInstance(this).registerReceiver(mLogoutCallBack, new IntentFilter("LogoutCall"));
         setTimer();
         uploadFirebaseToken();
@@ -533,16 +532,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
-        isConcept = true;
-        HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new PendingListLoader(), context, "Updating..."));
+        HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new PendingListLoader(true), context, "Updating..."));
     }
 
     private void loadAdhocData() {
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
-        isConcept = false;
-        HTTPHandler.post("cjt-adhoc-pending-jobs.php", params, new HTTPHandler.ResponseManager(new PendingListLoader(), context, "Updating..."));
+        HTTPHandler.post("cjt-adhoc-pending-jobs.php", params, new HTTPHandler.ResponseManager(new PendingListLoader(false), context, "Updating..."));
     }
 
     public void logoutUser() {
@@ -726,14 +723,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void resetLogOutTimer() {
-//        logOutHandler.removeCallbacks(logOutCallback);
-//        logOutHandler.postDelayed(logOutCallback, 30*60000);
         stopService(new Intent(MainActivity.this, LogoutService.class));
         startService(new Intent(MainActivity.this, LogoutService.class));
     }
 
     public void stopLogOutTimer() {
-//        logOutHandler.removeCallbacks(logOutCallback);
         stopService(new Intent(MainActivity.this, LogoutService.class));
     }
 
@@ -746,20 +740,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void setTimer() {
-//        timer = new Timer();
-//        TimerTask task = new TimerTask() {
-//            public void run() {
-//                logoutTimer = true;
-//                resetLogOutTimer();
-//            }
-//        };
-//        Calendar date = Calendar.getInstance();
-//        date.set(Calendar.HOUR, 9);
-//        date.set(Calendar.MINUTE, 30);
-//        date.set(Calendar.SECOND, 0);
-//        date.set(Calendar.MILLISECOND, 0);
-//        date.set(Calendar.AM_PM, Calendar.AM);
-//        timer.schedule(task, date.getTime());//, 1000 * 60 * 60 * 24);
         startService(new Intent(MainActivity.this, LogoutService.class));
     }
 
@@ -857,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     arr10 = adhocJobsStausTen;
                     arr2 = adhocJobsStausTwo;
                     arr9 = adhocJobsStausNine;
-                    concept = true;
+                    concept = false;
                     phpFile8 = "cjt-adhoc-update-jobs-status-8.php";
                     phpFile10 = "cjt-adhoc-update-jobs-status-10.php";
                     phpFile810 = "cjt-adhoc-update-jobs-status-8-10.php";
@@ -871,6 +851,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
                     params.add("conceptBookingPallets", String.valueOf(jobStatusEight.getPallets()));
                     params.add("conceptBookingParcels", String.valueOf(jobStatusEight.getParcels()));
+
+                    if(jobStatusEight.getReason() != null && !jobStatusEight.getReason().equals(""))
+                        params.add("reason", jobStatusEight.getReason());
+
                     if (jobStatusEight.getConceptPickupSignature().contains("uploads")) {
                         params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
                         params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());
@@ -893,6 +877,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
                                 HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
                             }
+                            params.add("pickupImages", jobStatusEight.getPickupImages());
                             HTTPHandler.post(phpFile8, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId(), concept), context, "Updating..."));
                             uploadPhotos(jobStatusEight.getPickupImages());
                             jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
@@ -914,6 +899,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
                     params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
 
+                    if(jobStausTen.getReason() != null && !jobStausTen.getReason().equals(""))
+                        params.add("reason", jobStausTen.getReason());
+
                     if (jobStausTen.getConceptDeliverySignature() != null) {
                         Bitmap bitmap = null;
                         try {
@@ -929,6 +917,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
                             HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
                         }
+                        params.add("deliveryImages", jobStausTen.getDeliveryImages());
                         uploadPhotos(jobStausTen.getDeliveryImages());
                     }
                     prejobsCount++;
@@ -954,6 +943,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 paramsImg.add("name", jobStausTen.getConceptPickupSignature());
                                 HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
                             }
+                            params.add("pickupImages", jobStausTen.getPickupImages());
                             HTTPHandler.post(phpFile810, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId(), concept), context, "Updating..."));
                             uploadPhotos(jobStausTen.getPickupImages());
                         }
@@ -967,6 +957,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     RequestParams params = new RequestParams();
                     params.add("id", String.valueOf(jobStausYwo.getId()));
                     params.add("conceptBookingStatus", String.valueOf(jobStausYwo.getConceptBookingStatus()));
+
+                    if(jobStausYwo.getReason() != null && !jobStausYwo.getReason().equals(""))
+                        params.add("reason", jobStausYwo.getReason());
+
                     HTTPHandler.post(phpFile29, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausYwo.getId(), concept), context, "Updating..."));
                 }
                 for (ConceptBooking jobStausNine : arr9) {
@@ -974,6 +968,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     RequestParams params = new RequestParams();
                     params.add("id", String.valueOf(jobStausNine.getId()));
                     params.add("conceptBookingStatus", String.valueOf(jobStausNine.getConceptBookingStatus()));
+
+                    if(jobStausNine.getReason() != null && !jobStausNine.getReason().equals(""))
+                        params.add("reason", jobStausNine.getReason());
+
                     HTTPHandler.post(phpFile29, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId(), concept), context, "Updating..."));
                     if (jobStausNine.getConceptPickupSignature() != null) {
                         if (!(jobStausNine.getConceptPickupSignature().contains("uploads"))) {
@@ -998,6 +996,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausNine.getConceptPickupSignature()), context, "Uploading Image..."));
                             }
                             prejobsCount++;
+                            params.add("pickupImages", jobStausNine.getPickupImages());
                             HTTPHandler.post(phpFile8, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId(), concept), context, "Updating..."));
                             uploadPhotos(jobStausNine.getPickupImages());
                             jobStausNine.setConceptPickupSignature("uploads/" + jobStausNine.getConceptPickupSignature());
@@ -1017,6 +1016,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             db.clearTable("conceptBooking");
             db.clearTable("adhocBooking");
             db.clearTable("adhocDimensions");
+            db.clearTable("parcelPalletLabel");
             prefsEditor.clear();
             prefsEditor.commit();
 
@@ -1038,8 +1038,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             String userId = String.valueOf(user.getUserid());
             RequestParams params = new RequestParams();
             params.add("userid", userId);
-            isConcept = true;
-            HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(), context, "Updating..."));
+            HTTPHandler.post("cjt-concept-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(true), context, "Updating..."));
         }
     }
 
@@ -1047,8 +1046,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String userId = String.valueOf(user.getUserid());
         RequestParams params = new RequestParams();
         params.add("userid", userId);
-        isConcept = false;
-        HTTPHandler.post("cjt-adhoc-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(), context, "Updating..."));
+        HTTPHandler.post("cjt-adhoc-pending-jobs.php", params, new HTTPHandler.ResponseManager(new NewJobsLoader(false), context, "Updating..."));
     }
 
     private void uploadPhotos(String imageString) {
@@ -1093,8 +1091,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
-            isConcept = true;
-            HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
+            HTTPHandler.post("cjt-concept-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId(), true), context, "Updating..."));
         }
 
         if (alljobs.size() == 0) {
@@ -1112,8 +1109,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             RequestParams params = new RequestParams();
             params.add("userid", String.valueOf(user.getUserid()));
             params.add("bookingId", String.valueOf(statusSevenJob.getId()));
-            isConcept = false;
-            HTTPHandler.post("cjt-adhoc-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId()), context, "Updating..."));
+            HTTPHandler.post("cjt-adhoc-check-assigned.php", params, new HTTPHandler.ResponseManager(new AssignedJobsChecker(statusSevenJob.getId(), false), context, "Updating..."));
         }
 
         if (alljobs.size() == 0) {
@@ -1274,22 +1270,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public class PendingListLoader implements ResponseListener {
+        boolean concept;
+
+        public PendingListLoader(boolean concept) {
+            this.concept = concept;
+        }
+
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 JSONArray objs = jSONObject.getJSONArray("joblist");
                 JSONArray dimens = null;
-                if (!isConcept) {
+                JSONArray labels = null;
+                if (!concept) {
                     if (jSONObject.has("dimenslist")) {
                         dimens = jSONObject.getJSONArray("dimenslist");
                     }
+
+                    if (jSONObject.has("labelslist")) {
+                        labels = jSONObject.getJSONArray("labelslist");
+                    }
                 }
+
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
-                    if (!db.jobExist(job.getId(), isConcept)) {
-                        db.addJob(job, isConcept);
+                    if (!db.jobExist(job.getId(), concept)) {
+                        db.addJob(job, concept);
                     }
                 }
                 if (dimens != null) {
@@ -1301,8 +1309,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         }
                     }
                 }
+                if (labels != null) {
+                    for (int i = 0; i < labels.length(); i++) {
+                        JSONObject obj = labels.getJSONObject(i);
+                        ParcelPalletLabel label = gson.fromJson(obj.toString(), ParcelPalletLabel.class);
+                        if (!db.labelExist(label.getLabelId()))
+                            db.addLabel(label);
+                    }
+                }
+
                 updateLabels();
-                if (isConcept) {
+                if (concept) {
                     loadAdhocData();
                 } else {
                     if (pendingJobs.size() > 0 || adhocPendingJobs.size() > 0) {
@@ -1316,51 +1333,53 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public class AssignedJobsChecker implements ResponseListener {
         int id;
+        boolean concept;
 
-        public AssignedJobsChecker(int id) {
+        public AssignedJobsChecker(int id, boolean concept) {
             this.id = id;
+            this.concept = concept;
         }
 
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                if (jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
-                    db.clearConcept(id, isConcept);
+                if (jSONObject.getInt("concept_status") == 1 ||jSONObject.getInt("concept_status") == -1 || jSONObject.getInt("concept_status") == 6) {
+                    db.clearConcept(id, concept);
                 }
                 else if(jSONObject.getInt("concept_status") == 10){
-                    db.clearConcept(id, isConcept);
+                    db.clearConcept(id, concept);
                 }
                 else if(jSONObject.getInt("concept_status") == 8){
-                    ConceptBooking job = db.getJobForId(id,isConcept);
+                    ConceptBooking job = db.getJobForId(id,concept);
                     if(job != null){
                         if(job.getConceptBookingStatus() == 2){
                             job.setConceptBookingStatus(8);
-                            db.updateJob(job,isConcept);
+                            db.updateJob(job,concept);
                         }
                     }
                 }
-                if (isConcept)
+                if (concept)
                     postJobsAssignedCheck++;
                 else
                     postAdhocJobsAssignedCheck++;
 
-                List<ConceptBooking> statusNineJobs = db.getPendingJobsWithStatus("9", isConcept);
+                List<ConceptBooking> statusNineJobs = db.getPendingJobsWithStatus("9", concept);
                 if(statusNineJobs.size() == 0) {
                     user.setUserArriveClient(null);
                     db.updateUser(user);
                 }
 
-                List<ConceptBooking> statusTwoJobs = db.getPendingJobsWithStatus("2", isConcept);
+                List<ConceptBooking> statusTwoJobs = db.getPendingJobsWithStatus("2", concept);
                 if(statusTwoJobs.size() == 0) {
                     user.setUserArriveConcept(null);
                     db.updateUser(user);
                 }
 
                 updateLabels();
-                if (isConcept && preJobsAssignedCheck == postJobsAssignedCheck) {
+                if (concept && preJobsAssignedCheck == postJobsAssignedCheck) {
                     checkAdhocJobsAssigned();
-                } else if (!isConcept && preAdhocJobsAssignedCheck == postAdhocJobsAssignedCheck) {
+                } else if (!concept && preAdhocJobsAssignedCheck == postAdhocJobsAssignedCheck) {
                     if(isNewJobsLoading)
                         loadNewJobs();
                     else
@@ -1438,6 +1457,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public class NewJobsLoader implements ResponseListener {
+        boolean concept;
+
+        public NewJobsLoader(boolean concept) {
+            this.concept = concept;
+        }
         @Override
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
@@ -1447,14 +1471,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for (int i = 0; i < objs.length(); i++) {
                     JSONObject obj = objs.getJSONObject(i);
                     ConceptBooking job = gson.fromJson(obj.toString(), ConceptBooking.class);
-                    if (!db.jobExist(job.getId(), isConcept)) {
-                        db.addJob(job, isConcept);
+                    if (!db.jobExist(job.getId(), concept)) {
+                        db.addJob(job, concept);
                         newJobs.add(job);
                     }
 
                 }
                 updateLabels();
-                if (isConcept) {
+                if (concept) {
                     conceptNewJobsCount = newJobs.size();
                     loadNewAdhocJobs();
                 } else {
@@ -1466,6 +1490,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
                                 if (!db.dimenExist(dimen.getId()))
                                     db.addDimension(dimen);
+                            }
+                        }
+                    }
+
+                    if (jSONObject.has("labelslist")) {
+                        JSONArray labels = jSONObject.getJSONArray("labelslist");
+                        if (labels != null) {
+                            for (int i = 0; i < labels.length(); i++) {
+                                JSONObject obj = labels.getJSONObject(i);
+                                ParcelPalletLabel label = gson.fromJson(obj.toString(), ParcelPalletLabel.class);
+                                if (!db.labelExist(label.getLabelId()))
+                                    db.addLabel(label);
                             }
                         }
                     }

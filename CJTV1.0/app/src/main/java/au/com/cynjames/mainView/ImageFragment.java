@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.utils.GenericMethods;
 
 

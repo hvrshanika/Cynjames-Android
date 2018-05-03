@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import au.com.cynjames.CJT;
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.User;

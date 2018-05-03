@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 import au.com.cynjames.CJT;
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.ConceptBooking;
@@ -526,7 +526,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 arr10 = adhocJobsStausTen;
                 arr2 = adhocJobsStausTwo;
                 arr9 = adhocJobsStausNine;
-                concept = true;
+                concept = false;
                 phpFile8 = "cjt-adhoc-update-jobs-status-8.php";
                 phpFile10 = "cjt-adhoc-update-jobs-status-10.php";
                 phpFile810 = "cjt-adhoc-update-jobs-status-8-10.php";
@@ -540,6 +540,10 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 params.add("conceptPickupName", jobStatusEight.getConceptPickupName());
                 params.add("conceptBookingPallets", String.valueOf(jobStatusEight.getPallets()));
                 params.add("conceptBookingParcels", String.valueOf(jobStatusEight.getParcels()));
+
+                if(jobStatusEight.getReason() != null && !jobStatusEight.getReason().equals(""))
+                    params.add("reason", jobStatusEight.getReason());
+
                 if (jobStatusEight.getConceptPickupSignature().contains("uploads")) {
                     params.add("conceptPickupSignature", jobStatusEight.getConceptPickupSignature());
                     params.add("conceptBookingPickupDate", jobStatusEight.getConceptBookingPickupDate());
@@ -560,6 +564,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                             paramsImg.add("name", jobStatusEight.getConceptPickupSignature());
                             HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStatusEight.getConceptPickupSignature()), context, "Uploading Image..."));
                         }
+                        params.add("pickupImages", jobStatusEight.getPickupImages());
                         HTTPHandler.post(phpFile8, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStatusEight.getId(), concept), context, "Updating..."));
                         uploadPhotos(jobStatusEight.getPickupImages());
                         jobStatusEight.setConceptPickupSignature("uploads/" + jobStatusEight.getConceptPickupSignature());
@@ -580,6 +585,9 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 params.add("conceptBookingTailLift", String.valueOf(jobStausTen.getConceptBookingTailLift()));
                 params.add("conceptBookingHandUnload", String.valueOf(jobStausTen.getConceptBookingHandUnload()));
 
+                if(jobStausTen.getReason() != null && !jobStausTen.getReason().equals(""))
+                    params.add("reason", jobStausTen.getReason());
+
                 if (jobStausTen.getConceptDeliverySignature() != null) {
                     Bitmap bitmap = null;
                     try {
@@ -594,6 +602,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                         paramsImg.add("name", jobStausTen.getConceptDeliverySignature());
                         HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptDeliverySignature()), context, "Uploading Image..."));
                     }
+                    params.add("deliveryImages", jobStausTen.getDeliveryImages());
                     uploadPhotos(jobStausTen.getDeliveryImages());
                 }
                 if (jobStausTen.getConceptPickupSignature() != null) {
@@ -617,6 +626,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                             paramsImg.add("name", jobStausTen.getConceptPickupSignature());
                             HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausTen.getConceptPickupSignature()), context, "Uploading Image..."));
                         }
+                        params.add("pickupImages", jobStausTen.getPickupImages());
                         HTTPHandler.post(phpFile810, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausTen.getId(), concept), context, "Updating..."));
                         uploadPhotos(jobStausTen.getPickupImages());
                     }
@@ -629,12 +639,20 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                 RequestParams params = new RequestParams();
                 params.add("id", String.valueOf(jobStausYwo.getId()));
                 params.add("conceptBookingStatus", String.valueOf(jobStausYwo.getConceptBookingStatus()));
+
+                if(jobStausYwo.getReason() != null && !jobStausYwo.getReason().equals(""))
+                    params.add("reason", jobStausYwo.getReason());
+
                 HTTPHandler.post(phpFile29, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausYwo.getId(), concept), context, "Updating..."));
             }
             for (ConceptBooking jobStausNine : arr9) {
                 RequestParams params = new RequestParams();
                 params.add("id", String.valueOf(jobStausNine.getId()));
                 params.add("conceptBookingStatus", String.valueOf(jobStausNine.getConceptBookingStatus()));
+
+                if(jobStausNine.getReason() != null && !jobStausNine.getReason().equals(""))
+                    params.add("reason", jobStausNine.getReason());
+
                 HTTPHandler.post(phpFile29, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId(), concept), context, "Updating..."));
                 if (jobStausNine.getConceptPickupSignature() != null) {
                     if (!(jobStausNine.getConceptPickupSignature().contains("uploads"))) {
@@ -657,6 +675,7 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
                             paramsImg.add("name", jobStausNine.getConceptPickupSignature());
                             HTTPHandler.post("cjt-upload-image.php", paramsImg, new HTTPHandler.ResponseManager(new ImageUploader(jobStausNine.getConceptPickupSignature()), context, "Uploading Image..."));
                         }
+                        params.add("pickupImages", jobStausNine.getPickupImages());
                         HTTPHandler.post(phpFile8, params, new HTTPHandler.ResponseManager(new ConceptUploader(jobStausNine.getId(), concept), context, "Updating..."));
                         uploadPhotos(jobStausNine.getPickupImages());
                         jobStausNine.setConceptPickupSignature("uploads/" + jobStausNine.getConceptPickupSignature());

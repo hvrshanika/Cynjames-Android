@@ -16,6 +16,7 @@ import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ConceptBookingLog;
 import au.com.cynjames.models.DriverStatus;
+import au.com.cynjames.models.ParcelPalletLabel;
 import au.com.cynjames.models.User;
 
 /**
@@ -23,7 +24,7 @@ import au.com.cynjames.models.User;
  */
 public class SQLiteHelper extends SQLiteOpenHelper {
     // Database Version
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 20;
     // Database Name
     private static final String DATABASE_NAME = "CJTdb";
     String[] USERCOLUMNS = {"userid","userFirstName","userLastName","userRole","driverId","userArriveConcept","userArriveClient"};
@@ -40,9 +41,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String createJobsTable = "CREATE TABLE conceptBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT)";
         String createDriverStatusTable = "CREATE TABLE driverStatus (id INTEGER PRIMARY KEY AUTOINCREMENT, driverStatusDate TEXT, driverStatusTime TEXT, driverStatusDescription TEXT, driverStatusLongitude DOUBLE, driverStatusLatitude DOUBLE, driverStatus_driverId INTEGER, driverStatus_vehicleId TEXT)";
         String createconceptBookingLogTable = "CREATE TABLE conceptBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
-        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT, conceptClientsName TEXT, conceptBookingPickupClientName TEXT, customerType INTEGER, no_pallets INTEGER, no_parcels INTEGER, concept_job_number TEXT)";
+        String createAdhocJobsTable = "CREATE TABLE adhocBooking (conceptBookingId INTEGER PRIMARY KEY NOT NULL, conceptBookingOrderNo TEXT, conceptBookingBarcode TEXT, conceptBookingDeliverySuburb TEXT, conceptBookingClientName TEXT, conceptBookingDeliveryAddress TEXT, specialNotes TEXT, conceptBookingTime TEXT, conceptBookingTimeFor TEXT, conceptBookingPallets INTEGER, conceptBookingParcels INTEGER, conceptBookingStatus INTEGER, conceptBookingTailLift INTEGER, conceptBookingHandUnload INTEGER, conceptBookingUrgent INTEGER, conceptBookingPickupDate TEXT,conceptPickupSignature TEXT, conceptPickupName TEXT, arrivedConcept TEXT, conceptDeliveryDate TEXT,arrivedClient TEXT, conceptDeliverySignature TEXT, conceptDeliveryName TEXT, deliveryImages TEXT, pickupImages TEXT, conceptBookingPickupAddress TEXT, conceptBookingPickupSuburb TEXT, conceptClientsName TEXT, conceptBookingPickupClientName TEXT, customerType INTEGER, no_pallets INTEGER, no_parcels INTEGER, concept_job_number TEXT, not_scan_reason TEXT, is_picture_upload INTEGER)";
         String createAdhocBookingLogTable = "CREATE TABLE adhocBookingLog (id INTEGER PRIMARY KEY AUTOINCREMENT, conceptBookingLog_bookingId INTEGER, conceptBookingLogOrderNo TEXT, conceptBookingLogBarcode TEXT, conceptBookingLogUserId INTEGER, conceptBookingLogComments TEXT, conceptBookingLogDate TEXT, conceptBookingLogStatus INTEGER, hasDeparted INTEGER)";
         String createAdhocDimensionsTable = "CREATE TABLE adhocDimensions (id INTEGER PRIMARY KEY AUTOINCREMENT, qty INTEGER, height REAL, width REAL, length REAL, weight REAL, clientId INTEGER, bookingId INTEGER, vehicle TEXT, rate REAL)";
+        String createLabelTable = "CREATE TABLE parcelPalletLabel (id INTEGER PRIMARY KEY NOT NULL, bookingId INTEGER, barcodeNo TEXT, isScanned INTEGER )";
         db.execSQL(createUserTable);
         db.execSQL(createJobsTable);
         db.execSQL(createDriverStatusTable);
@@ -50,7 +52,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(createAdhocJobsTable);
         db.execSQL(createAdhocBookingLogTable);
         db.execSQL(createAdhocDimensionsTable);
-
+        db.execSQL(createLabelTable);
     }
 
     @Override
@@ -62,6 +64,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS adhocBooking");
         db.execSQL("DROP TABLE IF EXISTS adhocBookingLog");
         db.execSQL("DROP TABLE IF EXISTS adhocDimensions");
+        db.execSQL("DROP TABLE IF EXISTS parcelPalletLabel");
         this.onCreate(db);
     }
 
@@ -184,6 +187,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put("no_pallets", job.getNo_pallets());
             values.put("no_parcels", job.getNo_parcels());
             values.put("concept_job_number", job.getJobno());
+            values.put("is_picture_upload", job.isNeedPhoto() ? 1 : 0);
         }
         db.insert(table, null, values);
 
@@ -232,6 +236,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put("no_pallets", job.getNo_pallets());
             values.put("no_parcels", job.getNo_parcels());
             values.put("concept_job_number", job.getJobno());
+            values.put("not_scan_reason", job.getReason());
         }
         db.update(table, values, "conceptBookingId"+" = ?",new String[] { String.valueOf(job.getId()) });
 
@@ -341,6 +346,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
                     job.setJobno(cursor.getString(32));
+                    job.setReason(cursor.getString(33));
+                    job.setNeedPhoto(cursor.getString(34).equals("1"));
                 }
             } while (cursor.moveToNext());
         }
@@ -403,6 +410,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
                     job.setJobno(cursor.getString(32));
+                    job.setReason(cursor.getString(33));
+                    job.setNeedPhoto(cursor.getString(34).equals("1"));
                 }
 
                 jobs.add(job);
@@ -466,6 +475,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
                     job.setJobno(cursor.getString(32));
+                    job.setReason(cursor.getString(33));
+                    job.setNeedPhoto(cursor.getString(34).equals("1"));
                 }
 
                 jobs.add(job);
@@ -528,6 +539,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     job.setNo_pallets(cursor.getInt(30));
                     job.setNo_parcels(cursor.getInt(31));
                     job.setJobno(cursor.getString(32));
+                    job.setReason(cursor.getString(33));
+                    job.setNeedPhoto(cursor.getString(34).equals("1"));
                 }
 
                 jobs.add(job);
@@ -724,5 +737,69 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         exist = count != 0;
         db.close();
         return exist;
+    }
+
+    public void addLabel(ParcelPalletLabel label){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("id", label.getLabelId());
+        values.put("bookingId", label.getBookingId());
+        values.put("barcodeNo", label.getBarcode());
+        values.put("isScanned", label.isSacanned() ? 1 : 0);
+
+        db.insert("parcelPalletLabel", null, values);
+
+        db.close();
+    }
+
+    public List<ParcelPalletLabel> getLabelsForJob(int jobid){
+        List<ParcelPalletLabel> labels = new LinkedList<ParcelPalletLabel>();
+
+        String query = "SELECT * FROM parcelPalletLabel WHERE bookingId = " + jobid;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        ParcelPalletLabel label = null;
+        if (cursor.moveToFirst()) {
+            do {
+                label = new ParcelPalletLabel();
+                label.setLabelId(Integer.parseInt(cursor.getString(0)));
+                label.setBookingId(Integer.parseInt(cursor.getString(1)));
+                label.setBarcode(cursor.getString(2));
+                label.setSacanned(cursor.getString(3).equals("1"));
+
+                labels.add(label);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return labels;
+    }
+
+    public boolean labelExist(int id){
+        boolean exist;
+
+        String query = "SELECT COUNT(id) FROM parcelPalletLabel WHERE id =" + id +"";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                count = cursor.getInt(0);
+            } while (cursor.moveToNext());
+        }
+        exist = count != 0;
+        db.close();
+        return exist;
+    }
+
+    public void updateLabel(ParcelPalletLabel label){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("isScanned", label.isSacanned() ? 1 : 0);
+
+        db.update("parcelPalletLabel", values, "id"+" = ?",new String[] { String.valueOf(label.getLabelId()) });
+
+        db.close();
     }
 }

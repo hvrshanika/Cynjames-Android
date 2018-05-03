@@ -7,17 +7,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import au.com.cynjames.cjtv10.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.mainView.MainActivity;
+import au.com.cynjames.models.AdhocDimensions;
+import au.com.cynjames.models.ConceptBooking;
 
 public class CynFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -25,17 +39,56 @@ public class CynFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            SQLiteHelper db = new SQLiteHelper(this);
+            Gson gson = new Gson();
+            boolean isConcept = false;
+
+            String str = remoteMessage.getData().get("isConcept");
+            if(str.equals("true"))
+                isConcept = true;
+
+            ConceptBooking job = gson.fromJson(remoteMessage.getData().get("job"), ConceptBooking.class);
+            if(job != null) {
+                if (job.getConceptBookingStatus() == 1 || job.getConceptBookingStatus() == -1 || job.getConceptBookingStatus() == 6) {
+                    db.clearConcept(job.getId(), isConcept);
+                } else if (job.getConceptBookingStatus() == 10) {
+                    db.clearConcept(job.getId(), isConcept);
+                } else {
+                    db.updateJob(job, isConcept);
+                }
+
+                if (!isConcept) {
+                    String dStr = remoteMessage.getData().get("dimens");
+                    if (!dStr.equals("[]")) {
+                        JsonParser parser = new JsonParser();
+                        JsonElement element = parser.parse(dStr);
+                        JsonArray dimens = element.getAsJsonArray();
+                        if (dimens != null) {
+                            for (int i = 0; i < dimens.size(); i++) {
+                                JsonObject obj = dimens.get(i).getAsJsonObject();
+                                AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
+                                if (!db.dimenExist(dimen.getId())) {
+                                    db.addDimension(dimen);
+                                }
+                            }
+                        }
+                    }
+                }
+                refreshActivity();
+            }
         }
 
         if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getNotification().getBody(), remoteMessage.getNotification().getTitle());
+//            sendNotification(remoteMessage.getNotification().getBody(), remoteMessage.getNotification().getTitle());
         }
 
+    }
+
+    private void refreshActivity() {
+        Intent intent = new Intent("RefreshUI");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void sendNotification(String messageBody, String title){

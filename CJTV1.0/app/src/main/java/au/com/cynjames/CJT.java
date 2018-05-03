@@ -6,7 +6,7 @@ import android.location.Location;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**

@@ -27,7 +27,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -49,12 +51,14 @@ import java.util.List;
 import java.util.Stack;
 
 import au.com.cynjames.CJT;
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
+import au.com.cynjames.models.ParcelPalletLabel;
 import au.com.cynjames.models.User;
+import au.com.cynjames.utils.BarcodeScannerActivity;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
@@ -63,6 +67,7 @@ import static au.com.cynjames.utils.SQLiteHelper.DATABASE_VERSION;
 
 public class JobDetailsFragment extends DialogFragment implements JobsDetailsFragmentListener {
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_SCAN_BARCODE = 2;
     ConceptBooking job;
     Context context;
     WindowManager.LayoutParams params;
@@ -80,6 +85,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     Location loc;
     String addressStr;
     List<AdhocDimensions> adhocDimensions;
+    List<ParcelPalletLabel> labels;
     boolean isTonnage;
 
     public JobDetailsFragment() {
@@ -106,6 +112,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         user = db.getUser(id);
         loadImages();
         adhocDimensions = db.getDimenForJob(job.getId());
+        labels = db.getLabelsForJob(job.getId());
     }
 
     @Override
@@ -173,6 +180,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         TextView btnBack = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_back_button);
         ImageView btnCamera = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_camera_button);
         ImageView btnDirections = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_directions_button);
+        ImageView btnBarcode = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_barcode_button);
         TextView btnViewImages = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_images_view_button);
         TextView suburb = (TextView) viewRef.findViewById(R.id.list_item_suburb);
         TextView suburbLbl = (TextView) viewRef.findViewById(R.id.list_item_suburb_label);
@@ -243,6 +251,12 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnDepartClicked();
             }
         });
+        btnBarcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnBarcodeClicked();
+            }
+        });
 
         btnDepart.setVisibility(View.GONE);
         eta.setVisibility(View.VISIBLE);
@@ -257,6 +271,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
             clientName.setText(job.getClient());
             pallets.setText(String.valueOf(job.getPallets()));
             parcels.setText(String.valueOf(job.getParcels()));
+            btnBarcode.setVisibility(View.GONE);
+            addressLbl.setText(" \nAddress:");
         } else {
             pallets.setText(String.valueOf(job.getNo_pallets()));
             parcels.setText(String.valueOf(job.getNo_parcels()));
@@ -405,12 +421,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
-                if (!isConcept) {
-//                    btnDepart.setVisibility(View.VISIBLE);
-                }
+                btnBarcode.setVisibility(View.GONE);
             }
         }
         if (type.equals("DeliveryJobs") && user.getUserArriveClient() != null) {
+            btnBarcode.setVisibility(View.GONE);
             if (job.getConceptBookingStatus() == 8) {
                 btnProcess.setVisibility(View.VISIBLE);
             } else if (job.getConceptBookingStatus() == 9) {
@@ -418,9 +433,6 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 btnProcess.setText("Cancel");
                 btnCamera.setVisibility(View.GONE);
                 btnViewImages.setVisibility(View.GONE);
-                if (!isConcept) {
-//                    btnDepart.setVisibility(View.VISIBLE);
-                }
             }
         }
     }
@@ -440,6 +452,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     private void btnDepartClicked() {
         listener.handleDialogCloseImage("");
         dismiss();
+    }
+
+    private void btnBarcodeClicked() {
+        Intent intent = new Intent(context, BarcodeScannerActivity.class);
+        startActivityForResult(intent, REQUEST_SCAN_BARCODE);
     }
 
     private void btnBackClicked() {
@@ -477,6 +494,38 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     private void BtnProcessClicked() {
         if (type.equals("JobsPending")) {
             if (job.getConceptBookingStatus() == 7) {
+
+                if(job.isNeedPhoto() && (imageFileName == null || imageFileName == "")){
+                    GenericMethods.showMessage(context,"Error", "Please add a Photo before Processing");
+                    return;
+                }
+
+                int notScanned = 0;
+                for(ParcelPalletLabel label : labels){
+                    if(!label.isSacanned())
+                        notScanned++;
+                }
+                if(notScanned > 0){
+                    AlertDialog.Builder build = new AlertDialog.Builder(context);
+                    build.setTitle("Warning");
+                    build.setMessage("There are " + notScanned + " Barcodes left to scan");
+                    build.setCancelable(false);
+                    build.setPositiveButton("Continue Anyway", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            showProcessReasonDialog();
+                            dialog.dismiss();
+                        }
+                    });
+                    build.setNegativeButton("Go Back", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+                    build.create().show();
+
+                    return;
+                }
+
                 job.setConceptBookingStatus(2);
                 if (!isTonnage) {
                     job.setPallets(Integer.parseInt(pallets.getText().toString()));
@@ -512,10 +561,52 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 listener.handleDialogClose();
                 dismiss();
             } else if (job.getConceptBookingStatus() == 8) {
+                if(job.isNeedPhoto() && (imageFileName == null || imageFileName == "")){
+                    GenericMethods.showMessage(context,"Error", "Please add a Photo before Processing");
+                    return;
+                }
                 showProcessDialog().show();
             }
         }
 
+    }
+
+    private void showProcessReasonDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setMessage("Please enter the reason");
+        alertDialog.setCancelable(false);
+
+        final EditText input = new EditText(context);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+
+        alertDialog.setPositiveButton("Process",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String reason = input.getText().toString();
+                        job.setReason(reason);
+                        job.setConceptBookingStatus(2);
+                        if (!isTonnage) {
+                            job.setPallets(Integer.parseInt(pallets.getText().toString()));
+                            job.setParcels(Integer.parseInt(parcels.getText().toString()));
+                        }
+                        job.setConceptBookingPickupDate(GenericMethods.getDisplayDate(new Date()));
+                        job.setPickupImages(createImageString());
+                        db.updateJob(job, isConcept);
+                        listener.handleDialogClose();
+                        dismiss();
+                    }
+                });
+
+        alertDialog.setNegativeButton("Go Back",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
     }
 
     private AlertDialog showProcessDialog() {
@@ -672,6 +763,27 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == -1) {
             images.add(imageFileName);
+        }
+        else if (requestCode == REQUEST_SCAN_BARCODE && resultCode == -1) {
+            String barcode = data.getStringExtra("barcode");
+
+            boolean hasBarcode = false;
+            for(ParcelPalletLabel label : labels){
+                if(label.getBarcode().equals(barcode)){
+                    hasBarcode = true;
+                    if(label.isSacanned()) {
+                        GenericMethods.showMessage(context, "Message", "Barcode already scanned");
+                    }
+                    else{
+                        label.setSacanned(true);
+                        db.updateLabel(label);
+                    }
+                }
+            }
+
+            if(!hasBarcode){
+                GenericMethods.showMessage(context, "Error", "No matching Barcode found");
+            }
         }
     }
 

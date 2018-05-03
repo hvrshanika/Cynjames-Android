@@ -10,7 +10,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 
 /**
  * Created by SHANIKA on 11/19/2016.

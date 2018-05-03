@@ -82,6 +82,16 @@
         android:layout_toLeftOf="@+id/fragment_jobs_details_header_depart_button"
         android:src="@mipmap/imgpsh_fullsize" />
 
+    <ImageView
+        android:id="@+id/fragment_job_details_header_barcode_button"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignTop="@+id/fragment_job_details_header_back_button"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="2.5dp"
+        android:layout_toLeftOf="@+id/fragment_job_details_header_directions_button"
+        android:src="@mipmap/icon_barcode" />
+
     <View
         android:id="@+id/view_seperator"
         android:layout_width="match_parent"

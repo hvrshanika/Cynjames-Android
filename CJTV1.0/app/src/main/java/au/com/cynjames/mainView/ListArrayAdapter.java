@@ -13,7 +13,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.utils.SQLiteHelper;

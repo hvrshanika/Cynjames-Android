@@ -15,6 +15,45 @@
       },
       "oauth_client": [
         {
+          "client_id": "217788933046-c1b02svfad2uueuj77h9sanjccbm32gg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.cynjames.cjtv10",
+            "certificate_hash": "567bbc685293f1cf80aa90c2b3eb9d153d7176d3"
+          }
+        },
+        {
+          "client_id": "217788933046-vkp554bkvslnrl2qeh2jngoa8c6fu6bn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDagOl6uzrK42t4KqMBWSUcY9ieWdvqhBQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217788933046:android:288aa038ab6db9bc",
+        "android_client_info": {
+          "package_name": "au.com.cynjames.cjtv20"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "217788933046-vkp554bkvslnrl2qeh2jngoa8c6fu6bn.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -39,6 +39,24 @@ public class ConceptBooking implements Serializable {
     private int no_pallets;
     private int no_parcels;
     private String jobno;
+    private boolean needPhoto;
+    private String reason;
+
+    public boolean isNeedPhoto() {
+        return needPhoto;
+    }
+
+    public void setNeedPhoto(boolean needPhoto) {
+        this.needPhoto = needPhoto;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
     public int getCustomerType() {
         return customerType;

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import au.com.cynjames.CJT;
 import au.com.cynjames.mainView.MainActivity;
 import au.com.cynjames.utils.GenericMethods;
-import au.com.cynjames.cjtv10.R;
+import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.communication.HTTPHandler;
 import au.com.cynjames.communication.ResponseListener;
 import au.com.cynjames.models.User;
