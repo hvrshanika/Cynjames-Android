@@ -1,5 +1,6 @@
 package au.com.cynjames.mainView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -28,7 +30,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -144,6 +148,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     boolean isDepart = false;
     int currentSelected = 0;
     ProgressDialog logoutProgress;
+    boolean jobDetailsOpened = false;
+
+    String[] permissions = new String[]{
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
+            Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+            Manifest.permission.CAMERA
+    };
 
     private BroadcastReceiver mRefreshReceiver = new BroadcastReceiver() {
         @Override
@@ -223,7 +240,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             GenericMethods.showNoInternetDialog(context);
             GenericMethods.showMessage(context, "Error", "Please Login again!");
         }
-        startLocationService();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            checkPermissions();
+        }
+        else{
+            startLocationService();
+        }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
         LocalBroadcastManager.getInstance(this).registerReceiver(mRefreshReceiver, new IntentFilter("RefreshUI"));
         LocalBroadcastManager.getInstance(this).registerReceiver(mLogoutCallBack, new IntentFilter("LogoutCall"));
@@ -233,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void setActionBar() {
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = findViewById(R.id.viewpager);
         adapter = new CustomPagerAdapter(this, getLayoutInflater());
         viewPager.setAdapter(adapter);
         viewPager.setOnPageChangeListener(
@@ -259,12 +288,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 viewPager.setCurrentItem(tab.getPosition());
                 currentSelected = tab.getPosition();
                 checkDepartBtn();
-                TextView title = (TextView) tab.getCustomView().findViewById(R.id.tab_view_id);
+                TextView title = tab.getCustomView().findViewById(R.id.tab_view_id);
                 title.setTypeface(Typeface.DEFAULT_BOLD);
             }
 
             public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-                TextView title = (TextView) tab.getCustomView().findViewById(R.id.tab_view_id);
+                TextView title = tab.getCustomView().findViewById(R.id.tab_view_id);
                 title.setTypeface(Typeface.DEFAULT);
             }
 
@@ -277,33 +306,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         conceptTab.setCustomView(R.layout.tab_item);
         conceptTab.setTag("1");
         conceptTab.setTabListener(tabListener);
-        TextView tab_title_c = (TextView) conceptTab.getCustomView().findViewById(R.id.tab_view_id);
+        TextView tab_title_c = conceptTab.getCustomView().findViewById(R.id.tab_view_id);
         tab_title_c.setText("CONCEPT");
-        tab_count_concept = (TextView) conceptTab.getCustomView().findViewById(R.id.tab_view_count);
+        tab_count_concept = conceptTab.getCustomView().findViewById(R.id.tab_view_count);
         tab_count_concept.setTypeface(tab_count_concept.getTypeface(), Typeface.BOLD);
 
         ActionBar.Tab adhocTab = actionBar.newTab();
         adhocTab.setCustomView(R.layout.tab_item);
         adhocTab.setTag("2");
         adhocTab.setTabListener(tabListener);
-        TextView tab_title_a = (TextView) adhocTab.getCustomView().findViewById(R.id.tab_view_id);
+        TextView tab_title_a = adhocTab.getCustomView().findViewById(R.id.tab_view_id);
         tab_title_a.setText("ADHOC");
-        tab_count_adhoc = (TextView) adhocTab.getCustomView().findViewById(R.id.tab_view_count);
+        tab_count_adhoc = adhocTab.getCustomView().findViewById(R.id.tab_view_count);
         tab_count_adhoc.setTypeface(tab_count_adhoc.getTypeface(), Typeface.BOLD);
 
         ActionBar.Tab msgsTab = actionBar.newTab();
         msgsTab.setCustomView(R.layout.tab_item);
         msgsTab.setTag("3");
         msgsTab.setTabListener(tabListener);
-        TextView tab_title_m = (TextView) msgsTab.getCustomView().findViewById(R.id.tab_view_id);
+        TextView tab_title_m = msgsTab.getCustomView().findViewById(R.id.tab_view_id);
         tab_title_m.setText("MESSAGES");
-        tab_count_msgs = (TextView) msgsTab.getCustomView().findViewById(R.id.tab_view_count);
+        tab_count_msgs = msgsTab.getCustomView().findViewById(R.id.tab_view_count);
         tab_count_msgs.setTypeface(tab_count_msgs.getTypeface(), Typeface.BOLD);
 
         actionBar.addTab(conceptTab, true);
         actionBar.addTab(adhocTab);
         actionBar.addTab(msgsTab);
     }
+
+    private boolean checkPermissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p : permissions) {
+            result = ContextCompat.checkSelfPermission(this, p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 100);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocationService();
+            }
+            return;
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -470,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void init() {
-        TextView welcome = (TextView) findViewById(R.id.main_welcome_user_text);
+        TextView welcome = findViewById(R.id.main_welcome_user_text);
         welcome.setText("Welcome " + user.getUserFirstName());
 
         pendingCount = (TextView) adapter.getViewAtPosition(CustomPagerAdapter.CONCEPT_COUNT);
@@ -478,8 +534,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adhocJobsListView = (ListView) adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_LISTVIEW);
         adhocNoJobsVIew = adapter.getViewAtPosition(CustomPagerAdapter.ADHOC_NOJOBSVIEW);
 
-        pendingIcon = (ImageView) findViewById(R.id.main_truck_icon);
-        messagesCount = (TextView) findViewById(R.id.main_messages_count);
+        pendingIcon = findViewById(R.id.main_truck_icon);
+        messagesCount = findViewById(R.id.main_messages_count);
 
         pendingCount.setTypeface(pendingCount.getTypeface(), Typeface.BOLD);
         deliverReadyCount.setTypeface(deliverReadyCount.getTypeface(), Typeface.BOLD);
@@ -1141,6 +1197,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void openJobDetailsFrag(ConceptBooking job) {
+        jobDetailsOpened = true;
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -1246,6 +1303,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void handleDialogClose() {
+        jobDetailsOpened = false;
         resetDisconnectTimer();
         runOnUiThread(new Runnable() {
             public void run() {
@@ -1364,16 +1422,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 else
                     postAdhocJobsAssignedCheck++;
 
-                List<ConceptBooking> statusNineJobs = db.getPendingJobsWithStatus("9", concept);
-                if(statusNineJobs.size() == 0) {
-                    user.setUserArriveClient(null);
-                    db.updateUser(user);
-                }
+                if(!jobDetailsOpened){
+                    List<ConceptBooking> statusNineJobs = db.getPendingJobsWithStatus("9", concept);
+                    if(statusNineJobs.size() == 0) {
+                        user.setUserArriveClient(null);
+                        db.updateUser(user);
+                    }
 
-                List<ConceptBooking> statusTwoJobs = db.getPendingJobsWithStatus("2", concept);
-                if(statusTwoJobs.size() == 0) {
-                    user.setUserArriveConcept(null);
-                    db.updateUser(user);
+                    List<ConceptBooking> statusTwoJobs = db.getPendingJobsWithStatus("2", concept);
+                    if(statusTwoJobs.size() == 0) {
+                        user.setUserArriveConcept(null);
+                        db.updateUser(user);
+                    }
                 }
 
                 updateLabels();
@@ -1430,6 +1490,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (jSONObject.getInt("status") == 10) {
+                    ConceptBooking job = db.getJobForId(id,concept);
+                    String imageString = job.getPickupImages();
+                    if (imageString != null) {
+                        String[] imagesArr = imageString.split(",");
+                        for (String image : imagesArr) {
+                            if (!image.equals("")) {
+                                File file = new File(FILE_PATH, image);
+                                if(file != null)
+                                    file.delete();
+                            }
+                        }
+                    }
+
+
                     db.clearConcept(id, concept);
                 }
             }
@@ -1449,8 +1523,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             postImagesCount++;
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                File file = new File(FILE_PATH, name);
-                file.delete();
+                if(!name.contains("PJ")){
+                    File file = new File(FILE_PATH, name);
+                    if(file != null)
+                        file.delete();
+                }
+
             }
             isUpdatefinished();
         }

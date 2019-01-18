@@ -32,25 +32,26 @@ public class ImageFragment extends DialogFragment {
     private Context context;
     private ArrayList<String> imageInfo;
     private WindowManager.LayoutParams params;
+    private String type;
     ImageView imageView;
     ImageView btnBack;
     ImageView btnNext;
+    ImageView btnDelete;
     String FILE_PATH = Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator;
     String cuurentImage;
-    boolean firstImage = false;
-    boolean secondImage = false;
-    boolean thirdImage = false;
     JobsDetailsFragmentListener listener;
     String deletedImage;
+    int index = 0;
 
     public ImageFragment() {
         // Required empty public constructor
     }
 
-    public ImageFragment(Context context, ArrayList<String> imageInfo, WindowManager.LayoutParams params) {
+    public ImageFragment(Context context, ArrayList<String> imageInfo, WindowManager.LayoutParams params, String type) {
         this.context = context;
         this.imageInfo = imageInfo;
         this.params = params;
+        this.type = type;
     }
 
 
@@ -67,8 +68,7 @@ public class ImageFragment extends DialogFragment {
         rootView = inflater.inflate(R.layout.fragment_image, container, false);
         setButtonListeners(rootView);
         if (imageInfo.size() > 0) {
-            firstImage = true;
-            setImage(imageInfo.get(0));
+            setImage(imageInfo.get(index));
         } else {
             GenericMethods.showToast(context, "No Images");
         }
@@ -79,32 +79,40 @@ public class ImageFragment extends DialogFragment {
     }
 
     private void setButtonListeners(View view) {
-        btnNext = (ImageView) view.findViewById(R.id.image_fragment_next_button);
+        btnNext = view.findViewById(R.id.image_fragment_next_button);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 nextBtnClicked();
             }
         });
-        btnBack = (ImageView) view.findViewById(R.id.image_fragment_back_button);
+        btnBack = view.findViewById(R.id.image_fragment_back_button);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 backBtnClicked();
             }
         });
-        ImageView btnDelete = (ImageView) view.findViewById(R.id.image_fragment_delete_button);
+        btnDelete = view.findViewById(R.id.image_fragment_delete_button);
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deleteBtnClicked();
             }
         });
-        imageView = (ImageView) view.findViewById(R.id.image_fragment_image);
+        imageView = view.findViewById(R.id.image_fragment_image);
     }
 
     private void setImage(String imageName) {
         cuurentImage = imageName;
+
+        if (type.equals("DeliveryJobs") && cuurentImage.contains("PJ")) {
+            btnDelete.setVisibility(View.INVISIBLE);
+        }
+        else{
+            btnDelete.setVisibility(View.VISIBLE);
+        }
+
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 8;
         String strPath = FILE_PATH + "" + imageName + "";
@@ -117,34 +125,19 @@ public class ImageFragment extends DialogFragment {
     }
 
     private void nextBtnClicked() {
-        if (firstImage) {
-            secondImage = true;
-            firstImage = false;
-            setImage(imageInfo.get(1));
-            btnBack.setVisibility(View.VISIBLE);
-        } else if (secondImage) {
-            secondImage = false;
-            thirdImage = true;
-            if (imageInfo.size() > 2) {
-                setImage(imageInfo.get(2));
-                btnNext.setVisibility(View.INVISIBLE);
-            }
-        }
+        index++;
+        setImage(imageInfo.get(index));
+        btnBack.setVisibility(View.VISIBLE);
+        if(imageInfo.size() == index+1)
+            btnNext.setVisibility(View.INVISIBLE);
     }
 
     private void backBtnClicked() {
-        if (thirdImage) {
-            thirdImage = firstImage;
-            secondImage = true;
-            btnNext.setVisibility(View.VISIBLE);
-            setImage(imageInfo.get(1));
-        } else if (secondImage) {
-            secondImage = false;
-            firstImage = true;
+        index--;
+        setImage(imageInfo.get(index));
+        btnNext.setVisibility(View.VISIBLE);
+        if(index == 0)
             btnBack.setVisibility(View.INVISIBLE);
-            setImage(imageInfo.get(0));
-        }
-
     }
 
     private void deleteBtnClicked() {

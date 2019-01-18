@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -45,6 +46,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +61,7 @@ import au.com.cynjames.models.ConceptBooking;
 import au.com.cynjames.models.ParcelPalletLabel;
 import au.com.cynjames.models.User;
 import au.com.cynjames.utils.BarcodeScannerActivity;
+import au.com.cynjames.utils.GenericFileProvider;
 import au.com.cynjames.utils.GenericMethods;
 import au.com.cynjames.utils.LocationService;
 import au.com.cynjames.utils.SQLiteHelper;
@@ -78,6 +81,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     TextView parcels;
     String type;
     ArrayList<String> images;
+    ArrayList<String> pickupImages;
     String imageFileName;
     boolean rejected = false;
     boolean isConcept;
@@ -105,6 +109,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         super.onCreate(savedInstanceState);
         db = new SQLiteHelper(context);
         images = new ArrayList<>();
+        pickupImages = new ArrayList<>();
         SharedPreferences mPrefs = context.getSharedPreferences("AppData" + DATABASE_VERSION, 0);
         Gson gson = new Gson();
         String jsonUser = mPrefs.getString("User", "");
@@ -175,45 +180,45 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     }
 
     private void setLabels(View viewRef) {
-        TextView jobNo = (TextView) viewRef.findViewById(R.id.list_item_job_no);
-        TextView jobNoLbl = (TextView) viewRef.findViewById(R.id.list_item_job_no_label);
-        TextView btnBack = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_back_button);
-        ImageView btnCamera = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_camera_button);
-        ImageView btnDirections = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_directions_button);
-        ImageView btnBarcode = (ImageView) viewRef.findViewById(R.id.fragment_job_details_header_barcode_button);
-        TextView btnViewImages = (TextView) viewRef.findViewById(R.id.fragment_job_details_header_images_view_button);
-        TextView suburb = (TextView) viewRef.findViewById(R.id.list_item_suburb);
-        TextView suburbLbl = (TextView) viewRef.findViewById(R.id.list_item_suburb_label);
-        TextView orderNo = (TextView) viewRef.findViewById(R.id.list_item_order_no);
-        TextView orderNoTypeTL = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_tl);
-        TextView orderNoTypeHU = (TextView) viewRef.findViewById(R.id.list_item_order_no_type_hu);
-        TextView clientNameLbl = (TextView) viewRef.findViewById(R.id.list_item_client_name_label);
-        TextView clientName = (TextView) viewRef.findViewById(R.id.list_item_client_name);
-        TextView customerName = (TextView) viewRef.findViewById(R.id.list_item_customer_name);
-        TextView customerNameLbl = (TextView) viewRef.findViewById(R.id.list_item_customer_name_label);
-        TextView bookingTime = (TextView) viewRef.findViewById(R.id.list_item_booking_time);
-        pallets = (TextView) viewRef.findViewById(R.id.list_item_pallets);
-        TextView palletsLbl = (TextView) viewRef.findViewById(R.id.list_item_pallets_label);
-        parcels = (TextView) viewRef.findViewById(R.id.list_item_parcels);
-        TextView parcelsLbl = (TextView) viewRef.findViewById(R.id.list_item_parcels_label);
-        TextView address = (TextView) viewRef.findViewById(R.id.list_item_address);
-        TextView addressLbl = (TextView) viewRef.findViewById(R.id.list_item_address_label);
-        TextView notes = (TextView) viewRef.findViewById(R.id.list_item_notes);
-        eta = (TextView) viewRef.findViewById(R.id.list_item_eta);
-        TextView etaLbl = (TextView) viewRef.findViewById(R.id.list_item_eta_label);
-        distance = (TextView) viewRef.findViewById(R.id.list_item_distance);
-        TextView distanceLbl = (TextView) viewRef.findViewById(R.id.list_item_distance_label);
-        TextView btnProcess = (TextView) viewRef.findViewById(R.id.list_item_process_button);
-        TextView deliveryClientName = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name);
-        TextView deliveryClientNameLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_client_name_label);
-        TextView deliveryAdd = (TextView) viewRef.findViewById(R.id.list_item_delivery_address);
-        TextView deliveryAddLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_address_label);
-        TextView deliverySuburb = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb);
-        TextView deliverySuburbLbl = (TextView) viewRef.findViewById(R.id.list_item_delivery_suburb_label);
-        TextView vehicleLbl = (TextView) viewRef.findViewById(R.id.list_item_vehicle_label);
-        TextView vehicle = (TextView) viewRef.findViewById(R.id.list_item_vehicle);
-        TextView btnDepart = (TextView) viewRef.findViewById(R.id.fragment_jobs_details_header_depart_button);
-        TableLayout dimensTable = (TableLayout) viewRef.findViewById(R.id.list_item_dimens_table);
+        TextView jobNo = viewRef.findViewById(R.id.list_item_job_no);
+        TextView jobNoLbl = viewRef.findViewById(R.id.list_item_job_no_label);
+        TextView btnBack = viewRef.findViewById(R.id.fragment_job_details_header_back_button);
+        ImageView btnCamera = viewRef.findViewById(R.id.fragment_job_details_header_camera_button);
+        ImageView btnDirections = viewRef.findViewById(R.id.fragment_job_details_header_directions_button);
+        ImageView btnBarcode = viewRef.findViewById(R.id.fragment_job_details_header_barcode_button);
+        TextView btnViewImages = viewRef.findViewById(R.id.fragment_job_details_header_images_view_button);
+        TextView suburb = viewRef.findViewById(R.id.list_item_suburb);
+        TextView suburbLbl = viewRef.findViewById(R.id.list_item_suburb_label);
+        TextView orderNo = viewRef.findViewById(R.id.list_item_order_no);
+        TextView orderNoTypeTL = viewRef.findViewById(R.id.list_item_order_no_type_tl);
+        TextView orderNoTypeHU = viewRef.findViewById(R.id.list_item_order_no_type_hu);
+        TextView clientNameLbl = viewRef.findViewById(R.id.list_item_client_name_label);
+        TextView clientName = viewRef.findViewById(R.id.list_item_client_name);
+        TextView customerName = viewRef.findViewById(R.id.list_item_customer_name);
+        TextView customerNameLbl = viewRef.findViewById(R.id.list_item_customer_name_label);
+        TextView bookingTime = viewRef.findViewById(R.id.list_item_booking_time);
+        pallets = viewRef.findViewById(R.id.list_item_pallets);
+        TextView palletsLbl = viewRef.findViewById(R.id.list_item_pallets_label);
+        parcels = viewRef.findViewById(R.id.list_item_parcels);
+        TextView parcelsLbl = viewRef.findViewById(R.id.list_item_parcels_label);
+        TextView address = viewRef.findViewById(R.id.list_item_address);
+        TextView addressLbl = viewRef.findViewById(R.id.list_item_address_label);
+        TextView notes = viewRef.findViewById(R.id.list_item_notes);
+        eta = viewRef.findViewById(R.id.list_item_eta);
+        TextView etaLbl = viewRef.findViewById(R.id.list_item_eta_label);
+        distance = viewRef.findViewById(R.id.list_item_distance);
+        TextView distanceLbl = viewRef.findViewById(R.id.list_item_distance_label);
+        TextView btnProcess = viewRef.findViewById(R.id.list_item_process_button);
+        TextView deliveryClientName = viewRef.findViewById(R.id.list_item_delivery_client_name);
+        TextView deliveryClientNameLbl = viewRef.findViewById(R.id.list_item_delivery_client_name_label);
+        TextView deliveryAdd = viewRef.findViewById(R.id.list_item_delivery_address);
+        TextView deliveryAddLbl = viewRef.findViewById(R.id.list_item_delivery_address_label);
+        TextView deliverySuburb = viewRef.findViewById(R.id.list_item_delivery_suburb);
+        TextView deliverySuburbLbl = viewRef.findViewById(R.id.list_item_delivery_suburb_label);
+        TextView vehicleLbl = viewRef.findViewById(R.id.list_item_vehicle_label);
+        TextView vehicle = viewRef.findViewById(R.id.list_item_vehicle);
+        TextView btnDepart = viewRef.findViewById(R.id.fragment_jobs_details_header_depart_button);
+        TableLayout dimensTable = viewRef.findViewById(R.id.list_item_dimens_table);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -495,7 +500,7 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         if (type.equals("JobsPending")) {
             if (job.getConceptBookingStatus() == 7) {
 
-                if(job.isNeedPhoto() && (imageFileName == null || imageFileName == "")){
+                if(job.isNeedPhoto() && (images == null || images.size() == 0)){
                     GenericMethods.showMessage(context,"Error", "Please add a Photo before Processing");
                     return;
                 }
@@ -712,7 +717,8 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
                 }
                 if (photoFile != null) {
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                    Uri photoURI = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".au.com.cynjames.utils.GenericFileProvider", photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
@@ -733,7 +739,15 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
     private File createImageFile() throws IOException {
         long time = System.currentTimeMillis();
-        imageFileName = job.getId() + "_" + time + ".jpg";
+
+        String jobType = "";
+        if (type.equals("JobsPending")) {
+            jobType = "PJ";
+        }
+        else if (type.equals("DeliveryJobs")) {
+            jobType = "DJ";
+        }
+        imageFileName = job.getId() + "_" + time + "_" + jobType + ".jpg";
 
         File dir = new File(Environment.getExternalStorageDirectory() + File.separator + ".CJT-AppData" + File.separator);
         dir.mkdir();
@@ -744,13 +758,16 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
     }
 
     private void viewImagesBtnClicked() {
-        if (images.size() > 0) {
+        if (images.size() > 0 || pickupImages.size() > 0) {
+            ArrayList<String> allImages = new ArrayList<>();
+            allImages.addAll(pickupImages);
+            allImages.addAll(images);
             WindowManager.LayoutParams params = new WindowManager.LayoutParams();
             params.width = WindowManager.LayoutParams.MATCH_PARENT;
             params.height = WindowManager.LayoutParams.MATCH_PARENT;
             params.gravity = Gravity.CENTER;
             FragmentManager fm = getFragmentManager();
-            ImageFragment imageFragment = new ImageFragment(context, images, params);
+            ImageFragment imageFragment = new ImageFragment(context, allImages, params, type);
             imageFragment.setListener(this);
             imageFragment.setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar);
             imageFragment.show(fm, "job_fragment");
@@ -766,6 +783,11 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
         }
         else if (requestCode == REQUEST_SCAN_BARCODE && resultCode == -1) {
             String barcode = data.getStringExtra("barcode");
+
+            if(barcode.contains("'")){
+                String[] arr = barcode.split("'");
+                barcode = arr[1];
+            }
 
             boolean hasBarcode = false;
             for(ParcelPalletLabel label : labels){
@@ -783,6 +805,14 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
 
             if(!hasBarcode){
                 GenericMethods.showMessage(context, "Error", "No matching Barcode found");
+            }
+            else{
+                int scanned = 0;
+                for(ParcelPalletLabel label : labels){
+                    if(label.isSacanned())
+                        scanned++;
+                }
+                GenericMethods.showToast(context,scanned + " of " + labels.size() + " scanned");
             }
         }
     }
@@ -820,6 +850,16 @@ public class JobDetailsFragment extends DialogFragment implements JobsDetailsFra
                 for (String image : imagesArr) {
                     if (!image.equals("")) {
                         images.add(image);
+                    }
+                }
+            }
+
+            String pickupImageString = job.getPickupImages();
+            if (pickupImageString != null) {
+                String[] imagesArr = pickupImageString.split(",");
+                for (String image : imagesArr) {
+                    if (!image.equals("")) {
+                        pickupImages.add(image);
                     }
                 }
             }

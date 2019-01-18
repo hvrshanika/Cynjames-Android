@@ -71,8 +71,10 @@ public class LocationService extends Service implements LocationListener,
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        }
     }
 
     @Override

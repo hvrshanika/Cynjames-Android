@@ -151,12 +151,12 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void init() {
-        jobsListView = (ListView) findViewById(R.id.fragment_jobs_list_jobs_list);
+        jobsListView = findViewById(R.id.fragment_jobs_list_jobs_list);
         jobsListView.setAdapter(adapter);
         jobsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         jobsListView.setOnItemClickListener(this);
 
-        TextView header = (TextView) findViewById(R.id.fragment_jobs_list_header_text);
+        TextView header = findViewById(R.id.fragment_jobs_list_header_text);
         String headerText;
         if(isConcept){
             headerText = "Concept Jobs";
@@ -172,21 +172,21 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void setButtonListeners() {
-        TextView backBtn = (TextView) findViewById(R.id.fragment_jobs_list_header_back_button);
+        TextView backBtn = findViewById(R.id.fragment_jobs_list_header_back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 backBtnClicked();
             }
         });
-        btnDepart = (TextView) findViewById(R.id.fragment_jobs_list_header_depart_button);
+        btnDepart = findViewById(R.id.fragment_jobs_list_header_depart_button);
         btnDepart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnDepartClicked();
             }
         });
-        btnCancel = (TextView) findViewById(R.id.fragment_jobs_list_header_cancel_button);
+        btnCancel = findViewById(R.id.fragment_jobs_list_header_cancel_button);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -762,6 +762,19 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
                 if (jSONObject.getInt("status") == 10) {
+                    ConceptBooking job = db.getJobForId(id,concept);
+                    String imageString = job.getPickupImages();
+                    if (imageString != null) {
+                        String[] imagesArr = imageString.split(",");
+                        for (String image : imagesArr) {
+                            if (!image.equals("")) {
+                                File file = new File(FILE_PATH, image);
+                                if(file != null)
+                                    file.delete();
+                            }
+                        }
+                    }
+
                     db.clearConcept(id, concept);
                 }
             }
@@ -779,8 +792,11 @@ public class JobsListActivity extends AppCompatActivity implements AdapterView.O
         public void onSuccess(JSONObject jSONObject) throws JSONException {
             Log.d("Response", jSONObject.toString());
             if (jSONObject.getInt("success") == 1) {
-                File file = new File(FILE_PATH, name);
-                file.delete();
+                if(!name.contains("PJ")){
+                    File file = new File(FILE_PATH, name);
+                    if(file != null)
+                        file.delete();
+                }
             }
         }
     }

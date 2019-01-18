@@ -32,6 +32,7 @@ import au.com.cynjames.cjtv20.R;
 import au.com.cynjames.mainView.MainActivity;
 import au.com.cynjames.models.AdhocDimensions;
 import au.com.cynjames.models.ConceptBooking;
+import au.com.cynjames.models.ParcelPalletLabel;
 
 public class CynFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -71,6 +72,21 @@ public class CynFirebaseMessagingService extends FirebaseMessagingService {
                                 AdhocDimensions dimen = gson.fromJson(obj.toString(), AdhocDimensions.class);
                                 if (!db.dimenExist(dimen.getId())) {
                                     db.addDimension(dimen);
+                                }
+                            }
+                        }
+                    }
+                    String lStr = remoteMessage.getData().get("labels");
+                    if (!lStr.equals("[]")) {
+                        JsonParser parser = new JsonParser();
+                        JsonElement element = parser.parse(lStr);
+                        JsonArray labels = element.getAsJsonArray();
+                        if (labels != null) {
+                            for (int i = 0; i < labels.size(); i++) {
+                                JsonObject obj = labels.get(i).getAsJsonObject();
+                                ParcelPalletLabel label = gson.fromJson(obj.toString(), ParcelPalletLabel.class);
+                                if (!db.labelExist(label.getLabelId())) {
+                                    db.addLabel(label);
                                 }
                             }
                         }

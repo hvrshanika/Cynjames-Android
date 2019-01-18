@@ -82,6 +82,17 @@
             android:name="au.com.cynjames.utils.LogoutTaskAlarm"
             android:enabled="true"
             android:exported="true"></receiver>
+
+        <provider
+            android:name="au.com.cynjames.utils.GenericFileProvider"
+            android:authorities="${applicationId}.au.com.cynjames.utils.GenericFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
     </application>
 
 </manifest>
